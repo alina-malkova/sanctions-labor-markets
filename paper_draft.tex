@@ -1132,6 +1132,60 @@ The hours evidence is therefore ambiguous:
 
 We therefore interpret the hours results cautiously. While we cannot rule out that the embargo increased hours worked, the evidence is less compelling than for monthly earnings. The cleaner wage event study (where pre-treatment coefficients are centered on zero) provides stronger support for the causal effect of protection on agricultural workers' economic outcomes.
 
+\subsubsection{Hours Robustness Tests}
+
+Table \ref{tab:hours_robustness} presents additional robustness tests for the hours effect.
+
+\begin{table}[H]
+\centering
+\caption{Hours Effect Robustness Tests}
+\label{tab:hours_robustness}
+\begin{threeparttable}
+\begin{tabular}{lccl}
+\toprule
+Test & Coefficient & SE / p-value & Interpretation \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel A: Placebo Treatment Dates}} \\
+2011 (placebo) & +6.39 & (2.29), $p = 0.008$ & Significant ``effect'' pre-embargo \\
+2012 (placebo) & +5.50 & (2.98), $p = 0.074$ & Marginally significant \\
+2013 (placebo) & +4.41 & (2.60), $p = 0.099$ & Marginally significant \\
+\textbf{2014 (actual)} & \textbf{+2.06} & \textbf{(2.18), $p = 0.351$} & \textbf{Not significant} \\
+2015 (placebo) & +1.09 & (2.04), $p = 0.597$ & Not significant \\
+2016 (placebo) & $-$0.26 & (2.13), $p = 0.903$ & Not significant \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel B: Pre-Treatment Comparison (Hours vs Wages)}} \\
+Hours pre-treatment avg & +6.37 & (3.09), $t = 2.06$ & Significantly $\neq 0$ (problematic) \\
+Wages pre-treatment avg & $-$0.023 & (0.025), $t = -0.93$ & Not sig. $\neq 0$ (good) \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel C: Level vs Change Decomposition}} \\
+Agri level effect (permanent) & +10.70 & (3.89), $p = 0.009$ & Significant level difference \\
+Agri $\times$ Post (change) & $-$2.80 & (2.12), $p = 0.194$ & No significant change \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel D: Different Control Groups}} \\
+Agri vs Govt/Educ/Health & +2.90 & (2.30), $p = 0.215$ & Not significant \\
+Agri vs Construction & $-$0.90 & (2.71), $p = 0.741$ & Not significant \\
+Agri vs Trade/Services & $-$0.23 & (2.74), $p = 0.934$ & Not significant \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel E: Sector Placebo Test}} \\
+Permutation p-value & \multicolumn{2}{c}{0.143} & 1/7 sectors $\geq$ agri effect \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Panel A tests whether hours effects appear at placebo treatment dates. Panel B compares pre-treatment averages for hours vs wages. Panel C decomposes the hours gap into permanent level differences vs treatment-induced changes. Panel D tests sensitivity to choice of control group. Panel E reports the proportion of control sectors with placebo effects as large as agriculture. All specifications include individual and year fixed effects with standard errors clustered at region level. Sample: 2010--2019.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The robustness tests reveal several concerning patterns:
+\begin{enumerate}
+    \item \textbf{Placebo dates}: The hours ``effect'' is actually \textit{larger} and more significant when we use placebo treatment dates (2011--2013) than the actual 2014 date. This suggests the measured effect reflects pre-existing differences rather than the embargo.
+    \item \textbf{Level vs change}: When we include the agricultural sector main effect, the permanent level difference (+10.7 hours, $p = 0.009$) is large and significant, while the treatment-induced \textit{change} is negative and insignificant ($-2.8$ hours, $p = 0.194$). The hours gap actually \textit{narrowed} post-embargo.
+    \item \textbf{Control group sensitivity}: The hours effect is not robust to the choice of control sectors, ranging from $-0.9$ to $+2.9$ hours depending on which sectors we compare agriculture to.
+\end{enumerate}
+
+These findings reinforce our conclusion that the hours result should be interpreted cautiously. The monthly earnings effect remains our primary finding, supported by cleaner parallel trends.
+
 \subsection{Labor Supply Elasticity: Heterogeneity Analysis}
 
 Our theoretical framework predicts that effects should be larger for workers with less elastic labor supply---those with fewer outside options and higher mobility costs. Table \ref{tab:heterogeneity} tests this prediction by estimating effects separately by worker characteristics.

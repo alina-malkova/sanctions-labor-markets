@@ -1,0 +1,948 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_hours_robustness_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 16:10:59
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "HOURS ROBUSTNESS ANALYSIS"
+HOURS ROBUSTNESS ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. ********************************************************************************
+. * TEST 1: Placebo Treatment Dates
+. * If 2014 is real, placebo dates should show no effect
+. ********************************************************************************
+. 
+. di _n "=== TEST 1: PLACEBO TREATMENT DATES ==="
+
+=== TEST 1: PLACEBO TREATMENT DATES ===
+
+. 
+. * Store results
+. tempname results
+
+. postfile `results' placebo_year coef se pval using "output/tables/hours_placebo_dates.dt
+> a", replace
+
+. 
+. foreach placebo_year in 2011 2012 2013 2015 2016 {
+  2.     gen post_placebo = (year >= `placebo_year')
+  3.     gen agri_post_placebo = agri * post_placebo
+  4. 
+.     quietly reghdfe hours_month agri_post_placebo, absorb(idind year) cluster(region)
+  5.     local coef = _b[agri_post_placebo]
+  6.     local se = _se[agri_post_placebo]
+  7.     local pval = 2 * ttail(e(df_r), abs(_b[agri_post_placebo]/_se[agri_post_placebo])
+> )
+  8. 
+.     post `results' (`placebo_year') (`coef') (`se') (`pval')
+  9. 
+.     di "Placebo year `placebo_year': coef = " %6.2f `coef' ", SE = " %6.2f `se' ", p = "
+>  %5.3f `pval'
+ 10. 
+.     drop post_placebo agri_post_placebo
+ 11. }
+Placebo year 2011: coef =   6.39, SE =   2.29, p = 0.008
+Placebo year 2012: coef =   5.50, SE =   2.98, p = 0.074
+Placebo year 2013: coef =   4.41, SE =   2.60, p = 0.099
+Placebo year 2015: coef =   1.09, SE =   2.04, p = 0.597
+Placebo year 2016: coef =  -0.26, SE =   2.13, p = 0.903
+
+. 
+. * Also test actual 2014
+. gen post_2014 = (year >= 2014)
+
+. gen agri_post_2014 = agri * post_2014
+
+. quietly reghdfe hours_month agri_post_2014, absorb(idind year) cluster(region)
+
+. local coef = _b[agri_post_2014]
+
+. local se = _se[agri_post_2014]
+
+. local pval = 2 * ttail(e(df_r), abs(_b[agri_post_2014]/_se[agri_post_2014]))
+
+. post `results' (2014) (`coef') (`se') (`pval')
+
+. di "Actual 2014: coef = " %6.2f `coef' ", SE = " %6.2f `se' ", p = " %5.3f `pval'
+Actual 2014: coef =   2.06, SE =   2.18, p = 0.351
+
+. drop post_2014 agri_post_2014
+
+. 
+. postclose `results'
+
+. 
+. * Display placebo results
+. preserve
+
+. use "output/tables/hours_placebo_dates.dta", clear
+
+. di _n "=== Placebo Date Results ==="
+
+=== Placebo Date Results ===
+
+. list
+
+     +--------------------------------------------+
+     | placeb~r        coef         se       pval |
+     |--------------------------------------------|
+  1. |     2011    6.392844   2.285432    .008132 |
+  2. |     2012    5.497676   2.984888   .0735256 |
+  3. |     2013    4.407506   2.603493   .0988758 |
+  4. |     2015    1.087433   2.036498   .5965547 |
+  5. |     2016   -.2622998   2.133824    .902832 |
+     |--------------------------------------------|
+  6. |     2014    2.064307   2.184292   .3507546 |
+     +--------------------------------------------+
+
+. restore
+
+. 
+. ********************************************************************************
+. * TEST 2: Pre-Trend Slope Test
+. * Is there a trend in pre-period hours gap?
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "TEST 2: PRE-TREND SLOPE TEST"
+TEST 2: PRE-TREND SLOPE TEST
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Create interaction with linear time trend (pre-period only)
+. gen rel_year = year - 2014
+
+. gen agri_trend = agri * rel_year
+
+. 
+. * Test for pre-period trend
+. preserve
+
+. keep if year < 2014
+(43,034 observations deleted)
+
+. reghdfe hours_month agri_trend, absorb(idind year) cluster(region)
+(dropped 5504 singleton observations)
+(MWFE estimator converged in 5 iterations)
+
+HDFE Linear regression                            Number of obs   =     26,342
+Absorbing 2 HDFE groups                           F(   1,     37) =       0.20
+Statistics robust to heteroskedasticity           Prob > F        =     0.6578
+                                                  R-squared       =     0.6268
+                                                  Adj R-squared   =     0.4329
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         38         Root MSE        =    38.2924
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  agri_trend |  -.4932962   1.104636    -0.45   0.658    -2.731501    1.744908
+       _cons |   176.5253   .1297869  1360.12   0.000     176.2623    176.7883
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      9003        9003           0    *|
+        year |         4           0           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. di _n "Pre-period trend in agri hours gap:"
+
+Pre-period trend in agri hours gap:
+
+. di "  Coefficient (hours/year): " _b[agri_trend]
+  Coefficient (hours/year): -.49329615
+
+. di "  SE: " _se[agri_trend]
+  SE: 1.1046357
+
+. di "  p-value: " 2 * ttail(e(df_r), abs(_b[agri_trend]/_se[agri_trend]))
+  p-value: .65778912
+
+. 
+. * Interpretation
+. if abs(_b[agri_trend]) < 2 & 2*ttail(e(df_r), abs(_b[agri_trend]/_se[agri_trend])) > 0.1
+>  {
+.     di "  --> No significant pre-trend detected"
+  --> No significant pre-trend detected
+. }
+
+. else {
+.     di "  --> WARNING: Pre-trend may be present"
+. }
+
+. restore
+
+. 
+. ********************************************************************************
+. * TEST 3: Compare Hours vs Wages Event Studies Formally
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "TEST 3: HOURS VS WAGES EVENT STUDY COMPARISON"
+TEST 3: HOURS VS WAGES EVENT STUDY COMPARISON
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Create event study dummies
+. gen Dm4 = (rel_year == -4) * agri
+
+. gen Dm3 = (rel_year == -3) * agri
+
+. gen Dm2 = (rel_year == -2) * agri
+
+. gen Dp0 = (rel_year == 0) * agri
+
+. gen Dp1 = (rel_year == 1) * agri
+
+. gen Dp2 = (rel_year == 2) * agri
+
+. gen Dp3 = (rel_year == 3) * agri
+
+. gen Dp4 = (rel_year == 4) * agri
+
+. gen Dp5 = (rel_year == 5) * agri
+
+. 
+. * Hours event study - store coefficients
+. quietly reghdfe hours_month Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5, absorb(idind year) clus
+> ter(region)
+
+. matrix hours_coef = e(b)
+
+. matrix hours_V = e(V)
+
+. 
+. * Calculate average pre and post for hours
+. lincom (Dm4 + Dm3 + Dm2) / 3
+
+ ( 1)  .3333333*Dm4 + .3333333*Dm3 + .3333333*Dm2 = 0
+
+------------------------------------------------------------------------------
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |   6.367654   3.090708     2.06   0.046     .1052843    12.63002
+------------------------------------------------------------------------------
+
+. local hours_pre = r(estimate)
+
+. local hours_pre_se = r(se)
+
+. 
+. lincom (Dp0 + Dp1 + Dp2 + Dp3 + Dp4 + Dp5) / 6
+
+ ( 1)  .1666667*Dp0 + .1666667*Dp1 + .1666667*Dp2 + .1666667*Dp3 + .1666667*Dp4 +
+       .1666667*Dp5 = 0
+
+------------------------------------------------------------------------------
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |   4.306383   2.834311     1.52   0.137    -1.436477    10.04924
+------------------------------------------------------------------------------
+
+. local hours_post = r(estimate)
+
+. local hours_post_se = r(se)
+
+. 
+. * Wages event study
+. quietly reghdfe ln_wage Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5, absorb(idind year) cluster(
+> region)
+
+. 
+. * Calculate average pre and post for wages
+. lincom (Dm4 + Dm3 + Dm2) / 3
+
+ ( 1)  .3333333*Dm4 + .3333333*Dm3 + .3333333*Dm2 = 0
+
+------------------------------------------------------------------------------
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |  -.0232595   .0250101    -0.93   0.358    -.0739348    .0274157
+------------------------------------------------------------------------------
+
+. local wages_pre = r(estimate)
+
+. local wages_pre_se = r(se)
+
+. 
+. lincom (Dp0 + Dp1 + Dp2 + Dp3 + Dp4 + Dp5) / 6
+
+ ( 1)  .1666667*Dp0 + .1666667*Dp1 + .1666667*Dp2 + .1666667*Dp3 + .1666667*Dp4 +
+       .1666667*Dp5 = 0
+
+------------------------------------------------------------------------------
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |   .0245061   .0310697     0.79   0.435    -.0384471    .0874593
+------------------------------------------------------------------------------
+
+. local wages_post = r(estimate)
+
+. local wages_post_se = r(se)
+
+. 
+. di _n "=== Pre-Treatment Averages ==="
+
+=== Pre-Treatment Averages ===
+
+. di "Hours: " %6.2f `hours_pre' " (SE: " %5.2f `hours_pre_se' ")"
+Hours:   6.37 (SE:  3.09)
+
+. di "Wages: " %6.4f `wages_pre' " (SE: " %6.4f `wages_pre_se' ")"
+Wages: -0.0233 (SE: 0.0250)
+
+. 
+. di _n "=== Post-Treatment Averages ==="
+
+=== Post-Treatment Averages ===
+
+. di "Hours: " %6.2f `hours_post' " (SE: " %5.2f `hours_post_se' ")"
+Hours:   4.31 (SE:  2.83)
+
+. di "Wages: " %6.4f `wages_post' " (SE: " %6.4f `wages_post_se' ")"
+Wages: 0.0245 (SE: 0.0311)
+
+. 
+. di _n "=== Pre-Treatment: Significantly Different from Zero? ==="
+
+=== Pre-Treatment: Significantly Different from Zero? ===
+
+. di "Hours pre: t = " %5.2f `hours_pre'/`hours_pre_se' " --> " cond(abs(`hours_pre'/`hour
+> s_pre_se') > 2, "YES (problematic)", "NO (good)")
+Hours pre: t =  2.06 --> YES (problematic)
+
+. di "Wages pre: t = " %5.2f `wages_pre'/`wages_pre_se' " --> " cond(abs(`wages_pre'/`wage
+> s_pre_se') > 2, "YES (problematic)", "NO (good)")
+Wages pre: t = -0.93 --> NO (good)
+
+. 
+. drop Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5
+
+. 
+. ********************************************************************************
+. * TEST 4: Heterogeneity in Hours Effects
+. * Do hours effects vary by worker characteristics?
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "TEST 4: HETEROGENEITY IN HOURS EFFECTS"
+TEST 4: HETEROGENEITY IN HOURS EFFECTS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. cap drop post
+
+. gen post = (year >= 2014)
+
+. cap drop agri_post
+
+. gen agri_post = agri * post
+
+. 
+. * By age
+. di _n "=== By Age ==="
+
+=== By Age ===
+
+. cap drop older
+
+. gen older = (age >= 40)
+
+. 
+. * Older workers
+. quietly reghdfe hours_month agri_post if older == 1, absorb(idind year) cluster(region)
+
+. di "Older workers (40+): " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p=" %5.3
+> f 2*ttail(e(df_r), abs(_b[agri_post]/_se[agri_post])) ")"
+Older workers (40+):   0.12 (SE:  2.61, p=0.964)
+
+. 
+. * Younger workers
+. quietly reghdfe hours_month agri_post if older == 0, absorb(idind year) cluster(region)
+
+. di "Younger workers (<40): " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p=" %5
+> .3f 2*ttail(e(df_r), abs(_b[agri_post]/_se[agri_post])) ")"
+Younger workers (<40):   4.31 (SE:  4.20, p=0.312)
+
+. 
+. * By education (using educ variable if available)
+. di _n "=== By Education ==="
+
+=== By Education ===
+
+. cap drop low_educ
+
+. cap gen low_educ = (educ < 15) if educ != .
+
+. 
+. cap quietly reghdfe hours_month agri_post if low_educ == 1, absorb(idind year) cluster(r
+> egion)
+
+. if _rc == 0 {
+.     di "Low education: " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p=" %5.3f 
+> 2*ttail(e(df_r), abs(_b[agri_post]/_se[agri_post])) ")"
+Low education:   8.20 (SE:  5.23, p=0.125)
+. }
+
+. else {
+.     di "Low education: [education variable not available]"
+. }
+
+. 
+. cap quietly reghdfe hours_month agri_post if low_educ == 0, absorb(idind year) cluster(r
+> egion)
+
+. if _rc == 0 {
+.     di "Higher education: " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p=" %5.
+> 3f 2*ttail(e(df_r), abs(_b[agri_post]/_se[agri_post])) ")"
+Higher education:  -0.11 (SE:  3.66, p=0.977)
+. }
+
+. else {
+.     di "Higher education: [education variable not available]"
+. }
+
+. 
+. * By gender
+. di _n "=== By Gender ==="
+
+=== By Gender ===
+
+. quietly reghdfe hours_month agri_post if female == 0, absorb(idind year) cluster(region)
+
+. di "Male: " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p=" %5.3f 2*ttail(e(df_
+> r), abs(_b[agri_post]/_se[agri_post])) ")"
+Male:   2.40 (SE:  3.39, p=0.484)
+
+. 
+. quietly reghdfe hours_month agri_post if female == 1, absorb(idind year) cluster(region)
+
+. di "Female: " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p=" %5.3f 2*ttail(e(d
+> f_r), abs(_b[agri_post]/_se[agri_post])) ")"
+Female:   2.43 (SE:  3.08, p=0.435)
+
+. 
+. ********************************************************************************
+. * TEST 5: Different Control Groups
+. * Compare agriculture to specific sectors
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "TEST 5: DIFFERENT CONTROL GROUPS"
+TEST 5: DIFFERENT CONTROL GROUPS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Compare to low-wage sectors only (education, health, government)
+. di _n "=== Agriculture vs Low-Wage Sectors Only ==="
+
+=== Agriculture vs Low-Wage Sectors Only ===
+
+. preserve
+
+. keep if agri == 1 | inlist(industry, 9, 10, 12)  // govt, educ, health
+(59,054 observations deleted)
+
+. reghdfe hours_month agri_post, absorb(idind year) cluster(region)
+(dropped 1930 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     15,365
+Absorbing 2 HDFE groups                           F(   1,     37) =       0.02
+Statistics robust to heteroskedasticity           Prob > F        =     0.8821
+                                                  R-squared       =     0.6265
+                                                  Adj R-squared   =     0.5215
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         38         Root MSE        =    35.0076
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |  -.4170848    2.79262    -0.15   0.882    -6.075471    5.241301
+       _cons |   168.1529   .2181025   770.98   0.000      167.711    168.5948
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      3364        3364           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. di "Agri vs Govt/Educ/Health: " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p="
+>  %5.3f 2*ttail(e(df_r), abs(_b[agri_post]/_se[agri_post])) ")"
+Agri vs Govt/Educ/Health:  -0.42 (SE:  2.79, p=0.882)
+
+. restore
+
+. 
+. * Compare to construction (often similar work patterns)
+. di _n "=== Agriculture vs Construction Only ==="
+
+=== Agriculture vs Construction Only ===
+
+. preserve
+
+. keep if agri == 1 | industry == 6
+(68,370 observations deleted)
+
+. reghdfe hours_month agri_post, absorb(idind year) cluster(region)
+(dropped 1500 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =      6,995
+Absorbing 2 HDFE groups                           F(   1,     37) =       0.11
+Statistics robust to heteroskedasticity           Prob > F        =     0.7406
+                                                  R-squared       =     0.6020
+                                                  Adj R-squared   =     0.4622
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         38         Root MSE        =    41.3712
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |  -.9037671   2.709258    -0.33   0.741    -6.393245     4.58571
+       _cons |   195.6048   .4686493   417.38   0.000     194.6552    196.5544
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      1808        1808           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. di "Agri vs Construction: " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p=" %5.
+> 3f 2*ttail(e(df_r), abs(_b[agri_post]/_se[agri_post])) ")"
+Agri vs Construction:  -0.90 (SE:  2.71, p=0.741)
+
+. restore
+
+. 
+. * Compare to trade/services
+. di _n "=== Agriculture vs Trade/Services Only ==="
+
+=== Agriculture vs Trade/Services Only ===
+
+. preserve
+
+. keep if agri == 1 | industry == 14
+(58,358 observations deleted)
+
+. reghdfe hours_month agri_post, absorb(idind year) cluster(region)
+(dropped 3009 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     14,819
+Absorbing 2 HDFE groups                           F(   1,     37) =       0.01
+Statistics robust to heteroskedasticity           Prob > F        =     0.9337
+                                                  R-squared       =     0.5797
+                                                  Adj R-squared   =     0.4349
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         38         Root MSE        =    39.6634
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |  -.2295424   2.738583    -0.08   0.934     -5.77844    5.319355
+       _cons |   185.2093   .2239802   826.90   0.000     184.7555    185.6632
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      3787        3787           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. di "Agri vs Trade/Services: " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ", p=" %
+> 5.3f 2*ttail(e(df_r), abs(_b[agri_post]/_se[agri_post])) ")"
+Agri vs Trade/Services:  -0.23 (SE:  2.74, p=0.934)
+
+. restore
+
+. 
+. ********************************************************************************
+. * TEST 6: Sector Placebo Test (Compare to Each Control Sector)
+. * Compare agriculture effect to effects for each control sector
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "TEST 6: SECTOR PLACEBO TEST"
+TEST 6: SECTOR PLACEBO TEST
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Get actual agriculture effect
+. quietly reghdfe hours_month agri_post, absorb(idind year) cluster(region)
+
+. local actual_effect = _b[agri_post]
+
+. di "Actual agriculture effect: " %6.2f `actual_effect'
+Actual agriculture effect:   2.06
+
+. 
+. * Test each control sector as if it were treated
+. di _n "Placebo effects by sector:"
+
+Placebo effects by sector:
+
+. local n_larger = 0
+
+. local n_sectors = 0
+
+. 
+. foreach sector in 1 6 7 9 10 12 14 {
+  2.     cap drop fake_treat fake_treat_post
+  3.     gen fake_treat = (industry == `sector')
+  4.     gen fake_treat_post = fake_treat * post
+  5. 
+.     cap quietly reghdfe hours_month fake_treat_post, absorb(idind year) cluster(region)
+  6.     if _rc == 0 {
+  7.         local perm_coef = _b[fake_treat_post]
+  8.         local perm_se = _se[fake_treat_post]
+  9. 
+.         if abs(`perm_coef') >= abs(`actual_effect') {
+ 10.             local n_larger = `n_larger' + 1
+ 11.         }
+ 12.         local n_sectors = `n_sectors' + 1
+ 13. 
+.         di "  Sector `sector': " %6.2f `perm_coef' " (SE: " %5.2f `perm_se' ")"
+ 14.     }
+ 15.     cap drop fake_treat fake_treat_post
+ 16. }
+  Sector 1:  -0.22 (SE:  1.67)
+  Sector 6:   1.06 (SE:  1.17)
+  Sector 7:   0.52 (SE:  1.31)
+  Sector 9:  -1.27 (SE:  2.10)
+  Sector 10:  -2.43 (SE:  1.23)
+  Sector 12:   1.66 (SE:  1.54)
+  Sector 14:   0.70 (SE:  0.93)
+
+. 
+. local perm_pval = `n_larger' / `n_sectors'
+
+. di _n "Sectors with |effect| >= |agriculture effect|: `n_larger' / `n_sectors'"
+
+Sectors with |effect| >= |agriculture effect|: 1 / 7
+
+. di "Implied permutation p-value: " %5.3f `perm_pval'
+Implied permutation p-value: 0.143
+
+. 
+. ********************************************************************************
+. * TEST 7: Level Difference vs Change
+. * Decompose into permanent level effect vs treatment-induced change
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "TEST 7: LEVEL VS CHANGE DECOMPOSITION"
+TEST 7: LEVEL VS CHANGE DECOMPOSITION
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Include agri main effect to capture level difference
+. reghdfe hours_month agri agri_post, absorb(idind year) cluster(region)
+(dropped 5277 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     65,361
+Absorbing 2 HDFE groups                           F(   2,     37) =       3.90
+Statistics robust to heteroskedasticity           Prob > F        =     0.0290
+                                                  R-squared       =     0.5266
+                                                  Adj R-squared   =     0.4031
+                                                  Within R-sq.    =     0.0006
+Number of clusters (region)  =         38         Root MSE        =    38.2994
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        agri |   10.70351   3.888884     2.75   0.009     2.823877    18.58313
+   agri_post |  -2.804166   2.120227    -1.32   0.194    -7.100155    1.491822
+       _cons |    176.379    .145271  1214.14   0.000     176.0847    176.6733
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     13509       13509           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== Decomposition ==="
+
+=== Decomposition ===
+
+. di "Agri level effect (permanent): " %6.2f _b[agri] " (SE: " %5.2f _se[agri] ")"
+Agri level effect (permanent):  10.70 (SE:  3.89)
+
+. di "Agri x Post (change): " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ")"
+Agri x Post (change):  -2.80 (SE:  2.12)
+
+. 
+. * Test if post effect is different from level effect
+. test agri_post = agri
+
+ ( 1)  - agri + agri_post = 0
+
+       F(  1,    37) =    7.35
+            Prob > F =    0.0101
+
+. di _n "Test: Post effect = Level effect"
+
+Test: Post effect = Level effect
+
+. di "F = " %6.2f r(F) ", p = " %5.3f r(p)
+F =   7.35, p = 0.010
+
+. 
+. * What share of "post effect" is explained by level?
+. local level = _b[agri]
+
+. local change = _b[agri_post]
+
+. local total_post = `level' + `change'
+
+. di _n "Post-period agri-nonagri gap = Level + Change = " %6.2f `total_post'
+
+Post-period agri-nonagri gap = Level + Change =   7.90
+
+. di "  Level contribution: " %5.1f 100*`level'/`total_post' "%"
+  Level contribution: 135.5%
+
+. di "  Change contribution: " %5.1f 100*`change'/`total_post' "%"
+  Change contribution: -35.5%
+
+. 
+. ********************************************************************************
+. * TEST 8: Triple Difference - Hours Effect by Region Treatment Intensity
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "TEST 8: TRIPLE DIFFERENCE (HOURS)"
+TEST 8: TRIPLE DIFFERENCE (HOURS)
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Try to merge treatment intensity
+. cap drop _merge
+
+. cap merge m:1 region using "output/treatment_intensity_region.dta", keep(1 3) nogen
+
+. 
+. cap confirm variable high_treatment
+
+. if _rc == 0 {
+.     * Create triple interaction
+.     cap drop high_treat_post
+.     gen high_treat_post = high_treatment * post
+(4,255 missing values generated)
+.     cap drop agri_high_treat_post
+.     gen agri_high_treat_post = agri * high_treatment * post
+(4,255 missing values generated)
+. 
+.     reghdfe hours_month agri_post high_treat_post agri_high_treat_post, absorb(idind yea
+> r) cluster(region)
+(dropped 5016 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     62,260
+Absorbing 2 HDFE groups                           F(   3,     35) =       2.29
+Statistics robust to heteroskedasticity           Prob > F        =     0.0950
+                                                  R-squared       =     0.5253
+                                                  Adj R-squared   =     0.4027
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         36         Root MSE        =    38.6668
+
+                                        (Std. Err. adjusted for 36 clusters in region)
+--------------------------------------------------------------------------------------
+                     |               Robust
+         hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------------+----------------------------------------------------------------
+           agri_post |  -3.331088   3.048815    -1.09   0.282    -9.520511    2.858336
+     high_treat_post |  -1.234776   .9316534    -1.33   0.194    -3.126133    .6565814
+agri_high_treat_post |   8.041724    3.79092     2.12   0.041     .3457476     15.7377
+               _cons |   176.9679   .2504974   706.47   0.000     176.4593    177.4764
+--------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     12766       12766           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+. 
+.     di _n "=== Triple Difference for Hours ==="
+
+=== Triple Difference for Hours ===
+.     di "Agri x Post: " %6.2f _b[agri_post] " (SE: " %5.2f _se[agri_post] ")"
+Agri x Post:  -3.33 (SE:  3.05)
+.     di "High Treatment x Post: " %6.2f _b[high_treat_post] " (SE: " %5.2f _se[high_treat
+> _post] ")"
+High Treatment x Post:  -1.23 (SE:  0.93)
+.     di "Agri x High Treatment x Post: " %6.2f _b[agri_high_treat_post] " (SE: " %5.2f _s
+> e[agri_high_treat_post] ")"
+Agri x High Treatment x Post:   8.04 (SE:  3.79)
+. }
+
+. else {
+.     di "Triple difference skipped: treatment intensity data not available"
+. }
+
+. 
+. ********************************************************************************
+. * SUMMARY TABLE
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "SUMMARY: HOURS ROBUSTNESS RESULTS"
+SUMMARY: HOURS ROBUSTNESS RESULTS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "Key findings:"
+
+Key findings:
+
+. di "1. Placebo dates: Effects appear at multiple dates, not just 2014"
+1. Placebo dates: Effects appear at multiple dates, not just 2014
+
+. di "2. Pre-trend slope: [see above]"
+2. Pre-trend slope: [see above]
+
+. di "3. Hours vs wages: Hours has significant pre-trend, wages does not"
+3. Hours vs wages: Hours has significant pre-trend, wages does not
+
+. di "4. Heterogeneity: [see above]"
+4. Heterogeneity: [see above]
+
+. di "5. Control groups: Effects vary substantially by comparison group"
+5. Control groups: Effects vary substantially by comparison group
+
+. di "6. Permutation test: p = " %5.3f `perm_pval'
+6. Permutation test: p = 0.143
+
+. di "7. Level vs change: Most of hours gap is permanent level difference"
+7. Level vs change: Most of hours gap is permanent level difference
+
+. di "8. Triple difference: [see above]"
+8. Triple difference: [see above]
+
+. 
+. di _n "OVERALL CONCLUSION:"
+
+OVERALL CONCLUSION:
+
+. di "The hours effect is NOT robust to multiple specification checks."
+The hours effect is NOT robust to multiple specification checks.
+
+. di "The pre-existing level difference dominates any treatment-induced change."
+The pre-existing level difference dominates any treatment-induced change.
+
+. di "Wages provide cleaner causal evidence than hours."
+Wages provide cleaner causal evidence than hours.
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_hours_robustness_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 16:11:08
+------------------------------------------------------------------------------------------
