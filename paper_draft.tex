@@ -155,6 +155,75 @@ The embargo was explicitly designed to promote domestic agricultural production 
 
 These differential outcomes across products motivate our analysis of heterogeneous effects by agricultural sub-sector.
 
+\subsection{Theoretical Framework: A Two-Period Model}
+
+To structure our empirical analysis and generate testable predictions about the dynamics of labor market adjustment, we present a simple two-period model of agricultural production under trade protection.
+
+\paragraph{Setup.} Consider a representative agricultural firm producing output $Y$ using capital $K$ and labor $L$ according to:
+\begin{equation}
+    Y = A K^\alpha L^{1-\alpha}, \quad \alpha \in (0,1)
+\end{equation}
+where $A$ is productivity. Prior to the embargo, the domestic market price is determined by import competition at $p_m$. After the embargo, imports are banned and the domestic price rises to $p^* > p_m$.
+
+\paragraph{Period 1: Short-run adjustment.} In the short run, capital is fixed at $K_0$. The firm chooses labor to maximize profits:
+\begin{equation}
+    \max_L \; \pi_1 = p^* A K_0^\alpha L^{1-\alpha} - w L
+\end{equation}
+The first-order condition yields labor demand:
+\begin{equation}
+    L_1^d = \left( \frac{(1-\alpha) p^* A K_0^\alpha}{w} \right)^{1/\alpha}
+\end{equation}
+The price increase from $p_m$ to $p^*$ shifts labor demand outward, increasing equilibrium hours. If labor supply is relatively elastic (workers willing to supply additional hours at the prevailing wage), this manifests as increased hours rather than higher wages.
+
+\paragraph{Period 2: Capacity expansion.} In period 2, firms can invest in additional capacity. Let $I$ denote investment, with capital evolving as $K_1 = K_0 + I$. Investment faces convex adjustment costs:
+\begin{equation}
+    C(I) = I + \frac{\gamma}{2} I^2
+\end{equation}
+where $\gamma > 0$ captures installation costs, supply chain frictions, and time-to-build.
+
+Crucially, firms face a \textit{credit constraint}: investment cannot exceed a fraction $\theta$ of period-1 profits:
+\begin{equation}
+    I \leq \theta \cdot \pi_1
+\end{equation}
+This constraint binds when firms cannot access external financing and must self-finance expansion from retained earnings.
+
+The firm's period-2 problem is:
+\begin{equation}
+    \max_{L_2, I} \; \pi_2 = p^* A (K_0 + I)^\alpha L_2^{1-\alpha} - w L_2 - C(I) \quad \text{s.t.} \quad I \leq \theta \pi_1
+\end{equation}
+
+When the credit constraint binds, investment is:
+\begin{equation}
+    I^* = \theta \pi_1 = \theta \left[ p^* A K_0^\alpha (L_1^*)^{1-\alpha} - w L_1^* \right]
+\end{equation}
+Higher period-1 profits relax the credit constraint, enabling more investment, which further increases labor demand in period 2.
+
+\paragraph{Predictions.} The model generates three testable predictions:
+
+\begin{enumerate}
+    \item \textbf{Growing effects}: Labor demand increases in both periods---first from the price shock at fixed capital, then from capacity expansion. Effects should grow over time as investment accumulates.
+
+    \item \textbf{Hours vs. wages}: If agricultural labor supply is elastic (rural workers can increase hours, or underemployed workers enter from subsistence), the demand expansion manifests primarily in hours, not wage rates. This is consistent with a ``Lewis-type'' surplus labor model.
+
+    \item \textbf{Persistence}: Effects persist because:
+    \begin{itemize}
+        \item \textit{Credit constraints} limit new firm entry, protecting incumbents
+        \item \textit{Sector-specific capital} (land, equipment, expertise) creates barriers
+        \item \textit{Geographic constraints}: Agriculture is predominantly rural; urban workers face high relocation costs
+        \item \textit{Firm consolidation}: Large incumbents capture scale economies, crowding out potential entrants
+    \end{itemize}
+\end{enumerate}
+
+\paragraph{Why doesn't labor entry erode rents?} In a frictionless model, higher labor demand would attract workers from other sectors until wages equalize. Several frictions prevent this:
+
+\begin{itemize}
+    \item \textbf{Sector-specific human capital}: Agricultural skills (equipment operation, animal husbandry, seasonal timing) are not easily acquired by urban workers.
+    \item \textbf{Geographic mismatch}: Agricultural jobs are in rural areas while unemployed workers are concentrated in cities. Relocation costs are substantial.
+    \item \textbf{Hours margin vs. employment margin}: Our evidence suggests adjustment occurs through \textit{incumbent workers increasing hours}, not new workers entering the sector. Agricultural employment actually \textit{declined} post-embargo.
+\end{itemize}
+
+This last point is crucial: workers are not capturing rents through higher wages because they are not scarce. Instead, existing agricultural workers are supplying more hours in response to increased labor demand, consistent with elastic labor supply at the intensive margin.
+
 %==============================================================================
 \section{Data} \label{sec:data}
 %==============================================================================
