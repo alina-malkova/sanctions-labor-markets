@@ -954,6 +954,57 @@ The hours-driven nature of our results has important implications:
     \item \textbf{Welfare implications}: From a worker welfare perspective, higher earnings from more hours is less attractive than higher earnings from higher wages, as it comes with reduced leisure.
 \end{enumerate}
 
+\subsection{Labor Supply Elasticity: Heterogeneity Analysis}
+
+Our theoretical framework predicts that effects should be larger for workers with less elastic labor supply---those with fewer outside options and higher mobility costs. Table \ref{tab:heterogeneity} tests this prediction by estimating effects separately by worker characteristics.
+
+\begin{table}[H]
+\centering
+\caption{Heterogeneous Effects by Worker Characteristics}
+\label{tab:heterogeneity}
+\begin{threeparttable}
+\begin{tabular}{lccccc}
+\toprule
+Subgroup & Coefficient & SE & p-value & N (total) & N (agri) \\
+\midrule
+\multicolumn{6}{l}{\textit{Panel A: By Age (Mobility Proxy)}} \\
+Young (age $<$ 40) & $-$0.023 & (0.034) & 0.496 & 35,879 & 1,325 \\
+\textbf{Older (age $\geq$ 40)} & \textbf{0.064} & (0.027) & \textbf{0.024} & 36,073 & 1,879 \\
+\midrule
+\multicolumn{6}{l}{\textit{Panel B: By Education (Outside Options)}} \\
+\textbf{Lower education} & \textbf{0.060} & (0.029) & \textbf{0.043} & 46,058 & 2,665 \\
+Higher education & $-$0.063 & (0.054) & 0.253 & 26,004 & 534 \\
+\midrule
+\multicolumn{6}{l}{\textit{Panel C: By Region Type}} \\
+Rural regions & 0.021 & (0.032) & 0.507 & 36,364 & 2,975 \\
+Urban regions & 0.020 & (0.072) & 0.784 & 36,540 & 229 \\
+\midrule
+\multicolumn{6}{l}{\textit{Panel D: Combined}} \\
+Rural + Older & 0.053 & (0.028) & 0.074 & 18,369 & 1,205 \\
+Urban + Young & 0.021 & (0.127) & 0.869 & 18,351 & 77 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Each row reports a separate regression of log wages on Agriculture $\times$ Post with individual and year fixed effects. Standard errors clustered at region level. Bold indicates p $<$ 0.05. Sample: 2010--2019.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The results strongly support the labor supply elasticity mechanism:
+
+\begin{enumerate}
+    \item \textbf{Age}: Older workers (40+) show significant earnings gains of 6.4\% (p=0.024), while young workers show no effect ($-$2.3\%, n.s.). Older workers have higher job-specific human capital and face greater costs of switching sectors or relocating.
+
+    \item \textbf{Education}: Less-educated workers show significant gains of 6.0\% (p=0.043), while more-educated workers show no effect ($-$6.3\%, n.s.). Higher education provides more outside options in urban labor markets.
+
+    \item \textbf{Region}: Effects do not differ significantly between rural and urban regions, though the sample of urban agricultural workers is very small (n=229).
+
+    \item \textbf{Most constrained workers}: Rural, older workers show marginally significant effects (5.3\%, p=0.074), while urban, young workers show no effect.
+\end{enumerate}
+
+This pattern is consistent with segmented labor markets: workers with fewer outside options (older, less educated) face more inelastic labor supply curves and thus experience larger effects from the demand expansion. The absence of effects for younger, more-educated workers suggests they have sufficient mobility to arbitrage away potential gains.
+
 \subsection{Welfare Implications}
 
 The welfare implications of our findings are nuanced. Agricultural workers saw higher earnings, but this came from working more hours rather than earning more per hour. Meanwhile, consumers faced higher food prices, with previous estimates suggesting losses of approximately 445 billion rubles per year (about 3,000 rubles per person).

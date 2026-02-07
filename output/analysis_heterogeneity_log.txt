@@ -1,0 +1,638 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_heterogeneity_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 13:33:01
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "HETEROGENEITY ANALYSIS"
+HETEROGENEITY ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Create variables (drop if exists)
+. cap drop agri_post
+
+. gen agri_post = agri * post
+
+. 
+. * Rural: regions with above-median agricultural share
+. cap drop region_agri_share rural
+
+. bysort region: egen region_agri_share = mean(agri) if year == 2013
+(69404 missing values generated)
+
+. bysort region: egen temp = max(region_agri_share)
+
+. replace region_agri_share = temp
+(69,404 real changes made)
+
+. drop temp
+
+. sum region_agri_share, detail
+
+                      region_agri_share
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs              78,095
+25%     .0046948              0       Sum of Wgt.      78,095
+
+50%     .0111732                      Mean           .0413259
+                        Largest       Std. Dev.      .0724484
+75%     .0414201       .3814433
+90%     .1117318       .3814433       Variance       .0052488
+95%     .1919192       .3814433       Skewness        2.85964
+99%     .3814433       .3814433       Kurtosis       12.08124
+
+. gen rural = (region_agri_share > r(p50)) if region_agri_share != .
+
+. 
+. * Age
+. cap drop young
+
+. gen young = (age < 40)
+
+. 
+. * Education - use median split
+. cap drop high_educ
+
+. sum educ, detail
+
+              Education (detail): over 14 years
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            8              0
+ 5%            9              0
+10%           14              0       Obs              77,980
+25%           16              0       Sum of Wgt.      77,980
+
+50%           18                      Mean           17.33992
+                        Largest       Std. Dev.      3.545602
+75%           21             23
+90%           21             23       Variance       12.57129
+95%           21             23       Skewness      -.8641925
+99%           22             23       Kurtosis       3.267522
+
+. gen high_educ = (educ > r(p50)) if educ != .
+(115 missing values generated)
+
+. 
+. di ""
+
+
+. di "--- Sample sizes ---"
+--- Sample sizes ---
+
+. tab rural agri
+
+           |  Agriculture sector
+     rural |         0          1 |     Total
+-----------+----------------------+----------
+         0 |    39,384        229 |    39,613 
+         1 |    35,507      2,975 |    38,482 
+-----------+----------------------+----------
+     Total |    74,891      3,204 |    78,095 
+
+. tab young agri  
+
+           |  Agriculture sector
+     young |         0          1 |     Total
+-----------+----------------------+----------
+         0 |    36,650      1,879 |    38,529 
+         1 |    38,241      1,325 |    39,566 
+-----------+----------------------+----------
+     Total |    74,891      3,204 |    78,095 
+
+. tab high_educ agri
+
+           |  Agriculture sector
+ high_educ |         0          1 |     Total
+-----------+----------------------+----------
+         0 |    47,257      2,665 |    49,922 
+         1 |    27,524        534 |    28,058 
+-----------+----------------------+----------
+     Total |    74,781      3,199 |    77,980 
+
+. 
+. ********************************************************************************
+. * REGRESSIONS
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "MAIN RESULTS BY SUBGROUP"
+MAIN RESULTS BY SUBGROUP
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Overall
+. di _n "=== OVERALL ==="
+
+=== OVERALL ===
+
+. reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3176
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0310473   .0306432     1.01   0.318    -.0310417    .0931363
+       _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * By region type
+. di _n "=== RURAL REGIONS ==="
+
+=== RURAL REGIONS ===
+
+. reghdfe ln_wage agri_post if rural == 1, absorb(idind year) cluster(region)
+(dropped 2118 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     36,364
+Absorbing 2 HDFE groups                           F(   1,     19) =       0.46
+Statistics robust to heteroskedasticity           Prob > F        =     0.5072
+                                                  R-squared       =     0.7915
+                                                  Adj R-squared   =     0.7427
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         20         Root MSE        =     0.3583
+
+                                (Std. Err. adjusted for 20 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0214823    .031777     0.68   0.507    -.0450276    .0879923
+       _cons |   9.657491   .0012461  7750.04   0.000     9.654883      9.6601
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      6895        6895           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== URBAN REGIONS ==="
+
+=== URBAN REGIONS ===
+
+. reghdfe ln_wage agri_post if rural == 0, absorb(idind year) cluster(region)
+(dropped 3073 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     36,540
+Absorbing 2 HDFE groups                           F(   1,     17) =       0.08
+Statistics robust to heteroskedasticity           Prob > F        =     0.7839
+                                                  R-squared       =     0.8019
+                                                  Adj R-squared   =     0.7504
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         18         Root MSE        =     0.3373
+
+                                (Std. Err. adjusted for 18 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0201381   .0722854     0.28   0.784    -.1323706    .1726469
+       _cons |   9.923408   .0001761  5.6e+04   0.000     9.923037    9.923779
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      7526        7526           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * By age
+. di _n "=== YOUNG (age < 40) ==="
+
+=== YOUNG (age < 40) ===
+
+. reghdfe ln_wage agri_post if young == 1, absorb(idind year) cluster(region)
+(dropped 3687 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     35,879
+Absorbing 2 HDFE groups                           F(   1,     37) =       0.47
+Statistics robust to heteroskedasticity           Prob > F        =     0.4957
+                                                  R-squared       =     0.7884
+                                                  Adj R-squared   =     0.7252
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         38         Root MSE        =     0.3577
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |  -.0232186    .033746    -0.69   0.496    -.0915946    .0451573
+       _cons |   9.856755   .0005568  1.8e+04   0.000     9.855627    9.857883
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      8246        8246           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== OLDER (age >= 40) ==="
+
+=== OLDER (age >= 40) ===
+
+. reghdfe ln_wage agri_post if young == 0, absorb(idind year) cluster(region)
+(dropped 2456 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     36,073
+Absorbing 2 HDFE groups                           F(   1,     37) =       5.54
+Statistics robust to heteroskedasticity           Prob > F        =     0.0240
+                                                  R-squared       =     0.8338
+                                                  Adj R-squared   =     0.7915
+                                                  Within R-sq.    =     0.0004
+Number of clusters (region)  =         38         Root MSE        =     0.3269
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |    .063527   .0269853     2.35   0.024     .0088495    .1182045
+       _cons |   9.723833    .000674  1.4e+04   0.000     9.722467    9.725199
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      7301        7301           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * By education
+. di _n "=== LOWER EDUCATION ==="
+
+=== LOWER EDUCATION ===
+
+. reghdfe ln_wage agri_post if high_educ == 0, absorb(idind year) cluster(region)
+(dropped 3864 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     46,058
+Absorbing 2 HDFE groups                           F(   1,     37) =       4.39
+Statistics robust to heteroskedasticity           Prob > F        =     0.0430
+                                                  R-squared       =     0.7933
+                                                  Adj R-squared   =     0.7401
+                                                  Within R-sq.    =     0.0004
+Number of clusters (region)  =         38         Root MSE        =     0.3466
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0601279   .0286882     2.10   0.043         .002    .1182558
+       _cons |    9.65312   .0007699  1.3e+04   0.000      9.65156    9.654679
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      9414        9414           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== HIGHER EDUCATION ==="
+
+=== HIGHER EDUCATION ===
+
+. reghdfe ln_wage agri_post if high_educ == 1, absorb(idind year) cluster(region)
+(dropped 2054 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     26,004
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.35
+Statistics robust to heteroskedasticity           Prob > F        =     0.2526
+                                                  R-squared       =     0.7964
+                                                  Adj R-squared   =     0.7435
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         38         Root MSE        =     0.3435
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |  -.0633053   .0544762    -1.16   0.253    -.1736846     .047074
+       _cons |   10.03493    .000574  1.7e+04   0.000     10.03376    10.03609
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      5361        5361           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * Most constrained: rural + older
+. di _n "=== RURAL + OLDER (most constrained) ==="
+
+=== RURAL + OLDER (most constrained) ===
+
+. reghdfe ln_wage agri_post if rural == 1 & young == 0, absorb(idind year) cluster(region)
+(dropped 1011 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     18,369
+Absorbing 2 HDFE groups                           F(   1,     19) =       3.57
+Statistics robust to heteroskedasticity           Prob > F        =     0.0743
+                                                  R-squared       =     0.8190
+                                                  Adj R-squared   =     0.7752
+                                                  Within R-sq.    =     0.0005
+Number of clusters (region)  =         20         Root MSE        =     0.3364
+
+                                (Std. Err. adjusted for 20 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |    .052568   .0278368     1.89   0.074    -.0056951     .110831
+       _cons |   9.589841   .0012911  7427.43   0.000     9.587138    9.592543
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      3572        3572           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * Most mobile: urban + young
+. di _n "=== URBAN + YOUNG (most mobile) ==="
+
+=== URBAN + YOUNG (most mobile) ===
+
+. reghdfe ln_wage agri_post if rural == 0 & young == 1, absorb(idind year) cluster(region)
+(dropped 2113 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     18,351
+Absorbing 2 HDFE groups                           F(   1,     17) =       0.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.8689
+                                                  R-squared       =     0.7815
+                                                  Adj R-squared   =     0.7135
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         18         Root MSE        =     0.3465
+
+                                (Std. Err. adjusted for 18 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0211977   .1265227     0.17   0.869    -.2457418    .2881372
+       _cons |   9.978721   .0002551  3.9e+04   0.000     9.978182    9.979259
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      4344        4344           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * HOURS EFFECTS
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "HOURS EFFECTS BY SUBGROUP"
+HOURS EFFECTS BY SUBGROUP
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "=== HOURS: RURAL ==="
+
+=== HOURS: RURAL ===
+
+. reghdfe hours agri_post if rural == 1, absorb(idind year) cluster(region)
+(dropped 2194 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     32,986
+Absorbing 2 HDFE groups                           F(   1,     19) =       0.80
+Statistics robust to heteroskedasticity           Prob > F        =     0.3816
+                                                  R-squared       =     0.5231
+                                                  Adj R-squared   =     0.4058
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         20         Root MSE        =    39.7199
+
+                                (Std. Err. adjusted for 20 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   2.152696   2.403426     0.90   0.382    -2.877731    7.183124
+       _cons |   179.1799   .0874344  2049.31   0.000     178.9969    179.3629
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      6504        6504           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== HOURS: URBAN ==="
+
+=== HOURS: URBAN ===
+
+. reghdfe hours agri_post if rural == 0, absorb(idind year) cluster(region)
+(dropped 3083 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     32,375
+Absorbing 2 HDFE groups                           F(   1,     17) =       0.60
+Statistics robust to heteroskedasticity           Prob > F        =     0.4506
+                                                  R-squared       =     0.5275
+                                                  Adj R-squared   =     0.3968
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         18         Root MSE        =    36.7862
+
+                                (Std. Err. adjusted for 18 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   4.785013   6.196974     0.77   0.451     -8.28946    17.85949
+       _cons |   174.1732   .0149302  1.2e+04   0.000     174.1417    174.2047
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      7005        7005           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== HOURS: OLDER ==="
+
+=== HOURS: OLDER ===
+
+. reghdfe hours agri_post if young == 0, absorb(idind year) cluster(region)
+(dropped 2495 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     32,523
+Absorbing 2 HDFE groups                           F(   1,     37) =       0.00
+Statistics robust to heteroskedasticity           Prob > F        =     0.9635
+                                                  R-squared       =     0.5647
+                                                  Adj R-squared   =     0.4486
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         38         Root MSE        =    37.4769
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |    .120262    2.61234     0.05   0.964    -5.172843    5.413367
+       _cons |   175.0492   .0605634  2890.34   0.000     174.9265    175.1719
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      6836        6836           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== HOURS: YOUNG ==="
+
+=== HOURS: YOUNG ===
+
+. reghdfe hours agri_post if young == 1, absorb(idind year) cluster(region)
+(dropped 3750 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     31,870
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.05
+Statistics robust to heteroskedasticity           Prob > F        =     0.3119
+                                                  R-squared       =     0.5204
+                                                  Adj R-squared   =     0.3687
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =    38.5546
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   4.305888   4.200145     1.03   0.312    -4.204414    12.81619
+       _cons |   178.3842   .0662903  2690.95   0.000     178.2498    178.5185
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      7646        7646           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di ""
+
+
+. di "Analysis complete!"
+Analysis complete!
+
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_heterogeneity_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 13:33:11
+------------------------------------------------------------------------------------------
