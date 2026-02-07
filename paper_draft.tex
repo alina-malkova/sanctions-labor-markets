@@ -1109,6 +1109,47 @@ Three patterns emerge from the firm-level data:
 
 \paragraph{Data limitations prevent worker-firm matching.} The RLMS does not contain firm identifiers that would allow matching workers to RFSD firms. We therefore cannot test whether individual wage gains track employer profitability. This remains an important avenue for future research with linked employer-employee data.
 
+\paragraph{Statistical matching approach: Sub-sector $\times$ firm structure.} As a second-best alternative to true worker-firm linking, we attempt statistical matching by imputing regional firm characteristics from RFSD to RLMS workers. Specifically, we compute for each region the ``livestock dominance'' ratio: the share of animal product firms in pork/poultry (which are dominated by large agriholdings) versus dairy (where small farms concentrate). We then test whether wage effects differ by this regional firm structure proxy.
+
+Table \ref{tab:firm_structure} presents the results. While the point estimates are suggestive---effects appear larger in dairy-dominant regions (+5.2\%) than in livestock-dominant regions (+0.5\%)---none of the interaction terms are statistically significant. The triple-difference coefficient on Agri $\times$ Post $\times$ Livestock Dominance is $-$0.028 (p=0.140), suggesting effects may be \textit{smaller} in regions with large-farm-dominated agriculture, but we cannot reject zero.
+
+\begin{table}[H]
+\centering
+\caption{Sub-sector $\times$ Firm Structure: Statistical Matching Approach}
+\label{tab:firm_structure}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& Livestock & Dairy & Triple DiD & Combined \\
+& Regions & Regions & (Livestock) & \\
+\midrule
+Agriculture $\times$ Post & 0.005 & 0.052 & 0.038 & 0.045 \\
+& (0.046) & (0.039) & (0.032) & (0.029) \\
+Agri $\times$ Post $\times$ Livestock & & & $-$0.028 & $-$0.107 \\
+& & & (0.019) & (0.083) \\
+Agri $\times$ Post $\times$ Dairy & & & & $-$0.090 \\
+& & & & (0.091) \\
+\midrule
+Observations & 31,121 & 41,783 & 72,904 & 72,904 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} All specifications include individual and year fixed effects (2010--2019). ``Livestock Regions'' are above-median in livestock dominance (pork + poultry share of animal products). ``Dairy Regions'' are below-median. Livestock and Dairy interactions are standardized. This is \textit{statistical matching} (imputing firm characteristics at regional level), not true worker-firm linking. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+We emphasize several caveats about this approach:
+\begin{itemize}
+    \item This is \textit{ecological inference}: we impute regional firm characteristics to individual workers, but a worker in a ``livestock-dominant'' region may work for a small dairy farm.
+    \item The RLMS occupation codes (ISCO) do not help: zero agricultural workers in our sample have skilled agricultural (ISCO 6) or agricultural laborer (ISCO 92) codes that might distinguish sub-sectors.
+    \item The lack of statistical significance may reflect either genuine null effects or insufficient power to detect differences using imputed regional measures.
+\end{itemize}
+
+The suggestive pattern---larger effects in dairy/small-farm regions, smaller in livestock/large-farm regions---is consistent with the hypothesis that large agriholdings capture protection rents as profits rather than passing them to workers as wages. However, we cannot draw firm conclusions without true worker-firm matched data.
+
 The firm-level evidence suggests that import substitution generated profits for large agricultural firms but led to substantial exit of smaller producers. Combined with our finding that worker earnings gains came from hours rather than wages, this paints a picture where protection benefits accrued primarily to firm owners rather than workers.
 
 \subsection{Limitations}

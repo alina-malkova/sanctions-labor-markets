@@ -1,0 +1,855 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_firm_structure_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 14:17:12
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "SUB-SECTOR x FIRM STRUCTURE ANALYSIS"
+SUB-SECTOR x FIRM STRUCTURE ANALYSIS
+
+. di "Statistical Matching Approach: RLMS workers to RFSD regional firm data"
+Statistical Matching Approach: RLMS workers to RFSD regional firm data
+
+. di "======================================================================"
+======================================================================
+
+. 
+. ********************************************************************************
+. * STEP 1: Import RFSD regional firm structure data
+. ********************************************************************************
+. 
+. preserve
+
+. import delimited "output/tables/region_firm_structure.csv", clear
+(11 vars, 89 obs)
+
+. list in 1/10
+
+     +--------------------------------------------------------------------------+
+  1. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     | arkhangelsk oblast |     1766 |      75 |       23 |      .23 |      .75 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |   .0733571   |    .095017   |   .0069702   |          0   |          1   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+  2. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |    belgorod oblast |     3437 |      62 |       77 | .5202703 | .4189189 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |    .099528   |   .1436864   |   .0143008   |          1   |          0   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+  3. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |       penza oblast |     4210 |     337 |      155 | .3045187 | .6620825 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |   .1648137   |   .1876722   |   .0309309   |          1   |          0   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+  4. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |    khanty-mansijsk |     3051 |      28 |       15 |  .326087 | .6086956 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |   .0766025   |   .1215175   |   .0093085   |          1   |          0   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+  5. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |           khakasia |      952 |      42 |        9 | .1730769 | .8076923 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |   .1045005   |   .1162815   |   .0121515   |          0   |          1   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+  6. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |            kherson |      469 |       3 |        3 |       .5 |       .5 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |    .576167   |   .6053305   |   .3487715   |          1   |          0   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+  7. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |   krasnoyarsk krai |     6452 |     137 |       49 |      .25 | .6989796 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |   .0891813   |   .1183432   |    .010554   |          1   |          1   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+  8. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |            luhansk |       46 |       2 |        1 | .3333333 | .6666667 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |   .2243902   |   .4478261   |   .1004878   |          1   |          0   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+  9. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |           buryatia |     2492 |     114 |       21 | .1478873 | .8028169 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |   .1524719   |   .1327849   |    .020246   |          0   |          1   |
+     +--------------------------------------------------------------------------+
+
+     +--------------------------------------------------------------------------+
+ 10. |        region_rfsd | food_a~s | n_dairy | n_live~k | livest~e | dairy_~e |
+     |     stavropol krai |     6151 |      78 |       71 | .4382716 | .4814815 |
+     |--------------------------------------------------------------------------|
+     |   agri_c~n   |   treatm~t   |   treatm~d   |   high_l~k   |   high_d~y   |
+     |   .1443253   |   .1821574   |   .0262899   |          1   |          0   |
+     +--------------------------------------------------------------------------+
+
+. 
+. * Clean region names for matching
+. gen region_match = lower(region_rfsd)
+
+. replace region_match = trim(region_match)
+(0 real changes made)
+
+. 
+. save "temp/firm_structure.dta", replace
+file temp/firm_structure.dta saved
+
+. restore
+
+. 
+. ********************************************************************************
+. * STEP 2: Create RLMS region matching variable
+. ********************************************************************************
+. 
+. * Get region labels
+. decode region, gen(region_str)
+
+. 
+. * Clean for matching
+. gen region_match = lower(region_str)
+
+. replace region_match = trim(region_match)
+(0 real changes made)
+
+. 
+. * Show unique RLMS regions
+. di _n "=== RLMS Regions ==="
+
+=== RLMS Regions ===
+
+. tab region_str if _n <= 100
+
+                        Region--cover.1 |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+               Altaiskij Kraj: Biisk CR |         51       51.00       51.00
+       Altaiskij Kraj: Kur`inskij Rajon |         49       49.00      100.00
+----------------------------------------+-----------------------------------
+                                  Total |        100      100.00
+
+. 
+. ********************************************************************************
+. * STEP 3: Manual crosswalk (RLMS region labels to RFSD)
+. ********************************************************************************
+. 
+. * Create RFSD region name based on RLMS region
+. cap drop region_rfsd
+
+. gen region_rfsd = ""
+(78,095 missing values generated)
+
+. 
+. * Moscow
+. replace region_rfsd = "moscow oblast" if strpos(region_str, "Moscow Oblast") > 0
+variable region_rfsd was str1 now str13
+(4,600 real changes made)
+
+. replace region_rfsd = "moscow" if strpos(region_str, "Moscow City") > 0
+(5,918 real changes made)
+
+. 
+. * St. Petersburg
+. replace region_rfsd = "st. petersburg" if strpos(region_str, "St. Petersburg") > 0
+variable region_rfsd was str13 now str14
+(2,246 real changes made)
+
+. replace region_rfsd = "leningrad oblast" if strpos(region_str, "Leningrad") > 0
+variable region_rfsd was str14 now str16
+(1,711 real changes made)
+
+. 
+. * Major regions
+. replace region_rfsd = "krasnodar krai" if strpos(region_str, "Krasnodarsk") > 0
+(2,646 real changes made)
+
+. replace region_rfsd = "rostov oblast" if strpos(region_str, "Rostov") > 0 | strpos(regio
+> n_str, "Batajsk") > 0
+(2,113 real changes made)
+
+. replace region_rfsd = "chelyabinsk oblast" if strpos(region_str, "Cheliabinsk") > 0
+variable region_rfsd was str16 now str18
+(3,784 real changes made)
+
+. replace region_rfsd = "nizhny novgorod oblast" if strpos(region_str, "Gorkovsk") > 0 | s
+> trpos(region_str, "Nizhnij Novgorod") > 0
+variable region_rfsd was str18 now str22
+(2,453 real changes made)
+
+. replace region_rfsd = "novosibirsk oblast" if strpos(region_str, "Novosibirsk") > 0
+(1,606 real changes made)
+
+. replace region_rfsd = "tatarstan" if strpos(region_str, "Tatarsk") > 0 | strpos(region_s
+> tr, "Kazan") > 0
+(2,568 real changes made)
+
+. replace region_rfsd = "volgograd oblast" if strpos(region_str, "Volgograd") > 0
+(1,865 real changes made)
+
+. replace region_rfsd = "saratov oblast" if strpos(region_str, "Saratov") > 0
+(3,578 real changes made)
+
+. replace region_rfsd = "krasnoyarsk krai" if strpos(region_str, "Krasnojarsk") > 0
+(3,740 real changes made)
+
+. replace region_rfsd = "penza oblast" if strpos(region_str, "Penzensk") > 0
+(1,288 real changes made)
+
+. replace region_rfsd = "tula oblast" if strpos(region_str, "Tulsk") > 0
+(1,658 real changes made)
+
+. replace region_rfsd = "lipetzk" if strpos(region_str, "Lipetsk") > 0
+(2,691 real changes made)
+
+. replace region_rfsd = "tambov oblast" if strpos(region_str, "Tambov") > 0
+(3,553 real changes made)
+
+. replace region_rfsd = "kaluga oblast" if strpos(region_str, "Kaluzh") > 0 | strpos(regio
+> n_str, "Kuibyshev") > 0
+(1,319 real changes made)
+
+. replace region_rfsd = "smolensk oblast" if strpos(region_str, "Smolensk") > 0
+(1,258 real changes made)
+
+. replace region_rfsd = "stavropol krai" if strpos(region_str, "Stavropol") > 0
+(1,952 real changes made)
+
+. replace region_rfsd = "altai krai" if strpos(region_str, "Altaisk") > 0
+(2,937 real changes made)
+
+. replace region_rfsd = "amur oblast" if strpos(region_str, "Amursk") > 0
+(1,635 real changes made)
+
+. replace region_rfsd = "tomsk" if strpos(region_str, "Tomsk") > 0
+(2,107 real changes made)
+
+. replace region_rfsd = "komi republic" if strpos(region_str, "Komi") > 0
+(4,060 real changes made)
+
+. replace region_rfsd = "udmurt republic" if strpos(region_str, "Udmurt") > 0
+(2,219 real changes made)
+
+. replace region_rfsd = "chuvash republic" if strpos(region_str, "Chuvash") > 0
+(1,989 real changes made)
+
+. replace region_rfsd = "kurgan oblast" if strpos(region_str, "Kurgan") > 0
+(1,433 real changes made)
+
+. replace region_rfsd = "orenburg oblast" if strpos(region_str, "Orenburg") > 0 | strpos(r
+> egion_str, "Orsk") > 0
+(2,162 real changes made)
+
+. replace region_rfsd = "kabardino-balkaria" if strpos(region_str, "Kabardino") > 0
+(993 real changes made)
+
+. replace region_rfsd = "primorsky krai" if strpos(region_str, "Vladivostok") > 0
+(1,564 real changes made)
+
+. replace region_rfsd = "perm krai" if strpos(region_str, "Perm") > 0 | strpos(region_str,
+>  "Solikamsk") > 0
+(2,386 real changes made)
+
+. replace region_rfsd = "kalinin oblast" if strpos(region_str, "Kalinin") > 0 | strpos(reg
+> ion_str, "Rzhev") > 0
+(1,792 real changes made)
+
+. 
+. di _n "=== Merge Match Rates ==="
+
+=== Merge Match Rates ===
+
+. tab region_rfsd if region_rfsd != ""
+
+           region_rfsd |      Freq.     Percent        Cum.
+-----------------------+-----------------------------------
+            altai krai |      2,937        3.85        3.85
+           amur oblast |      1,635        2.15        6.00
+    chelyabinsk oblast |      3,784        4.97       10.97
+      chuvash republic |      1,989        2.61       13.58
+    kabardino-balkaria |        993        1.30       14.88
+        kalinin oblast |      1,792        2.35       17.23
+         kaluga oblast |      1,319        1.73       18.96
+         komi republic |      4,060        5.33       24.29
+        krasnodar krai |      2,646        3.47       27.77
+      krasnoyarsk krai |      3,740        4.91       32.68
+         kurgan oblast |      1,433        1.88       34.56
+      leningrad oblast |      1,711        2.25       36.80
+               lipetzk |      2,691        3.53       40.33
+                moscow |      5,918        7.77       48.10
+         moscow oblast |      4,600        6.04       54.14
+nizhny novgorod oblast |      2,453        3.22       57.36
+    novosibirsk oblast |      1,606        2.11       59.47
+       orenburg oblast |      2,162        2.84       62.30
+          penza oblast |      1,288        1.69       63.99
+             perm krai |      2,386        3.13       67.13
+        primorsky krai |      1,564        2.05       69.18
+         rostov oblast |      2,113        2.77       71.95
+        saratov oblast |      3,578        4.70       76.65
+       smolensk oblast |      1,258        1.65       78.30
+        st. petersburg |      2,246        2.95       81.25
+        stavropol krai |      1,952        2.56       83.81
+         tambov oblast |      1,918        2.52       86.33
+             tatarstan |      2,568        3.37       89.70
+                 tomsk |      2,107        2.77       92.46
+           tula oblast |      1,658        2.18       94.64
+       udmurt republic |      2,219        2.91       97.55
+      volgograd oblast |      1,865        2.45      100.00
+-----------------------+-----------------------------------
+                 Total |     76,189      100.00
+
+. 
+. ********************************************************************************
+. * STEP 4: Merge with RFSD firm structure
+. ********************************************************************************
+. 
+. merge m:1 region_rfsd using "temp/firm_structure.dta", keep(1 3) nogen
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         8,330
+        from master                     8,330  
+        from using                          0  
+
+    matched                            69,765  
+    -----------------------------------------
+
+. 
+. di _n "=== Match Summary ==="
+
+=== Match Summary ===
+
+. count if livestock_dominance != .
+  69,765
+
+. di "Matched observations: " r(N)
+Matched observations: 69765
+
+. count if livestock_dominance == .
+  8,330
+
+. di "Unmatched observations: " r(N)
+Unmatched observations: 8330
+
+. 
+. * Fill unmatched with median values
+. sum livestock_dominance, detail
+
+                     livestock_dominance
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     .0857988       .0857988
+ 5%     .1098485       .0857988
+10%     .1447368       .0857988       Obs              69,765
+25%      .200692       .0857988       Sum of Wgt.      69,765
+
+50%     .2352941                      Mean           .2676642
+                        Largest       Std. Dev.      .1098111
+75%     .3529412        .505618
+90%     .4210526        .505618       Variance       .0120585
+95%      .480597        .505618       Skewness       .5269505
+99%      .505618        .505618       Kurtosis       2.300548
+
+. replace livestock_dominance = r(p50) if livestock_dominance == .
+(8,330 real changes made)
+
+. sum dairy_share, detail
+
+                         dairy_share
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     .4044944       .4044944
+ 5%     .4447761       .4044944
+10%           .5       .4044944       Obs              69,765
+25%     .5818182       .4044944       Sum of Wgt.      69,765
+
+50%     .6814815                      Mean           .6594506
+                        Largest       Std. Dev.      .1215668
+75%     .7314815        .887574
+90%     .8333333        .887574       Variance       .0147785
+95%     .8421053        .887574       Skewness      -.1388565
+99%      .887574        .887574       Kurtosis       2.314447
+
+. replace dairy_share = r(p50) if dairy_share == .
+(8,330 real changes made)
+
+. sum high_livestock, detail
+
+                       high_livestock
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs              69,765
+25%            0              0       Sum of Wgt.      69,765
+
+50%            0                      Mean           .4748656
+                        Largest       Std. Dev.      .4993714
+75%            1              1
+90%            1              1       Variance       .2493718
+95%            1              1       Skewness       .1006648
+99%            1              1       Kurtosis       1.010133
+
+. replace high_livestock = round(r(p50)) if high_livestock == .
+(8,330 real changes made)
+
+. 
+. ********************************************************************************
+. * PART 1: Effects by Regional Firm Structure
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 1: EFFECTS BY REGIONAL FIRM STRUCTURE"
+PART 1: EFFECTS BY REGIONAL FIRM STRUCTURE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. cap drop agri_post
+
+. gen agri_post = agri * post
+
+. 
+. * Overall baseline
+. di _n "=== OVERALL (Baseline) ==="
+
+=== OVERALL (Baseline) ===
+
+. reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3176
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0310473   .0306432     1.01   0.318    -.0310417    .0931363
+       _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * By livestock vs dairy dominance
+. di _n "=== LIVESTOCK-DOMINANT REGIONS (large farm proxy) ==="
+
+=== LIVESTOCK-DOMINANT REGIONS (large farm proxy) ===
+
+. reghdfe ln_wage agri_post if high_livestock == 1, absorb(idind year) cluster(region)
+(dropped 2008 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     31,121
+Absorbing 2 HDFE groups                           F(   1,     16) =       0.01
+Statistics robust to heteroskedasticity           Prob > F        =     0.9160
+                                                  R-squared       =     0.8011
+                                                  Adj R-squared   =     0.7526
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         17         Root MSE        =     0.3243
+
+                                (Std. Err. adjusted for 17 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0048771    .045516     0.11   0.916    -.0916126    .1013667
+       _cons |   9.677935   .0010998  8799.42   0.000     9.675603    9.680266
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      6089        6089           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== DAIRY-DOMINANT REGIONS (small farm proxy) ==="
+
+=== DAIRY-DOMINANT REGIONS (small farm proxy) ===
+
+. reghdfe ln_wage agri_post if high_livestock == 0, absorb(idind year) cluster(region)
+(dropped 3183 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     41,783
+Absorbing 2 HDFE groups                           F(   1,     20) =       1.78
+Statistics robust to heteroskedasticity           Prob > F        =     0.1966
+                                                  R-squared       =     0.7991
+                                                  Adj R-squared   =     0.7489
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         21         Root MSE        =     0.3649
+
+                                (Std. Err. adjusted for 21 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0516909   .0386992     1.34   0.197    -.0290342    .1324161
+       _cons |   9.874558   .0007067  1.4e+04   0.000     9.873084    9.876032
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      8332        8332           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * PART 2: Triple Difference - Agri × Post × Firm Structure
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: TRIPLE DIFFERENCE WITH FIRM STRUCTURE"
+PART 2: TRIPLE DIFFERENCE WITH FIRM STRUCTURE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Standardize livestock dominance
+. sum livestock_dominance
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+livestock_~e |     78,095    .2642114    .1042693   .0857988    .505618
+
+. gen livestock_std = (livestock_dominance - r(mean)) / r(sd)
+
+. 
+. * Create triple interaction
+. gen agri_post_livestock = agri_post * livestock_std
+
+. 
+. di _n "=== TRIPLE DIFF: Agri × Post × Livestock Dominance (standardized) ==="
+
+=== TRIPLE DIFF: Agri × Post × Livestock Dominance (standardized) ===
+
+. reghdfe ln_wage agri_post agri_post_livestock, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   2,     37) =       1.18
+Statistics robust to heteroskedasticity           Prob > F        =     0.3195
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                       (Std. Err. adjusted for 38 clusters in region)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------+----------------------------------------------------------------
+          agri_post |   .0378078   .0315304     1.20   0.238    -.0260788    .1016944
+agri_post_livestock |   -.028363    .018788    -1.51   0.140    -.0664311     .009705
+              _cons |    9.79057   .0005984  1.6e+04   0.000     9.789357    9.791782
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * With binary indicator
+. gen agri_post_highlivestock = agri_post * high_livestock
+
+. 
+. di _n "=== TRIPLE DIFF: Agri × Post × High Livestock (binary) ==="
+
+=== TRIPLE DIFF: Agri × Post × High Livestock (binary) ===
+
+. reghdfe ln_wage agri_post agri_post_highlivestock, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   2,     37) =       0.76
+Statistics robust to heteroskedasticity           Prob > F        =     0.4745
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                           (Std. Err. adjusted for 38 clusters in region)
+-----------------------------------------------------------------------------------------
+                        |               Robust
+                ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+------------------------+----------------------------------------------------------------
+              agri_post |   .0451268   .0380923     1.18   0.244    -.0320555    .1223091
+agri_post_highlivestock |  -.0290013   .0584697    -0.50   0.623    -.1474721    .0894695
+                  _cons |   9.790577   .0006149  1.6e+04   0.000     9.789331    9.791823
+-----------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * PART 3: Dairy-dominant vs Other (Small farm proxy)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: DAIRY REGIONS (Small Farm Proxy)"
+PART 3: DAIRY REGIONS (Small Farm Proxy)
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Standardize dairy share
+. sum dairy_share
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ dairy_share |     78,095    .6618005    .1151016   .4044944    .887574
+
+. gen dairy_std = (dairy_share - r(mean)) / r(sd)
+
+. 
+. * Triple interaction with dairy
+. gen agri_post_dairy = agri_post * dairy_std
+
+. 
+. di _n "=== TRIPLE DIFF: Agri × Post × Dairy Share (standardized) ==="
+
+=== TRIPLE DIFF: Agri × Post × Dairy Share (standardized) ===
+
+. reghdfe ln_wage agri_post agri_post_dairy, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   2,     37) =       0.84
+Statistics robust to heteroskedasticity           Prob > F        =     0.4390
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                   (Std. Err. adjusted for 38 clusters in region)
+---------------------------------------------------------------------------------
+                |               Robust
+        ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+----------------+----------------------------------------------------------------
+      agri_post |   .0344141   .0311995     1.10   0.277     -.028802    .0976302
+agri_post_dairy |   .0254112   .0205658     1.24   0.224    -.0162592    .0670815
+          _cons |   9.790566   .0006153  1.6e+04   0.000     9.789319    9.791812
+---------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * PART 4: Combined Model (test both simultaneously)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: COMBINED MODEL"
+PART 4: COMBINED MODEL
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "=== Livestock AND Dairy interactions (testing both) ==="
+
+=== Livestock AND Dairy interactions (testing both) ===
+
+. reghdfe ln_wage agri_post agri_post_livestock agri_post_dairy, absorb(idind year) cluste
+> r(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   3,     37) =       1.29
+Statistics robust to heteroskedasticity           Prob > F        =     0.2921
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                       (Std. Err. adjusted for 38 clusters in region)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------+----------------------------------------------------------------
+          agri_post |   .0447762   .0289354     1.55   0.130    -.0138526    .1034049
+agri_post_livestock |  -.1073889    .083254    -1.29   0.205    -.2760776    .0612997
+    agri_post_dairy |  -.0895745   .0908494    -0.99   0.331    -.2736529    .0945038
+              _cons |   9.790584   .0005739  1.7e+04   0.000     9.789421    9.791746
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * PART 5: Sub-sector proxy using occupation codes
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 5: SUB-SECTOR PROXY USING OCCUPATION CODES"
+PART 5: SUB-SECTOR PROXY USING OCCUPATION CODES
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Check if occupation variable exists
+. cap describe occup08
+
+. if _rc == 0 {
+.     * ISCO codes: 6 = Skilled agricultural workers, 92 = Agricultural laborers
+.     gen skilled_agri = (occup08 >= 600 & occup08 < 700)
+.     gen unskilled_agri = (occup08 >= 920 & occup08 < 930)
+. 
+.     * Create sub-sector proxy
+.     gen agri_skilled = agri * skilled_agri
+.     gen agri_unskilled = agri * unskilled_agri
+. 
+.     tab skilled_agri agri if agri == 1
+
+           | Agricultur
+skilled_ag |  e sector
+        ri |         1 |     Total
+-----------+-----------+----------
+         0 |     3,204 |     3,204 
+-----------+-----------+----------
+     Total |     3,204 |     3,204 
+.     tab unskilled_agri agri if agri == 1
+
+           | Agricultur
+unskilled_ |  e sector
+      agri |         1 |     Total
+-----------+-----------+----------
+         0 |     3,204 |     3,204 
+-----------+-----------+----------
+     Total |     3,204 |     3,204 
+. 
+.     * Effects by skill level (sub-sector proxy)
+.     di _n "=== SKILLED AGRICULTURAL WORKERS ==="
+
+=== SKILLED AGRICULTURAL WORKERS ===
+.     reghdfe ln_wage agri_post if skilled_agri == 1, absorb(idind year) cluster(region)
+insufficient observations
+r(2001);
+. 
+.     di _n "=== UNSKILLED AGRICULTURAL LABORERS ==="
+.     reghdfe ln_wage agri_post if unskilled_agri == 1, absorb(idind year) cluster(region)
+. 
+.     * Triple difference with skill × firm structure
+.     gen skilled_post = skilled_agri * post
+.     gen skilled_post_livestock = skilled_post * livestock_std
+. 
+.     di _n "=== SKILLED AGRI × Livestock Dominance ==="
+.     reghdfe ln_wage skilled_post skilled_post_livestock if agri == 1, absorb(idind year)
+>  cluster(region)
+. }
+r(2001);
+
+end of do-file
+r(2001);
