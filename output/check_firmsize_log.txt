@@ -1,0 +1,95 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/check_firmsize_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 13:48:39
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019 & agri == 1
+(101,938 observations deleted)
+
+. 
+. di "=== FIRM SIZE AND SUB-SECTOR VARIABLES FOR AGRICULTURAL WORKERS ==="
+=== FIRM SIZE AND SUB-SECTOR VARIABLES FOR AGRICULTURAL WORKERS ===
+
+. 
+. * List all j* variables
+. di _n "--- All j* variables in dataset ---"
+
+--- All j* variables in dataset ---
+
+. describe j*
+
+              storage   display    value
+variable name   type    format     label      variable label
+------------------------------------------------------------------------------------------
+j10_1           double  %12.0g     j10_1       % Of money officially registered
+j10_2           double  %12.0g     j10_2       Bonus amount last 30 days?--job 1
+
+. 
+. * Check j11 (enterprise type) if exists
+. di _n "--- j11: Enterprise type (if exists) ---"
+
+--- j11: Enterprise type (if exists) ---
+
+. cap tab j11, m
+
+. 
+. * Check j2 (number of employees) if exists  
+. di _n "--- j2: Employees at workplace (if exists) ---"
+
+--- j2: Employees at workplace (if exists) ---
+
+. cap tab j2, m
+
+. 
+. * Check occupation codes
+. di _n "--- Occupation codes (ISCO) ---"
+
+--- Occupation codes (ISCO) ---
+
+. tab occup08, m
+
+         Professional group by isco2008 |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+                               Managers |        177        5.52        5.52
+                          Professionals |        229        7.15       12.67
+Technicians and associate prefessionals |        369       11.52       24.19
+               Clerical support workers |        117        3.65       27.84
+              Servece and sales workers |        310        9.68       37.52
+Skilled agricultural, forestry and fish |        101        3.15       40.67
+       Craft and related trades workers |        240        7.49       48.16
+Plant and machine operators, and assemb |      1,159       36.17       84.33
+                 Elementary occupations |        501       15.64       99.97
+                      REFUSES TO ANSWER |          1        0.03      100.00
+----------------------------------------+-----------------------------------
+                                  Total |      3,204      100.00
+
+. 
+. * Create occupation-based categories
+. gen occ_1digit = floor(occup08/1000) if occup08 != .
+
+. di _n "--- 1-digit occupation ---"
+
+--- 1-digit occupation ---
+
+. tab occ_1digit, m
+
+ occ_1digit |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      3,203       99.97       99.97
+      99999 |          1        0.03      100.00
+------------+-----------------------------------
+      Total |      3,204      100.00
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/check_firmsize_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 13:48:44
+------------------------------------------------------------------------------------------
