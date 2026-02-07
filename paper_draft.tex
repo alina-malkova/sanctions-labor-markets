@@ -224,6 +224,48 @@ Our treatment intensity measure for region $r$ is:
 \end{equation}
 where $\text{Share}_{rp}$ is the share of region $r$'s agricultural firms in product category $p$, and $\text{ImportShare}_p$ is the pre-ban import share for product $p$.
 
+\subsection{Sample Size and Statistical Power}
+
+Table \ref{tab:sample_sizes} reports effective sample sizes for our analysis. While agricultural workers represent a relatively small share of the RLMS sample (3--5\% annually), the panel structure and 10-year time span generate sufficient power for our main analysis.
+
+\begin{table}[H]
+\centering
+\caption{Effective Sample Sizes}
+\label{tab:sample_sizes}
+\begin{threeparttable}
+\begin{tabular}{lcc}
+\toprule
+& Agriculture & Other Sectors \\
+\midrule
+\multicolumn{3}{l}{\textit{Primary Sample (2010--2019)}} \\
+\quad Worker-years & 3,204 & 74,891 \\
+\quad Unique individuals & 766 & 14,847 \\
+\quad Baseline (2013) & 368 & 8,323 \\
+\quad Post-treatment (2014--2019) & 1,571 & 41,463 \\
+\midrule
+\multicolumn{3}{l}{\textit{Extended Sample (2010--2023)}} \\
+\quad Worker-years & 4,139 & 101,003 \\
+\quad Unique individuals & 892 & 16,215 \\
+\midrule
+\multicolumn{3}{l}{\textit{By Year (Agriculture)}} \\
+\quad 2010 & 430 & \\
+\quad 2013 (baseline) & 368 & \\
+\quad 2014 & 273 & \\
+\quad 2019 & 244 & \\
+\quad 2023 & 236 & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Sample restricted to employed workers aged 18--65 with non-missing wages.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\paragraph{Power calculations.} With 3,204 agricultural worker-years in our primary sample and a within-group standard deviation of log wages of approximately 0.65, our minimum detectable effect (MDE) at 80\% power and $\alpha = 0.05$ is approximately 3.2 percentage points. Accounting for clustering at the regional level (35 clusters, design effect $\approx$ 1.5), the MDE increases to approximately 4.0 percentage points. Our estimated effect of 3.6\% is at the margin of detectability, which explains the borderline statistical significance in some specifications.
+
+\paragraph{Sub-sector analysis: Data limitations.} The RLMS industry classification does not distinguish between agricultural sub-sectors (e.g., livestock, dairy, crops). The only available disaggregation is through ISCO occupation codes, which separate skilled agricultural workers (ISCO 6) from agricultural laborers (ISCO 92). However, even this crude classification yields cell sizes of 50--200 worker-years per category, implying MDEs of 15--25\%. We therefore \textit{do not} pursue sub-sector heterogeneity analysis, as we lack the statistical power to detect meaningful differences. Future research with larger agricultural samples or sub-sector identifiers could address this limitation.
+
 %==============================================================================
 \section{Empirical Strategy} \label{sec:empirical}
 %==============================================================================
@@ -860,11 +902,15 @@ A complete welfare analysis would need to account for:
 Our analysis has several limitations:
 
 \begin{enumerate}
-    \item \textbf{Sample size}: With approximately 400 agricultural workers at baseline, power is limited for sub-sector heterogeneity analysis.
-    \item \textbf{Hours measurement}: Hours are self-reported and may be subject to measurement error.
-    \item \textbf{Firm-level mechanisms}: We cannot observe whether earnings gains track firm profitability or productivity growth.
-    \item \textbf{2022 contamination}: While our results are robust to excluding 2022--2023, the full extended sample may be contaminated by Ukraine war effects. We recommend treating 2010--2019 as our primary sample.
-    \item \textbf{No consumer analysis}: We lack consumption data to directly estimate consumer welfare losses.
+    \item \textbf{Sample size and sub-sector analysis}: With 368 agricultural workers at baseline and 3,204 agricultural worker-years in our primary sample, we have adequate power to detect effects of 4+ percentage points for the aggregate agricultural sector. However, we \textit{cannot} reliably estimate heterogeneous effects across agricultural sub-sectors (livestock, dairy, crops). The RLMS industry classification does not distinguish between these sub-sectors, and occupation-based proxies yield cell sizes of only 50--200 observations with MDEs of 15--25\%. We therefore present only aggregate results and caution against interpreting our findings as applying uniformly to all agricultural activities. Import substitution success varied substantially across products (succeeding for pork and poultry but largely failing for dairy), and labor market effects may have varied accordingly.
+
+    \item \textbf{Hours measurement}: Hours are self-reported and may be subject to measurement error. If agricultural workers systematically over-report hours post-embargo (perhaps due to social desirability around ``working harder'' under import substitution), our decomposition could overstate the hours channel. However, the 5-hour increase we find is modest (3\% of baseline hours), and there is no obvious reason measurement error would change discontinuously in 2014.
+
+    \item \textbf{Firm-level mechanisms}: We cannot observe whether earnings gains track firm profitability or productivity growth. Linking worker-level RLMS data to firm-level RFSD outcomes would help identify whether protection generated rents that firms partially shared with workers versus simply increased labor demand.
+
+    \item \textbf{2022+ contamination}: While our results are robust to excluding 2022--2023, the extended sample is contaminated by Ukraine war effects (mobilization, emigration, additional sanctions). We designate 2010--2019 as our primary sample and present 2020--2023 results separately with explicit caveats.
+
+    \item \textbf{No consumer analysis}: We lack consumption data to directly estimate consumer welfare losses from higher food prices, preventing a complete welfare accounting.
 \end{enumerate}
 
 %==============================================================================
