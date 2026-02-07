@@ -45,7 +45,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent We study how domestic labor markets respond to sudden trade barriers using the natural experiment of Russia's 2014 food import embargo. Using individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS) covering 2010--2019, we employ a difference-in-differences design comparing agricultural workers to those in other sectors. We find that agricultural workers experienced earnings gains of 8--13 percent relative to other workers following the embargo when using intent-to-treat (pre-2014 industry assignment) specifications. However, our wage decomposition reveals that these gains are driven entirely by increased hours worked (5 additional hours per month), not higher hourly wages. This pattern is consistent with labor demand expansion: import substitution increased demand for agricultural output, which farms met by employing more worker-hours rather than paying higher wages. Our findings suggest that trade protection can generate persistent earnings gains for workers in protected industries, but these gains come from working more rather than earning more per hour---a less favorable outcome for worker welfare than higher wage rates.
+\noindent We study how domestic labor markets respond to sudden trade barriers using Russia's 2014 food import embargo as a natural experiment. Using individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS), we employ a difference-in-differences design comparing agricultural workers to those in other sectors. \textbf{Our primary sample covers 2010--2019}, providing a clean 5-year pre/post window uncontaminated by later shocks (COVID-19, Ukraine war). Using intent-to-treat specifications, we find agricultural workers experienced earnings gains of 8--9 percent. However, our wage decomposition reveals these gains are driven entirely by increased hours worked (+5 hours/month), not higher hourly wages. Strikingly, agricultural employment \textit{declined} 36\% despite these earnings gains, suggesting workers value non-wage amenities over the protection premium. We present 2020--2023 results separately with explicit caveats about confounding from pandemic and war disruptions. Our findings suggest trade protection generates earnings gains through increased labor demand, but workers respond on the hours margin rather than through sectoral reallocation.
 
 \bigskip
 \noindent \textbf{JEL Codes:} F13, F14, J22, J31, Q17
@@ -466,45 +466,93 @@ Observations & 99,536 & 88,681 & 99,536 & 99,536 & 99,536 \\
 
 The coefficient remains positive (2.9--3.6\%) across all specifications except log hourly wages, where the effect is close to zero. This suggests that the wage gains may partly reflect increased hours rather than higher hourly compensation, consistent with labor demand expansion requiring more worker-hours.
 
-\subsection{Excluding 2022--2024}
+\subsection{Primary Sample: 2010--2019}
 
-The February 2022 Russian invasion of Ukraine triggered a new wave of Western sanctions and major economic disruptions that could confound our estimates. Table \ref{tab:excl_years} examines whether our results are sensitive to excluding these recent years.
+\textbf{We adopt 2010--2019 as our primary estimation sample.} The post-2019 period is contaminated by two major confounding events that fundamentally disrupted Russian labor markets:
+
+\begin{enumerate}
+    \item \textbf{COVID-19 pandemic (2020--2021)}: Widespread lockdowns, supply chain disruptions, and shifts in labor demand across sectors.
+    \item \textbf{Ukraine war (2022--present)}: Military mobilization removed an estimated 300,000+ working-age men from the labor force. Mass emigration of skilled workers. New Western sanctions disrupted trade and production. Wartime production shifted labor demand toward defense industries.
+\end{enumerate}
+
+These disruptions affect both treatment and control sectors in ways that cannot be cleanly separated from the 2014 food embargo effects. Therefore, our primary results use the 2010--2019 sample, which provides 5 years of pre-treatment data (2010--2013) and 5 years of post-treatment data (2014--2019)---a clean ``medium-run'' window uncontaminated by later shocks.
+
+Table \ref{tab:primary_sample} presents our primary specification using the 2010--2019 sample.
 
 \begin{table}[H]
 \centering
-\caption{Excluding Recent Years}
-\label{tab:excl_years}
+\caption{Primary Results: 2010--2019 Sample}
+\label{tab:primary_sample}
 \begin{threeparttable}
-\begin{tabular}{lccccc}
+\begin{tabular}{lccc}
 \toprule
-& (1) & (2) & (3) & (4) & (5) \\
-& Full Sample & Excl. 2022--23 & Excl. 2022 & Pre-COVID & 2010--2018 \\
+& (1) & (2) & (3) \\
+& Current Industry & ITT (Initial Ind.) & Stayers Only \\
 \midrule
-Agriculture $\times$ Post & 0.036 & 0.034 & 0.031 & 0.031 & 0.034 \\
-& (0.023) & (0.026) & (0.023) & (0.031) & (0.034) \\
+Agriculture $\times$ Post & 0.031 & 0.079** & 0.089** \\
+& (0.031) & (0.033) & (0.038) \\
 \midrule
-Observations & 99,536 & 86,194 & 92,319 & 72,904 & 65,948 \\
+Sample & 2010--2019 & 2010--2019 & 2010--2019 \\
+Observations & 72,904 & 63,830 & 52,411 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \small
-\item \textit{Notes:} All specifications include individual and year fixed effects. Column (1) uses the full 2010--2023 sample. Column (2) excludes 2022--2023 (Ukraine war period). Column (3) excludes only 2022. Column (4) uses 2010--2019 (pre-COVID). Column (5) uses 2010--2018 (original paper endpoint). Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\item \textit{Notes:} All specifications include individual and year fixed effects. Column (1) uses current industry assignment. Column (2) uses intent-to-treat (pre-2014 industry). Column (3) restricts to workers who remained in same sector throughout. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
 
-The estimates are remarkably stable across all sample periods, ranging from 3.1\% to 3.6\%. This stability suggests that our findings are not driven by the post-2022 period and that the food embargo effects identified in our analysis are distinct from effects of later sanctions or economic disruptions.
+Using the clean 2010--2019 sample, we find earnings effects of 3.1\% (current industry) to 7.9--8.9\% (ITT/stayers). These estimates are our preferred ``medium-run'' effects of the food embargo.
 
-Figure \ref{fig:event_study_excl_war} presents the event study excluding 2022--2023.
+\subsection{Extended Period: 2020--2023 (With Caveats)}
+
+We present results for the extended 2020--2023 period separately, with explicit caveats about interpretation.
+
+\begin{table}[H]
+\centering
+\caption{Extended Period Results (Interpret with Caution)}
+\label{tab:extended}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& 2014--2019 & 2020--2021 & 2022--2023 & Full Sample \\
+\midrule
+Agriculture $\times$ Post & 0.012 & 0.071** & 0.094** & 0.036 \\
+& (0.024) & (0.027) & (0.037) & (0.023) \\
+\midrule
+Period & Pre-COVID & COVID & War & All \\
+Confounders & None & Pandemic & Mobilization, & Mixed \\
+& & & emigration & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Column (1) shows effect in 2014--2019 relative to 2010--2013. Column (2) shows incremental effect in 2020--2021. Column (3) shows incremental effect in 2022--2023. The larger effects in Columns (2)--(3) likely reflect confounding from pandemic and war disruptions, not food embargo effects.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\textbf{Warning}: The apparent growth in effects after 2019 (from 1.2\% to 7.1\% to 9.4\%) should \textit{not} be interpreted as growing food embargo effects. More plausible explanations include:
+
+\begin{itemize}
+    \item \textbf{COVID effects}: Agricultural work is outdoor/rural, potentially less affected by pandemic restrictions than urban service jobs.
+    \item \textbf{Mobilization effects}: Military conscription disproportionately affected non-agricultural sectors, creating artificial relative gains for agriculture.
+    \item \textbf{Emigration effects}: Skilled worker emigration from IT, finance, and professional services created relative wage compression.
+    \item \textbf{War economy}: Shifts toward domestic food production for food security reasons (distinct from 2014 import substitution).
+\end{itemize}
+
+Figure \ref{fig:event_study_excl_war} shows the event study using only 2010--2021 (excluding the war period).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{output/figures/event_study_excl_war.png}
-\caption{Event Study: Excluding 2022--2023 (War Period)}
+\caption{Event Study: Primary Sample Excluding War Period (2010--2021)}
 \label{fig:event_study_excl_war}
 \begin{minipage}{0.9\textwidth}
 \small
-\textit{Notes:} Figure plots event study coefficients using the sample restricted to 2010--2021. The pattern is similar to the full-sample results, with growing effects over time.
+\textit{Notes:} Figure plots event study coefficients using 2010--2021 sample. Effects are modest in 2014--2019 and grow in 2020--2021, but the COVID period is also confounded.
 \end{minipage}
 \end{figure}
 
@@ -823,7 +871,7 @@ Our analysis has several limitations:
 \section{Conclusion} \label{sec:conclusion}
 %==============================================================================
 
-This paper studies the labor market effects of Russia's 2014 food import embargo using individual-level panel data covering 2010--2019. We find that agricultural workers experienced earnings gains of 8--13\% relative to workers in other sectors following the embargo when using intent-to-treat specifications that avoid bias from post-treatment industry switching.
+This paper studies the labor market effects of Russia's 2014 food import embargo using individual-level panel data. Our \textbf{primary sample covers 2010--2019}, providing a clean medium-run window uncontaminated by COVID-19 or the Ukraine war. We find that agricultural workers experienced earnings gains of 8--9\% relative to other sectors when using intent-to-treat specifications. Results for 2020--2023 show larger effects but are confounded by pandemic disruptions and wartime mobilization.
 
 Our key finding is that these earnings gains are driven entirely by increased hours worked, not higher hourly wages. Agricultural workers worked approximately 5 additional hours per month post-embargo, while their hourly wage rate was essentially unchanged. This pattern is consistent with labor demand expansion through import substitution, with farms meeting increased demand by employing more worker-hours rather than bidding up wage rates.
 
