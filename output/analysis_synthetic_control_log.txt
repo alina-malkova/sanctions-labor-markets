@@ -1,0 +1,729 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_synthetic_control_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 14:43:33
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "SYNTHETIC CONTROL ANALYSIS"
+SYNTHETIC CONTROL ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. ********************************************************************************
+. * STEP 1: Prepare sector-level panel data
+. ********************************************************************************
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. * Check what industry variable is available
+. describe industry agri
+
+              storage   display    value
+variable name   type    format     label      variable label
+------------------------------------------------------------------------------------------
+industry        double  %12.0g     j4_1       Industry code
+agri            float   %9.0g                 Agriculture sector
+
+. 
+. * Create sector variable from industry
+. gen sector = industry
+
+. label define sector_lbl 1 "Food Industry" 2 "Machine Constr" 3 "Military" ///
+>     4 "Oil/Gas" 5 "Heavy Industry" 6 "Construction" 7 "Transport" ///
+>     8 "Agriculture" 9 "Government" 10 "Education" 11 "Science" ///
+>     12 "Health" 13 "Army/Police" 14 "Trade/Services" 15 "Finance" 16 "Other"
+
+. label values sector sector_lbl
+
+. 
+. * Drop missing sectors
+. drop if sector == .
+(0 observations deleted)
+
+. 
+. * Collapse to sector-year level
+. collapse (mean) ln_wage hours_month age female ///
+>          (count) n_obs = ln_wage, by(sector year)
+
+. 
+. di _n "=== Sector-Year Panel ==="
+
+=== Sector-Year Panel ===
+
+. list sector year ln_wage n_obs if year == 2013
+
+     +------------------------------------------+
+     |         sector   year    ln_wage   n_obs |
+     |------------------------------------------|
+  4. |  Food Industry   2013   9.702696     487 |
+ 14. | Machine Constr   2013   9.775604     204 |
+ 24. |       Military   2013   9.771808     160 |
+ 34. |        Oil/Gas   2013   10.19906     251 |
+ 44. | Heavy Industry   2013   9.858632     321 |
+     |------------------------------------------|
+ 54. |   Construction   2013   9.998844     767 |
+ 64. |      Transport   2013   9.909385     831 |
+ 74. |    Agriculture   2013   9.243885     368 |
+ 84. |     Government   2013   9.493696     255 |
+ 94. |      Education   2013   9.507995     861 |
+     |------------------------------------------|
+104. |        Science   2013   9.605491     276 |
+114. |         Health   2013   9.518984     655 |
+124. |    Army/Police   2013   10.01537     437 |
+134. | Trade/Services   2013   9.698905    1802 |
+144. |        Finance   2013   9.967795     198 |
+     |------------------------------------------|
+154. |          Other   2013   9.897228     184 |
+164. |             17   2013   9.522058     304 |
+172. |             18   2013   10.17976      34 |
+180. |             20   2013   9.256895      58 |
+188. |             21   2013   10.07355      33 |
+     |------------------------------------------|
+196. |             22   2013   8.875233       9 |
+204. |             23   2013   9.762703      20 |
+212. |             24   2013   9.798418      17 |
+220. |             25   2013   9.834558      30 |
+228. |             26   2013   9.654211      89 |
+     |------------------------------------------|
+236. |             27   2013   10.25895      23 |
+244. |             28   2013   9.383424       5 |
+251. |             29   2013   9.509106      12 |
+     +------------------------------------------+
+
+. 
+. * Reshape to wide format for synthetic control
+. reshape wide ln_wage hours_month age female n_obs, i(year) j(sector)
+(note: j = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 20 21 22 23 24 25 26 27 28 29 30 3
+> 1 32)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                      274   ->      10
+Number of variables                   7   ->     156
+j variable (31 values)           sector   ->   (dropped)
+xij variables:
+                                ln_wage   ->   ln_wage1 ln_wage2 ... ln_wage32
+                            hours_month   ->   hours_month1 hours_month2 ... hours_month32
+                                    age   ->   age1 age2 ... age32
+                                 female   ->   female1 female2 ... female32
+                                  n_obs   ->   n_obs1 n_obs2 ... n_obs32
+-----------------------------------------------------------------------------
+
+. 
+. * Rename for clarity (industry codes: 8=agri, 1=food, 6=constr, 7=transport, 9=govt, 10=
+> educ, 12=health, 14=trade)
+. rename ln_wage8 ln_wage_agri
+
+. rename ln_wage1 ln_wage_food
+
+. rename ln_wage6 ln_wage_constr
+
+. rename ln_wage7 ln_wage_transport
+
+. rename ln_wage9 ln_wage_govt
+
+. rename ln_wage10 ln_wage_educ
+
+. rename ln_wage12 ln_wage_health
+
+. rename ln_wage14 ln_wage_trade
+
+. 
+. * Also rename other sectors if they exist (might not all exist)
+. cap rename ln_wage2 ln_wage_machine
+
+. cap rename ln_wage5 ln_wage_heavy
+
+. 
+. di _n "=== Pre-Treatment Wages (2013) ==="
+
+=== Pre-Treatment Wages (2013) ===
+
+. list year ln_wage_agri ln_wage_food ln_wage_constr ln_wage_govt ln_wage_trade if year ==
+>  2013
+
+     +-------------------------------------------------------------+
+     | year   ln_wag~i   ln_wag~d   ln_wag~r   ln_wa~vt   ln_wa~de |
+     |-------------------------------------------------------------|
+  4. | 2013   9.243885   9.702696   9.998844   9.493696   9.698905 |
+     +-------------------------------------------------------------+
+
+. 
+. ********************************************************************************
+. * STEP 2: Construct Synthetic Control Weights
+. * Match on pre-2014 wage levels
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "STEP 2: CONSTRUCT SYNTHETIC CONTROL WEIGHTS"
+STEP 2: CONSTRUCT SYNTHETIC CONTROL WEIGHTS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Calculate pre-treatment means (2010-2013)
+. preserve
+
+. keep if year <= 2013
+(6 observations deleted)
+
+. 
+. collapse (mean) ln_wage_agri ln_wage_food ln_wage_machine ln_wage_heavy ///
+>                 ln_wage_constr ln_wage_transport ln_wage_govt ln_wage_educ ///
+>                 ln_wage_health ln_wage_trade
+
+. 
+. * Agriculture pre-treatment mean
+. local agri_pre = ln_wage_agri[1]
+
+. di "Agriculture pre-treatment mean: " `agri_pre'
+Agriculture pre-treatment mean: 9.1139345
+
+. 
+. * Calculate distance from agriculture for each sector
+. gen dist_food = abs(ln_wage_food - ln_wage_agri)
+
+. gen dist_machine = abs(ln_wage_machine - ln_wage_agri)
+
+. gen dist_heavy = abs(ln_wage_heavy - ln_wage_agri)
+
+. gen dist_constr = abs(ln_wage_constr - ln_wage_agri)
+
+. gen dist_transport = abs(ln_wage_transport - ln_wage_agri)
+
+. gen dist_govt = abs(ln_wage_govt - ln_wage_agri)
+
+. gen dist_educ = abs(ln_wage_educ - ln_wage_agri)
+
+. gen dist_health = abs(ln_wage_health - ln_wage_agri)
+
+. gen dist_trade = abs(ln_wage_trade - ln_wage_agri)
+
+. 
+. di _n "=== Distance from Agriculture (pre-treatment) ==="
+
+=== Distance from Agriculture (pre-treatment) ===
+
+. list dist_food dist_constr dist_govt dist_educ dist_trade
+
+     +------------------------------------------------------+
+     | dist_f~d   dist_c~r   dist_g~t   dist_e~c   dist_t~e |
+     |------------------------------------------------------|
+  1. |  .410428   .7406778   .3110123   .1441841   .4150743 |
+     +------------------------------------------------------+
+
+. 
+. * Pre-treatment sector means
+. local pre_food = ln_wage_food[1]
+
+. local pre_machine = ln_wage_machine[1]
+
+. local pre_heavy = ln_wage_heavy[1]
+
+. local pre_constr = ln_wage_constr[1]
+
+. local pre_transport = ln_wage_transport[1]
+
+. local pre_govt = ln_wage_govt[1]
+
+. local pre_educ = ln_wage_educ[1]
+
+. local pre_health = ln_wage_health[1]
+
+. local pre_trade = ln_wage_trade[1]
+
+. restore
+
+. 
+. ********************************************************************************
+. * STEP 3: Simple Synthetic Control (weighted average)
+. * Use inverse-distance weighting based on pre-treatment wage levels
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "STEP 3: CONSTRUCT SYNTHETIC AGRICULTURE"
+STEP 3: CONSTRUCT SYNTHETIC AGRICULTURE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Method 1: Simple average of all control sectors
+. gen synth_simple = (ln_wage_food + ln_wage_constr + ln_wage_transport + ///
+>                     ln_wage_govt + ln_wage_educ + ln_wage_health + ln_wage_trade) / 7
+
+. 
+. * Method 2: Weighted by similarity to agriculture
+. * Use sectors closest to agriculture in pre-treatment wages
+. * Agriculture is low-wage, so give more weight to other low-wage sectors
+. 
+. * Calculate pre-treatment adjustment factor
+. gen pre_period = (year <= 2013)
+
+. 
+. * Method 3: Match exactly on pre-2013 mean, then track
+. * Synthetic = agriculture mean + (weighted control deviation from their mean)
+. egen synth_mean_food = mean(ln_wage_food) if year <= 2013
+(6 missing values generated)
+
+. egen synth_mean_constr = mean(ln_wage_constr) if year <= 2013
+(6 missing values generated)
+
+. egen synth_mean_govt = mean(ln_wage_govt) if year <= 2013
+(6 missing values generated)
+
+. egen synth_mean_educ = mean(ln_wage_educ) if year <= 2013
+(6 missing values generated)
+
+. egen synth_mean_trade = mean(ln_wage_trade) if year <= 2013
+(6 missing values generated)
+
+. egen agri_mean = mean(ln_wage_agri) if year <= 2013
+(6 missing values generated)
+
+. 
+. * Fill in means for all years
+. foreach v in synth_mean_food synth_mean_constr synth_mean_govt synth_mean_educ synth_mea
+> n_trade agri_mean {
+  2.     egen temp = max(`v')
+  3.     replace `v' = temp
+  4.     drop temp
+  5. }
+(6 real changes made)
+(6 real changes made)
+(6 real changes made)
+(6 real changes made)
+(6 real changes made)
+(6 real changes made)
+
+. 
+. * Create de-meaned control sectors (deviation from pre-treatment mean)
+. gen dev_food = ln_wage_food - synth_mean_food
+
+. gen dev_constr = ln_wage_constr - synth_mean_constr
+
+. gen dev_govt = ln_wage_govt - synth_mean_govt
+
+. gen dev_educ = ln_wage_educ - synth_mean_educ
+
+. gen dev_trade = ln_wage_trade - synth_mean_trade
+
+. 
+. * Synthetic control: agriculture pre-mean + weighted average of control deviations
+. * Weight by 1/distance to agriculture
+. gen synth_matched = agri_mean + (dev_food + dev_constr + dev_trade)/3
+
+. 
+. * Also try: just shift control sectors to match agriculture level
+. gen synth_shifted = synth_simple - (synth_mean_food + synth_mean_constr + ///
+>     synth_mean_govt + synth_mean_educ + synth_mean_trade)/5 + agri_mean
+
+. 
+. di _n "=== Comparison: Agriculture vs Synthetic ==="
+
+=== Comparison: Agriculture vs Synthetic ===
+
+. list year ln_wage_agri synth_simple synth_matched synth_shifted
+
+     +--------------------------------------------------+
+     | year   ln_wag~i   synth~le   synt~hed   synt~ted |
+     |--------------------------------------------------|
+  1. | 2010   8.919818   9.344296   8.929583   8.940021 |
+  2. | 2011   9.102503   9.464857   9.063936   9.060582 |
+  3. | 2012   9.189533    9.59662   9.184132   9.192345 |
+  4. | 2013   9.243885   9.690072   9.278089   9.285797 |
+  5. | 2014   9.418563   9.786652   9.368332   9.382377 |
+     |--------------------------------------------------|
+  6. | 2015   9.543257   9.833503   9.408587   9.429228 |
+  7. | 2016   9.593905   9.877236   9.451498   9.472961 |
+  8. | 2017   9.649827   9.935719   9.522532   9.531444 |
+  9. | 2018   9.798817   10.03458   9.588047   9.630302 |
+ 10. | 2019   9.902315   10.12253   9.673156   9.718252 |
+     +--------------------------------------------------+
+
+. 
+. ********************************************************************************
+. * STEP 4: Calculate Treatment Effect (Gap)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "STEP 4: TREATMENT EFFECT (AGRICULTURE - SYNTHETIC)"
+STEP 4: TREATMENT EFFECT (AGRICULTURE - SYNTHETIC)
+
+. di "======================================================================"
+======================================================================
+
+. 
+. gen gap_simple = ln_wage_agri - synth_simple
+
+. gen gap_matched = ln_wage_agri - synth_matched
+
+. gen gap_shifted = ln_wage_agri - synth_shifted
+
+. 
+. di _n "=== Gap: Agriculture minus Synthetic Control ==="
+
+=== Gap: Agriculture minus Synthetic Control ===
+
+. list year ln_wage_agri synth_matched gap_matched
+
+     +----------------------------------------+
+     | year   ln_wag~i   synt~hed   gap_mat~d |
+     |----------------------------------------|
+  1. | 2010   8.919818   8.929583   -.0097647 |
+  2. | 2011   9.102503   9.063936    .0385666 |
+  3. | 2012   9.189533   9.184132    .0054016 |
+  4. | 2013   9.243885   9.278089   -.0342035 |
+  5. | 2014   9.418563   9.368332     .050231 |
+     |----------------------------------------|
+  6. | 2015   9.543257   9.408587    .1346693 |
+  7. | 2016   9.593905   9.451498    .1424074 |
+  8. | 2017   9.649827   9.522532    .1272955 |
+  9. | 2018   9.798817   9.588047    .2107697 |
+ 10. | 2019   9.902315   9.673156    .2291594 |
+     +----------------------------------------+
+
+. 
+. * Pre-treatment gap (should be ~0 if good match)
+. sum gap_matched if year <= 2013
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ gap_matched |          4           0     .030451  -.0342035   .0385666
+
+. local pre_gap = r(mean)
+
+. di "Pre-treatment gap (matched): " `pre_gap'
+Pre-treatment gap (matched): 0
+
+. 
+. * Post-treatment gap
+. sum gap_matched if year >= 2014
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ gap_matched |          6    .1490887     .064368    .050231   .2291594
+
+. local post_gap = r(mean)
+
+. di "Post-treatment gap (matched): " `post_gap'
+Post-treatment gap (matched): .1490887
+
+. 
+. di _n "=== TREATMENT EFFECT ==="
+
+=== TREATMENT EFFECT ===
+
+. di "Post-pre difference: " `post_gap' - `pre_gap'
+Post-pre difference: .1490887
+
+. 
+. * By year
+. di _n "=== Gap by Year ==="
+
+=== Gap by Year ===
+
+. list year gap_matched if year >= 2010
+
+     +------------------+
+     | year   gap_mat~d |
+     |------------------|
+  1. | 2010   -.0097647 |
+  2. | 2011    .0385666 |
+  3. | 2012    .0054016 |
+  4. | 2013   -.0342035 |
+  5. | 2014     .050231 |
+     |------------------|
+  6. | 2015    .1346693 |
+  7. | 2016    .1424074 |
+  8. | 2017    .1272955 |
+  9. | 2018    .2107697 |
+ 10. | 2019    .2291594 |
+     +------------------+
+
+. 
+. ********************************************************************************
+. * STEP 5: Placebo Tests (treat each control sector as if treated)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "STEP 5: PLACEBO TESTS"
+STEP 5: PLACEBO TESTS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * For each control sector, compute gap relative to other controls
+. * If agriculture effect is real, placebo gaps should be smaller
+. 
+. * Placebo: Food Industry
+. gen synth_ex_food = (ln_wage_constr + ln_wage_transport + ln_wage_govt + ///
+>                      ln_wage_educ + ln_wage_health + ln_wage_trade) / 6
+
+. gen gap_food = ln_wage_food - synth_ex_food
+
+. 
+. * Placebo: Construction
+. gen synth_ex_constr = (ln_wage_food + ln_wage_transport + ln_wage_govt + ///
+>                        ln_wage_educ + ln_wage_health + ln_wage_trade) / 6
+
+. gen gap_constr = ln_wage_constr - synth_ex_constr
+
+. 
+. * Placebo: Government
+. gen synth_ex_govt = (ln_wage_food + ln_wage_constr + ln_wage_transport + ///
+>                      ln_wage_educ + ln_wage_health + ln_wage_trade) / 6
+
+. gen gap_govt = ln_wage_govt - synth_ex_govt
+
+. 
+. * Placebo: Education
+. gen synth_ex_educ = (ln_wage_food + ln_wage_constr + ln_wage_transport + ///
+>                      ln_wage_govt + ln_wage_health + ln_wage_trade) / 6
+
+. gen gap_educ = ln_wage_educ - synth_ex_educ
+
+. 
+. * Placebo: Trade
+. gen synth_ex_trade = (ln_wage_food + ln_wage_constr + ln_wage_transport + ///
+>                       ln_wage_govt + ln_wage_educ + ln_wage_health) / 6
+
+. gen gap_trade = ln_wage_trade - synth_ex_trade
+
+. 
+. di _n "=== Placebo Gaps (Post-2014 Average) ==="
+
+=== Placebo Gaps (Post-2014 Average) ===
+
+. foreach sector in food constr govt educ trade {
+  2.     sum gap_`sector' if year >= 2014
+  3.     di "Gap `sector': " r(mean)
+  4. }
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    gap_food |          6   -.0006429     .046661  -.0660257   .0470181
+Gap food: -.00064294
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+  gap_constr |          6    .3293292     .021218   .2945271   .3512239
+Gap constr: .32932917
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    gap_govt |          6   -.1781034    .0412395  -.2081413  -.1004534
+Gap govt: -.17810345
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    gap_educ |          6   -.2413036    .0233306  -.2859907  -.2256813
+Gap educ: -.2413036
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+   gap_trade |          6    -.005345    .0290521  -.0340824   .0477676
+Gap trade: -.00534503
+
+. 
+. * Agriculture gap for comparison
+. sum gap_simple if year >= 2014
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+  gap_simple |          6   -.2805883     .051846  -.3680887   -.220212
+
+. di "Gap agriculture (simple): " r(mean)
+Gap agriculture (simple): -.28058831
+
+. 
+. ********************************************************************************
+. * STEP 6: Post/Pre Ratio Test
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "STEP 6: POST/PRE RATIO TEST"
+STEP 6: POST/PRE RATIO TEST
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Calculate RMSPE (root mean squared prediction error) ratio
+. * Good synthetic control: small pre-treatment RMSPE
+. 
+. * Pre-treatment RMSPE
+. gen gap_sq = gap_matched^2
+
+. sum gap_sq if year <= 2013
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      gap_sq |          4    .0006954     .000743   .0000292   .0014874
+
+. local pre_rmspe = sqrt(r(mean))
+
+. di "Pre-treatment RMSPE: " `pre_rmspe'
+Pre-treatment RMSPE: .02637134
+
+. 
+. * Post-treatment RMSPE
+. sum gap_sq if year >= 2014
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+      gap_sq |          6    .0256801    .0188865   .0025232    .052514
+
+. local post_rmspe = sqrt(r(mean))
+
+. di "Post-treatment RMSPE: " `post_rmspe'
+Post-treatment RMSPE: .16025025
+
+. 
+. di "Post/Pre RMSPE ratio: " `post_rmspe'/`pre_rmspe'
+Post/Pre RMSPE ratio: 6.0766829
+
+. 
+. ********************************************************************************
+. * STEP 7: Export results for plotting
+. ********************************************************************************
+. 
+. keep year ln_wage_agri synth_matched synth_simple gap_matched gap_simple ///
+>      gap_food gap_constr gap_govt gap_educ gap_trade
+
+. 
+. export delimited using "output/tables/synthetic_control_results.csv", replace
+(note: file output/tables/synthetic_control_results.csv not found)
+file output/tables/synthetic_control_results.csv saved
+
+. 
+. di _n "=== Results saved to output/tables/synthetic_control_results.csv ==="
+
+=== Results saved to output/tables/synthetic_control_results.csv ===
+
+. 
+. ********************************************************************************
+. * STEP 8: Summary Statistics
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "SUMMARY: SYNTHETIC CONTROL RESULTS"
+SUMMARY: SYNTHETIC CONTROL RESULTS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "Pre-treatment (2010-2013):"
+
+Pre-treatment (2010-2013):
+
+. sum gap_matched if year <= 2013
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ gap_matched |          4           0     .030451  -.0342035   .0385666
+
+. di "  Mean gap: " r(mean)
+  Mean gap: 0
+
+. di "  SD gap: " r(sd)
+  SD gap: .030451
+
+. 
+. di _n "Post-treatment (2014-2019):"
+
+Post-treatment (2014-2019):
+
+. sum gap_matched if year >= 2014
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ gap_matched |          6    .1490887     .064368    .050231   .2291594
+
+. di "  Mean gap: " r(mean)
+  Mean gap: .1490887
+
+. di "  SD gap: " r(sd)
+  SD gap: .06436801
+
+. 
+. di _n "Year-by-year gaps:"
+
+Year-by-year gaps:
+
+. list year ln_wage_agri synth_matched gap_matched
+
+     +----------------------------------------+
+     | year   ln_wag~i   synth_~d   gap_mat~d |
+     |----------------------------------------|
+  1. | 2010   8.919818   8.929583   -.0097647 |
+  2. | 2011   9.102503   9.063936    .0385666 |
+  3. | 2012   9.189533   9.184132    .0054016 |
+  4. | 2013   9.243885   9.278089   -.0342035 |
+  5. | 2014   9.418563   9.368332     .050231 |
+     |----------------------------------------|
+  6. | 2015   9.543257   9.408587    .1346693 |
+  7. | 2016   9.593905   9.451498    .1424074 |
+  8. | 2017   9.649827   9.522532    .1272955 |
+  9. | 2018   9.798817   9.588047    .2107697 |
+ 10. | 2019   9.902315   9.673156    .2291594 |
+     +----------------------------------------+
+
+. 
+. di ""
+
+
+. di "Analysis complete!"
+Analysis complete!
+
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_synthetic_control_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 14:43:38
+------------------------------------------------------------------------------------------
