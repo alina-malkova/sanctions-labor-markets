@@ -897,6 +897,58 @@ A complete welfare analysis would need to account for:
     \item Government revenue: Changes in tax revenue from the food sector
 \end{itemize}
 
+\subsection{Firm-Level Evidence: Consolidation and Profitability}
+
+While we cannot match individual workers to firms, we use the Russian Firm Statistical Database (RFSD) to examine aggregate firm-level trends in agriculture. Table \ref{tab:firm_dynamics} presents key findings.
+
+\begin{table}[H]
+\centering
+\caption{Agricultural Firm Dynamics (RFSD)}
+\label{tab:firm_dynamics}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& 2013 & 2014 & 2018 & 2023 \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel A: Firm Counts}} \\
+Total agri/food firms & 408,324 & 412,240 & 379,599 & 237,239 \\
+\quad Primary agriculture & 130,402 & 128,399 & 112,020 & 86,192 \\
+\quad Food processing/retail & 277,922 & 283,841 & 267,579 & 151,047 \\
+Change from 2013 (\%) & --- & +1.0 & $-$7.0 & $-$41.9 \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel B: Profitability}} \\
+Total revenue (bn RUB) & 16,133 & 19,492 & 26,472 & 40,138 \\
+Total net profit (bn RUB) & 376 & 398 & 426 & 2,135 \\
+Profit margin (\%) & 2.3 & 2.0 & 1.6 & 5.3 \\
+Share profitable (\%) & 77.4 & 77.0 & 75.3 & 69.6 \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel C: Entry/Exit (2013--2023)}} \\
+\multicolumn{2}{l}{10-year survival rate} & \multicolumn{3}{c}{25.1\%} \\
+\multicolumn{2}{l}{Firms exiting} & \multicolumn{3}{c}{305,868} \\
+\multicolumn{2}{l}{New entrants} & \multicolumn{3}{c}{134,783} \\
+\multicolumn{2}{l}{Net change} & \multicolumn{3}{c}{$-$171,085 ($-$42\%)} \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel D: Concentration}} \\
+Top 10\% share of assets & 92.8\% & --- & 96.0\% & 92.3\% \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Data from Russian Firm Statistical Database. Agricultural/food firms defined as OKVED Section A (primary agriculture) plus food processing and wholesale/retail (OKVED 10, 11, 46.2, 46.3, 47.2). Revenue and profit in nominal rubles.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Three patterns emerge from the firm-level data:
+
+\paragraph{Massive consolidation.} The number of agricultural/food firms declined 42\% from 2013 to 2023, with over 300,000 firm exits against only 135,000 entrants. The 10-year survival rate was just 25\%. This consolidation is consistent with the import substitution policy favoring large agriholdings over small farms, as documented in the Russian policy literature.
+
+\paragraph{Profits concentrated in large firms.} The top 10\% of firms by assets hold over 92\% of total sector assets. Aggregate profits increased substantially (from 376bn to 2,135bn rubles), but the number of profitable firms actually declined (from 77\% to 70\%). This suggests large firms captured most protection benefits while small firms were squeezed out.
+
+\paragraph{Data limitations prevent worker-firm matching.} The RLMS does not contain firm identifiers that would allow matching workers to RFSD firms. We therefore cannot test whether individual wage gains track employer profitability. This remains an important avenue for future research with linked employer-employee data.
+
+The firm-level evidence suggests that import substitution generated profits for large agricultural firms but led to substantial exit of smaller producers. Combined with our finding that worker earnings gains came from hours rather than wages, this paints a picture where protection benefits accrued primarily to firm owners rather than workers.
+
 \subsection{Limitations}
 
 Our analysis has several limitations:
@@ -906,7 +958,7 @@ Our analysis has several limitations:
 
     \item \textbf{Hours measurement}: Hours are self-reported and may be subject to measurement error. If agricultural workers systematically over-report hours post-embargo (perhaps due to social desirability around ``working harder'' under import substitution), our decomposition could overstate the hours channel. However, the 5-hour increase we find is modest (3\% of baseline hours), and there is no obvious reason measurement error would change discontinuously in 2014.
 
-    \item \textbf{Firm-level mechanisms}: We cannot observe whether earnings gains track firm profitability or productivity growth. Linking worker-level RLMS data to firm-level RFSD outcomes would help identify whether protection generated rents that firms partially shared with workers versus simply increased labor demand.
+    \item \textbf{Worker-firm matching}: While we analyze aggregate firm-level trends (showing consolidation and profit concentration), the RLMS lacks firm identifiers that would allow matching individual workers to RFSD firms. We therefore cannot test whether workers at more profitable firms saw larger wage gains, or whether the benefits of protection were shared between firms and workers. Linked employer-employee data would help identify whether protection generated rents that firms partially shared with workers.
 
     \item \textbf{2022+ contamination}: While our results are robust to excluding 2022--2023, the extended sample is contaminated by Ukraine war effects (mobilization, emigration, additional sanctions). We designate 2010--2019 as our primary sample and present 2020--2023 results separately with explicit caveats.
 
