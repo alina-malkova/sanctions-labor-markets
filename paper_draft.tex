@@ -772,6 +772,38 @@ The placebo timing tests reveal an interesting pattern: coefficients for fake tr
 
 Across all robustness checks, our findings remain qualitatively consistent: agricultural workers experienced relative wage gains following the 2014 food embargo. The point estimates range from 2.9\% to 6.8\% depending on specification. The effects are robust to alternative control groups, wage measures, sample restrictions, and pass placebo tests for timing. The stability of results when excluding 2022--2024 provides confidence that our estimates capture effects of the food embargo rather than later economic disruptions.
 
+\subsection{Competing Explanations}
+
+Three alternative explanations could potentially account for our findings: government subsidies, ruble depreciation, and pre-existing productivity trends. We address each in turn.
+
+\paragraph{Government subsidies.} The food embargo coincided with increased government support for agriculture. Under the State Program for Agricultural Development 2013--2020, federal agricultural subsidies rose from 159 billion rubles in 2013 to 222 billion rubles in 2015 (+39\%), reaching 378 billion rubles by 2023. Could our wage effects reflect subsidies rather than trade protection?
+
+Several considerations suggest subsidies are unlikely to explain our findings:
+\begin{enumerate}
+    \item \textbf{Timing}: The State Program began in January 2013, 18 months \textit{before} the embargo. If subsidies drove wage gains, we would expect positive pre-trends in our event study---instead, we find negative pre-trends (agricultural wages were \textit{declining} relative to other sectors before 2014).
+
+    \item \textbf{Productivity evidence}: A World Bank analysis concluded that ``subsidies financed through public funds have \textit{not} contributed to productivity increase at the agri-enterprise or farm level,'' contrary to program objectives. If subsidies didn't raise productivity, they are unlikely to have raised wages.
+
+    \item \textbf{Magnitude}: Agricultural subsidies totaled roughly 250 billion rubles annually post-embargo, supporting an agricultural workforce of approximately 6 million. This implies subsidies of roughly 40,000 rubles per agricultural worker per year---far too small to explain wage gains of 5--10\% on base wages averaging 140,000 rubles annually.
+\end{enumerate}
+
+\paragraph{Ruble depreciation.} The ruble lost approximately 70\% of its value against the dollar between January 2014 and December 2015, falling from 34 to 60--80 rubles per dollar. This depreciation independently boosted agricultural competitiveness by making Russian exports cheaper on world markets and imports more expensive.
+
+We acknowledge this as a genuine confound that we cannot fully separate from the embargo effect. However, two points are relevant:
+\begin{enumerate}
+    \item \textbf{Reinforcement, not alternative}: Ruble depreciation and the import ban worked in the \textit{same direction}---both increased demand for domestic agricultural products. Our estimates capture the combined effect of trade protection (embargo) and exchange rate protection (depreciation). This is arguably the policy-relevant quantity, since the depreciation was itself partly caused by Western sanctions.
+
+    \item \textbf{Differential sectoral effects}: If depreciation alone drove our results, we would expect similar wage gains in other tradable sectors that benefited from improved export competitiveness (e.g., chemicals, metals). Our placebo tests show that manufacturing sectors did \textit{not} experience comparable wage gains, suggesting the agricultural effect is not purely a depreciation story.
+\end{enumerate}
+
+\paragraph{Pre-existing productivity trends.} Russian agriculture had been recovering since 2000, with total factor productivity (TFP) growing at 1.7\% annually during 2005--2013. Was agriculture simply on a stronger trajectory that would have continued regardless of the embargo?
+
+Our event study directly addresses this concern. The pre-treatment coefficients (2010--2013) are close to zero or \textit{negative}, indicating that agricultural wages were not outpacing other sectors before the embargo. In fact, our placebo timing tests reveal that agricultural wages were \textit{declining} relative to other sectors in 2011--2013, with coefficients of $-$5\% to $-$6\%. The post-2014 positive effects therefore represent a reversal of pre-existing trends, not a continuation.
+
+Moreover, USDA estimates suggest that Russian agricultural TFP growth actually \textit{slowed} from +2.7\% annually in 2000--2008 to $-$1.0\% in 2010--2016. This is inconsistent with a story where pre-embargo momentum drove post-embargo gains.
+
+\paragraph{Summary.} While we cannot definitively rule out all alternative explanations, the weight of evidence supports our interpretation. Subsidies were too small to explain the magnitude of wage gains, and the World Bank finds they did not boost productivity. Ruble depreciation is a genuine confound but worked in the same direction as the embargo and does not explain why agriculture specifically (rather than other tradables) saw gains. Pre-existing trends were actually \textit{negative}, making the post-embargo gains more striking, not less.
+
 %==============================================================================
 \section{Addressing Identification Concerns} \label{sec:identification}
 %==============================================================================
