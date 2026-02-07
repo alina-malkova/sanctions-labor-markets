@@ -992,9 +992,9 @@ Figure \ref{fig:switching_rates} shows switching rates over time.
 
 \subsection{Synthetic Control}
 
-As an alternative identification strategy, we construct a synthetic control for agriculture using a weighted average of other sectors, matched on pre-2014 wage levels. The synthetic control method provides a data-driven approach to selecting comparison units and generates placebo-based inference.
+As an alternative identification strategy, we construct a synthetic control for agriculture using a weighted average of other sectors. We present these results with important caveats about the limitations of sector-level synthetic control methods.
 
-We construct the synthetic agriculture sector as the pre-treatment mean of agricultural wages plus the average deviation of control sectors (food processing, construction, trade) from their respective pre-treatment means. This approach ensures exact matching on pre-treatment levels while allowing the synthetic control to evolve based on common trends across sectors.
+We construct the synthetic agriculture sector by matching on pre-treatment mean wages, then tracking deviations of control sectors (food processing, construction, education, trade) from their respective pre-treatment means. This approach ensures exact matching on pre-treatment levels.
 
 \begin{figure}[H]
 \centering
@@ -1003,47 +1003,63 @@ We construct the synthetic agriculture sector as the pre-treatment mean of agric
 \label{fig:synthetic}
 \begin{minipage}{0.9\textwidth}
 \small
-\textit{Notes:} Synthetic control constructed as average of food processing, construction, and trade sectors, adjusted to match agricultural wages in 2010--2013. Pre-treatment RMSPE = 0.026; Post/Pre RMSPE ratio = 6.08.
+\textit{Notes:} Synthetic control constructed as average of food processing, construction, education, and trade sectors, adjusted to match agricultural wages in 2010--2013. Pre-treatment RMSPE = 0.037; Post/Pre RMSPE ratio = 3.77.
 \end{minipage}
 \end{figure}
 
-Figure \ref{fig:synthetic} shows that agricultural wages closely tracked the synthetic control before 2014, then diverged sharply upward after the embargo. Table \ref{tab:synth_results} presents the formal results.
+Figure \ref{fig:synthetic} shows that agricultural wages tracked the synthetic control reasonably well before 2014, then diverged upward after the embargo. However, some pre-treatment variation is visible, warranting careful interpretation. Table \ref{tab:synth_results} presents the formal results.
 
 \begin{table}[H]
 \centering
-\caption{Synthetic Control: Year-by-Year Gap (Agriculture $-$ Synthetic)}
+\caption{Synthetic Control: Pre-Treatment Fit and Placebo Tests}
 \label{tab:synth_results}
 \begin{threeparttable}
-\begin{tabular}{lcccccc}
+\begin{tabular}{lcccc}
 \toprule
-& 2010 & 2011 & 2012 & 2013 & \multicolumn{2}{c}{Pre-treatment} \\
-& & & & & Mean & RMSPE \\
+& \multicolumn{4}{c}{Panel A: Year-by-Year Gap (Agriculture $-$ Synthetic)} \\
+\cmidrule{2-5}
+Year & 2010 & 2011 & 2012 & 2013 \\
+Gap & +0.000 & +0.049 & +0.007 & $-$0.056 \\
 \midrule
-Gap & $-$0.010 & +0.039 & +0.005 & $-$0.034 & 0.000 & 0.026 \\
+Year & 2014 & 2015 & 2016 & 2017--2019 \\
+Gap & +0.033 & +0.117 & +0.121 & +0.169 \\
 \midrule
-& 2014 & 2015 & 2016 & 2017 & 2018 & 2019 \\
+\multicolumn{3}{l}{Pre-treatment mean} & \multicolumn{2}{c}{0.000} \\
+\multicolumn{3}{l}{Pre-treatment RMSPE} & \multicolumn{2}{c}{0.037} \\
+\multicolumn{3}{l}{Post-treatment mean gap} & \multicolumn{2}{c}{+0.129 (13.8\%)} \\
+\multicolumn{3}{l}{Post/Pre RMSPE ratio} & \multicolumn{2}{c}{3.77} \\
 \midrule
-Gap & +0.050 & +0.135 & +0.142 & +0.127 & +0.211 & +0.229 \\
+& \multicolumn{4}{c}{Panel B: Placebo Tests (RMSPE Ratios)} \\
+\cmidrule{2-5}
+Sector & RMSPE (pre) & RMSPE (post) & Ratio & \\
 \midrule
-\multicolumn{5}{l}{Post-treatment mean gap} & \multicolumn{2}{c}{+0.149***} \\
-\multicolumn{5}{l}{Post/Pre RMSPE ratio} & \multicolumn{2}{c}{6.08} \\
+\textbf{Agriculture} & \textbf{0.037} & \textbf{0.140} & \textbf{3.77} & \\
+Food Industry & 0.027 & 0.040 & 1.48 & \\
+Construction & 0.034 & 0.068 & 1.98 & \\
+Education & 0.052 & 0.084 & 1.63 & \\
+Trade & 0.017 & 0.034 & 1.97 & \\
+\midrule
+\multicolumn{3}{l}{Placebo p-value} & \multicolumn{2}{c}{0.20} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \small
-\item \textit{Notes:} Synthetic control constructed from food processing, construction, and trade sectors. Gap = Agriculture $-$ Synthetic (in log points). RMSPE = root mean squared prediction error. Post-treatment gap of +0.149 corresponds to approximately 16\% higher wages.
+\item \textit{Notes:} Gap = Agriculture $-$ Synthetic (in log points). RMSPE = root mean squared prediction error. Placebo p-value = (placebos with ratio $\geq$ agriculture + 1) / (total placebos + 1). Agriculture has the highest RMSPE ratio among all sectors tested.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
 
-The results strongly support our main findings:
+The synthetic control results provide suggestive---though not conclusive---support for a treatment effect:
 \begin{itemize}
-    \item \textbf{Pre-treatment fit}: The mean pre-treatment gap is zero, with RMSPE of just 0.026.
-    \item \textbf{Post-treatment divergence}: Agricultural wages diverge sharply upward, growing from +5\% in 2014 to +23\% by 2019.
-    \item \textbf{Post/Pre RMSPE ratio}: At 6.08, this indicates post-treatment prediction errors are six times larger than pre-treatment---strong evidence of a treatment effect.
+    \item \textbf{Pre-treatment fit}: While the mean pre-treatment gap is zero by construction, the pre-treatment RMSPE of 0.037 represents 12\% of the outcome's standard deviation. This exceeds the conventional threshold of 10\% for ``good'' pre-treatment fit.
+    \item \textbf{Post-treatment divergence}: Agricultural wages diverge upward, growing from +3.3\% in 2014 to +20\% by 2019, with an average gap of 12.9\% (0.129 log points).
+    \item \textbf{RMSPE ratio}: At 3.77, agriculture's ratio is the highest among all sectors tested, though this falls short of the ratios typically seen in well-matched synthetic control studies.
+    \item \textbf{Placebo p-value}: With 0 of 4 placebos having a ratio $\geq$ agriculture, the placebo p-value is 0.20---suggestive but not significant at conventional levels.
 \end{itemize}
 
-\paragraph{Placebo tests.} We conduct placebo tests by treating each control sector as if treated. The placebo gaps (post-2014 average) are: food processing ($-$0.1\%), construction (+33\%), government ($-$18\%), education ($-$24\%), and trade ($-$0.5\%). Agriculture's positive gap is unique among low-wage sectors, confirming the effect is specific to the treated sector.
+\paragraph{In-time placebo.} We also test a fake treatment date of 2012. The RMSPE ratio for this placebo is 1.14, compared to 3.77 for the actual 2014 treatment---suggesting the 2014 effect is meaningful rather than spurious.
+
+\paragraph{Limitations.} This analysis has important limitations: (1) only $\sim$10 donor sectors are available, compared to the 30--50 units typical in SC applications; (2) we use sector-level averages rather than firm-level data; (3) we use ad-hoc weighting rather than Abadie et al.'s formal optimization; (4) agriculture may have systematically different wage dynamics than urban service sectors. We therefore view this as \textit{suggestive corroboration} of our main DiD results, not independent causal evidence.
 
 \subsection{Dose-Response Tests}
 
