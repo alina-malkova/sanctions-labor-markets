@@ -1,0 +1,26 @@
+# Data files (too large for git)
+*.dta
+*.parquet
+*.zip
+HH/
+IND/
+temp/
+
+# Stata logs
+*.log
+*.smcl
+
+# LaTeX auxiliary files
+*.aux
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Large output files (keep CSV/tex tables)
+output/*.dta

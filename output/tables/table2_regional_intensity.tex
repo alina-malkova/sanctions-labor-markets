@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Regional Treatment Intensity}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{Intensity}&\multicolumn{1}{c}{High/Low}&\multicolumn{1}{c}{Agri Only}&\multicolumn{1}{c}{Triple DiD}\\
+\midrule
+Treatment intensity × Post&       1.155         &                     &      -6.497         &                     \\
+                    &     (0.868)         &                     &     (4.633)         &                     \\
+\addlinespace
+High treatment region × Post&                     &       0.024         &                     &       0.021         \\
+                    &                     &     (0.019)         &                     &     (0.018)         \\
+\addlinespace
+triple\_did          &                     &                     &                     &      -0.055         \\
+                    &                     &                     &                     &     (0.067)         \\
+\midrule
+Observations        &   93962.000         &   93962.000         &    3594.000         &   93962.000         \\
+Adj. R-squared      &       0.764         &       0.764         &       0.733         &       0.764         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

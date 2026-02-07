@@ -1,0 +1,21 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Intent-to-Treat: Pre-2014 Industry Assignment}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{Current Ind}&\multicolumn{1}{c}{Initial Ind}&\multicolumn{1}{c}{ITT + Controls}&\multicolumn{1}{c}{ITT 2010-19}\\
+\midrule
+Agriculture × Post-2014&       0.036         &                     &                     &                     \\
+                    &     (0.023)         &                     &                     &                     \\
+\addlinespace
+Agri (initial) × Post&                     &       0.118\sym{***}&       0.133\sym{***}&       0.079\sym{**} \\
+                    &                     &     (0.036)         &     (0.035)         &     (0.033)         \\
+\midrule
+Observations        &   99536.000         &   78895.000         &   78805.000         &   63830.000         \\
+Adj. R-squared      &       0.768         &       0.761         &       0.765         &       0.754         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

@@ -1,0 +1,18 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Wage Decomposition: Earnings = Hourly Wage × Hours}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{Log Earnings}&\multicolumn{1}{c}{Log Hourly}&\multicolumn{1}{c}{Log Hours}&\multicolumn{1}{c}{Hours (levels)}\\
+\midrule
+Agriculture × Post-2014&       0.036         &       0.003         &       0.026\sym{*}  &       5.081\sym{**} \\
+                    &     (0.023)         &     (0.029)         &     (0.015)         &     (2.331)         \\
+\midrule
+Observations        &   99536.000         &   88681.000         &   88681.000         &   88681.000         \\
+Adj. R-squared      &       0.768         &       0.711         &       0.357         &       0.392         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

@@ -1,0 +1,30 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Pre vs. Post 2022: Structural Break Analysis}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{Pooled}&\multicolumn{1}{c}{By Period}&\multicolumn{1}{c}{2010-2019}&\multicolumn{1}{c}{Post-2014 Only}\\
+\midrule
+Agriculture × Post-2014&       0.036         &                     &       0.031         &                     \\
+                    &     (0.023)         &                     &     (0.031)         &                     \\
+\addlinespace
+agri\_p2             &                     &       0.012         &                     &                     \\
+                    &                     &     (0.024)         &                     &                     \\
+\addlinespace
+agri\_p3             &                     &       0.070\sym{**} &                     &                     \\
+                    &                     &     (0.027)         &                     &                     \\
+\addlinespace
+agri\_p4             &                     &       0.094\sym{**} &                     &                     \\
+                    &                     &     (0.037)         &                     &                     \\
+\addlinespace
+agri\_post22         &                     &                     &                     &       0.037         \\
+                    &                     &                     &                     &     (0.022)         \\
+\midrule
+Observations        &   99536.000         &   99536.000         &   72904.000         &   66694.000         \\
+Adj. R-squared      &       0.768         &       0.768         &       0.755         &       0.763         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

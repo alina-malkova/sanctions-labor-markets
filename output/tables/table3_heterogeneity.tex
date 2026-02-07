@@ -1,0 +1,81 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Heterogeneous Effects}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{Gender}&\multicolumn{1}{c}{Education}&\multicolumn{1}{c}{Firm Size}&\multicolumn{1}{c}{Age}\\
+\midrule
+Agriculture × Post-2014&       0.021         &       0.147         &       0.036         &       0.010         \\
+                    &     (0.025)         &     (0.097)         &     (0.023)         &     (0.056)         \\
+\addlinespace
+0                   &       0.000         &                     &                     &                     \\
+                    &         (.)         &                     &                     &                     \\
+\addlinespace
+MALE                &       0.000         &                     &                     &                     \\
+                    &         (.)         &                     &                     &                     \\
+\addlinespace
+0 $\times$ Agriculture × Post-2014&       0.000         &                     &                     &                     \\
+                    &         (.)         &                     &                     &                     \\
+\addlinespace
+MALE $\times$ Agriculture × Post-2014&       0.046         &                     &                     &                     \\
+                    &     (0.042)         &                     &                     &                     \\
+\addlinespace
+Less than secondary &                     &       0.000         &                     &                     \\
+                    &                     &         (.)         &                     &                     \\
+\addlinespace
+Secondary           &                     &      -0.076         &                     &                     \\
+                    &                     &     (0.187)         &                     &                     \\
+\addlinespace
+Some college        &                     &      -0.077         &                     &                     \\
+                    &                     &     (0.189)         &                     &                     \\
+\addlinespace
+University+         &                     &       0.016         &                     &                     \\
+                    &                     &     (0.187)         &                     &                     \\
+\addlinespace
+Less than secondary $\times$ Agriculture × Post-2014&                     &       0.000         &                     &                     \\
+                    &                     &         (.)         &                     &                     \\
+\addlinespace
+Secondary $\times$ Agriculture × Post-2014&                     &      -0.010         &                     &                     \\
+                    &                     &     (0.109)         &                     &                     \\
+\addlinespace
+Some college $\times$ Agriculture × Post-2014&                     &      -0.110         &                     &                     \\
+                    &                     &     (0.106)         &                     &                     \\
+\addlinespace
+University+ $\times$ Agriculture × Post-2014&                     &      -0.158         &                     &                     \\
+                    &                     &     (0.104)         &                     &                     \\
+\addlinespace
+large\_firm=0        &                     &                     &       0.000         &                     \\
+                    &                     &                     &         (.)         &                     \\
+\addlinespace
+large\_firm=0 $\times$ Agriculture × Post-2014&                     &                     &       0.000         &                     \\
+                    &                     &                     &         (.)         &                     \\
+\addlinespace
+age\_group=1         &                     &                     &                     &       0.000         \\
+                    &                     &                     &                     &         (.)         \\
+\addlinespace
+age\_group=2         &                     &                     &                     &       0.072\sym{***}\\
+                    &                     &                     &                     &     (0.009)         \\
+\addlinespace
+age\_group=3         &                     &                     &                     &       0.020\sym{*}  \\
+                    &                     &                     &                     &     (0.011)         \\
+\addlinespace
+age\_group=1 $\times$ Agriculture × Post-2014&                     &                     &                     &       0.000         \\
+                    &                     &                     &                     &         (.)         \\
+\addlinespace
+age\_group=2 $\times$ Agriculture × Post-2014&                     &                     &                     &       0.010         \\
+                    &                     &                     &                     &     (0.069)         \\
+\addlinespace
+age\_group=3 $\times$ Agriculture × Post-2014&                     &                     &                     &       0.067         \\
+                    &                     &                     &                     &     (0.073)         \\
+\addlinespace
+Constant            &       9.935\sym{***}&       9.956\sym{***}&       9.935\sym{***}&       9.889\sym{***}\\
+                    &     (0.001)         &     (0.188)         &     (0.001)         &     (0.007)         \\
+\midrule
+Observations        &   99536.000         &   99399.000         &   99536.000         &   99536.000         \\
+Adj. R-squared      &       0.768         &       0.768         &       0.768         &       0.768         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

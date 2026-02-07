@@ -1,0 +1,33 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Placebo Tests: Other Sectors as Fake Treatment}
+\begin{tabular}{l*{6}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
+                    &\multicolumn{1}{c}{Agriculture}&\multicolumn{1}{c}{Construction}&\multicolumn{1}{c}{Heavy Ind}&\multicolumn{1}{c}{Transport}&\multicolumn{1}{c}{Government}&\multicolumn{1}{c}{Education}\\
+\midrule
+Agriculture × Post-2014&       0.036         &                     &                     &                     &                     &                     \\
+                    &     (0.023)         &                     &                     &                     &                     &                     \\
+\addlinespace
+constr\_post         &                     &       0.036\sym{***}&                     &                     &                     &                     \\
+                    &                     &     (0.012)         &                     &                     &                     &                     \\
+\addlinespace
+heavy\_post          &                     &                     &       0.040         &                     &                     &                     \\
+                    &                     &                     &     (0.030)         &                     &                     &                     \\
+\addlinespace
+transp\_post         &                     &                     &                     &      -0.010         &                     &                     \\
+                    &                     &                     &                     &     (0.011)         &                     &                     \\
+\addlinespace
+gov\_post            &                     &                     &                     &                     &      -0.059\sym{*}  &                     \\
+                    &                     &                     &                     &                     &     (0.029)         &                     \\
+\addlinespace
+educ\_post           &                     &                     &                     &                     &                     &      -0.036\sym{**} \\
+                    &                     &                     &                     &                     &                     &     (0.013)         \\
+\midrule
+Observations        &   99536.000         &   99536.000         &   99536.000         &   99536.000         &   99536.000         &   99536.000         \\
+Adj. R-squared      &       0.768         &       0.768         &       0.768         &       0.768         &       0.768         &       0.768         \\
+\bottomrule
+\multicolumn{7}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{7}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

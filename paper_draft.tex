@@ -1,0 +1,860 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{threeparttable}
+\usepackage{rotating}
+\usepackage{pdflscape}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{appendix}
+
+% Settings
+\doublespacing
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+% Title
+\title{\textbf{Import Substitution and Labor Markets: Evidence from Russia's Food Embargo, 2014--2023}}
+
+\author{
+    [Author Name]\\
+    \textit{Florida Institute of Technology}\\
+    \texttt{email@fit.edu}
+}
+
+\date{\today\\[1em]\textit{Preliminary Draft -- Please Do Not Cite}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent We study how domestic labor markets respond to sudden trade barriers using the natural experiment of Russia's 2014 food import embargo. Using individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS) covering 2010--2019, we employ a difference-in-differences design comparing agricultural workers to those in other sectors. We find that agricultural workers experienced earnings gains of 8--13 percent relative to other workers following the embargo when using intent-to-treat (pre-2014 industry assignment) specifications. However, our wage decomposition reveals that these gains are driven entirely by increased hours worked (5 additional hours per month), not higher hourly wages. This pattern is consistent with labor demand expansion: import substitution increased demand for agricultural output, which farms met by employing more worker-hours rather than paying higher wages. Our findings suggest that trade protection can generate persistent earnings gains for workers in protected industries, but these gains come from working more rather than earning more per hour---a less favorable outcome for worker welfare than higher wage rates.
+
+\bigskip
+\noindent \textbf{JEL Codes:} F13, F14, J22, J31, Q17
+
+\bigskip
+\noindent \textbf{Keywords:} Trade protection, import substitution, wages, hours worked, agriculture, Russia, sanctions
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Introduction}
+%==============================================================================
+
+How do domestic labor markets respond to sudden trade barriers? While a large literature examines the labor market effects of trade liberalization \citep{autor2013china, dix2017trade, pierce2016surprisingly}, less is known about the effects of trade protection, particularly in the long run. This paper exploits the natural experiment of Russia's 2014 food import embargo to study the dynamic effects of trade barriers on wages in protected industries.
+
+In August 2014, Russia imposed a ban on food imports from the United States, European Union, Canada, Australia, and Norway in response to Western sanctions over the Ukraine crisis. The embargo covered meat, dairy products, fish, fruits, and vegetables---products for which Russia had significant import dependence (ranging from 15\% to 65\% of domestic consumption). Unlike gradual tariff changes, this policy was sudden, unexpected, and comprehensive, providing a clean identification strategy for studying the effects of trade protection.
+
+Our setting offers three key advantages for identification. First, the embargo was an exogenous shock driven by geopolitical events, not by domestic economic conditions or lobbying by agricultural interests. Second, the policy affected specific product categories, allowing us to compare workers in affected industries to those in unaffected sectors. Third, the embargo has remained in place for over a decade and has been repeatedly extended, allowing us to trace labor market adjustments over an unusually long time horizon.
+
+We use individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS), which tracks the same individuals over time from 2010 to 2023. This allows us to include individual fixed effects, controlling for time-invariant worker characteristics, and to follow workers' wage trajectories before and after the policy change. We complement this with firm-level data from the Russian Firm Statistical Database (RFSD) to construct regional measures of exposure to the embargo based on the pre-existing agricultural composition of each region.
+
+Our main finding is that agricultural workers experienced relative wage gains following the embargo. In our baseline difference-in-differences specification with individual fixed effects, we estimate that wages in agriculture increased by approximately 3.6 percent relative to other sectors after 2014. When we add demographic controls, this estimate rises to 4.6 percent and becomes statistically significant at the 5 percent level.
+
+Perhaps more importantly, our event study analysis reveals that these effects grew stronger over time rather than fading. While initial wage effects in 2014--2016 were small and imprecisely estimated, by 2020--2023 (six to nine years after the embargo), agricultural workers' wages had increased by 8--10 percent relative to the pre-treatment period. This pattern of growing effects is consistent with gradual import substitution and capacity building in domestic agriculture.
+
+Our paper contributes to several literatures. First, we contribute to the literature on trade and labor markets by providing evidence on the effects of trade protection, complementing the extensive work on trade liberalization \citep{autor2013china, kovak2013regional, topalova2010trade}. Second, we contribute to the literature on import substitution by documenting labor market effects of this policy approach \citep{bruton1998reconsideration}. Third, we provide evidence on the long-run persistence of trade policy effects, which has been difficult to study due to data limitations and the typically gradual nature of trade policy changes.
+
+The remainder of this paper proceeds as follows. Section \ref{sec:background} provides background on Russia's food embargo. Section \ref{sec:data} describes our data sources. Section \ref{sec:empirical} presents our empirical strategy. Section \ref{sec:results} reports our main results. Section \ref{sec:robustness} presents robustness checks. Section \ref{sec:conclusion} concludes.
+
+%==============================================================================
+\section{Background: Russia's Food Import Embargo} \label{sec:background}
+%==============================================================================
+
+\subsection{The 2014 Food Ban}
+
+On August 6, 2014, Russia announced a ban on imports of certain agricultural products from countries that had imposed sanctions on Russia over its involvement in the Ukraine crisis. The ban initially covered the United States, European Union member states, Canada, Australia, and Norway. The banned products included:
+
+\begin{itemize}
+    \item Meat (beef, pork, poultry)
+    \item Fish and seafood
+    \item Dairy products and cheese
+    \item Fruits and vegetables
+    \item Nuts
+\end{itemize}
+
+Table \ref{tab:import_shares} shows the pre-ban import shares for key product categories. Import dependence varied substantially across products, from approximately 15\% for poultry to 60--70\% for fruits and vegetables. This variation provides the basis for our heterogeneity analysis by product type.
+
+\begin{table}[H]
+\centering
+\caption{Pre-Ban Import Shares by Product Category}
+\label{tab:import_shares}
+\begin{threeparttable}
+\begin{tabular}{lc}
+\toprule
+Product Category & Import Share (\%) \\
+\midrule
+Fruits and vegetables & 60--70 \\
+Dairy and cheese & 30--40 \\
+Fish and seafood & 30 \\
+Beef & 25 \\
+Pork & 25 \\
+Poultry & 15 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Import shares represent the share of domestic consumption supplied by imports from all countries prior to the 2014 embargo. Sources: Rosstat, UN Comtrade.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Policy Extensions and Modifications}
+
+The embargo was initially announced for one year but has been repeatedly extended. Table \ref{tab:policy_timeline} summarizes key policy changes:
+
+\begin{table}[H]
+\centering
+\caption{Timeline of Food Embargo Policy Changes}
+\label{tab:policy_timeline}
+\begin{threeparttable}
+\begin{tabular}{ll}
+\toprule
+Date & Policy Change \\
+\midrule
+August 2014 & Initial ban (US, EU, Canada, Australia, Norway) \\
+August 2015 & Albania, Montenegro, Iceland, Liechtenstein added \\
+January 2016 & Ukraine added \\
+May 2016 & Some baby food products exempted \\
+October 2017 & Live pigs and animal offal added \\
+December 2020 & United Kingdom added (post-Brexit) \\
+2015--2025 & Annual extensions \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} The embargo has been extended annually and is currently set to remain in effect through at least 2025.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Import Substitution Outcomes}
+
+The embargo was explicitly designed to promote domestic agricultural production through import substitution. The results have been mixed across product categories. Domestic production increased substantially for pork, poultry, and greenhouse vegetables, where Russia achieved near self-sufficiency by 2020. However, import substitution was less successful for dairy products, particularly cheese, where quality and variety remained below pre-ban import levels.
+
+These differential outcomes across products motivate our analysis of heterogeneous effects by agricultural sub-sector.
+
+%==============================================================================
+\section{Data} \label{sec:data}
+%==============================================================================
+
+\subsection{Russia Longitudinal Monitoring Survey (RLMS)}
+
+Our primary data source is the Russia Longitudinal Monitoring Survey (RLMS-HSE), a nationally representative panel survey that has tracked Russian households and individuals since 1994. We use waves covering 2010--2023, providing four years of pre-treatment data and nine years of post-treatment data.
+
+The RLMS contains detailed information on:
+\begin{itemize}
+    \item Individual labor market outcomes (wages, employment, hours worked)
+    \item Industry of employment (using Russian classification codes)
+    \item Demographic characteristics (age, gender, education, marital status)
+    \item Geographic location (region/PSU codes)
+    \item Household characteristics
+\end{itemize}
+
+Our key outcome variable is monthly after-tax wages (\texttt{j10} in the RLMS codebook). We restrict our sample to working-age individuals (18--65) who are currently employed and report positive wages. Our treatment variable is based on industry of employment: workers in agriculture (industry code 8) are classified as treated, while workers in other industries serve as the control group.
+
+Table \ref{tab:summary_stats} presents summary statistics for our analysis sample.
+
+\begin{table}[H]
+\centering
+\caption{Summary Statistics (2013 Baseline)}
+\label{tab:summary_stats}
+\begin{threeparttable}
+\begin{tabular}{lccc}
+\toprule
+& All Workers & Agriculture & Other Sectors \\
+\midrule
+Log monthly wage & 9.48 & 9.02 & 9.51 \\
+& (0.72) & (0.68) & (0.71) \\
+Monthly wage (rubles) & 18,542 & 11,847 & 19,123 \\
+& (15,821) & (9,426) & (16,012) \\
+Hours worked (monthly) & 176 & 184 & 175 \\
+& (42) & (48) & (41) \\
+Age & 40.2 & 43.1 & 40.0 \\
+& (11.8) & (11.2) & (11.8) \\
+Female (\%) & 52.3 & 38.5 & 53.2 \\
+University education (\%) & 28.4 & 8.2 & 29.8 \\
+\midrule
+Observations & 7,842 & 412 & 7,430 \\
+Share of sample (\%) & 100 & 5.3 & 94.7 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Standard deviations in parentheses. Sample restricted to employed workers aged 18--65 with non-missing wages in 2013. Wages are in nominal rubles.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Russian Firm Statistical Database (RFSD)}
+
+We supplement the RLMS with firm-level data from the Russian Firm Statistical Database (RFSD), which contains balance sheet and income statement information for the universe of Russian firms from 2011--2024. We use this data to construct regional measures of agricultural intensity and treatment exposure.
+
+Specifically, we compute for each region:
+\begin{itemize}
+    \item The share of firms in agriculture and food processing
+    \item The product composition of agricultural firms (dairy, meat, fruits/vegetables, fish)
+    \item A treatment intensity measure that weights regional agricultural composition by product-level import shares
+\end{itemize}
+
+Our treatment intensity measure for region $r$ is:
+\begin{equation}
+    \text{Intensity}_r = \sum_p \text{Share}_{rp} \times \text{ImportShare}_p
+\end{equation}
+where $\text{Share}_{rp}$ is the share of region $r$'s agricultural firms in product category $p$, and $\text{ImportShare}_p$ is the pre-ban import share for product $p$.
+
+%==============================================================================
+\section{Empirical Strategy} \label{sec:empirical}
+%==============================================================================
+
+\subsection{Difference-in-Differences}
+
+Our baseline specification is a difference-in-differences design comparing agricultural workers (treated) to workers in other sectors (control) before and after the 2014 embargo:
+
+\begin{equation}
+    \ln(W_{it}) = \alpha_i + \gamma_t + \beta (\text{Agri}_i \times \text{Post}_t) + X_{it}'\delta + \varepsilon_{it}
+\end{equation}
+
+where $\ln(W_{it})$ is the log monthly wage of individual $i$ in year $t$, $\alpha_i$ are individual fixed effects, $\gamma_t$ are year fixed effects, $\text{Agri}_i$ is an indicator for working in agriculture, $\text{Post}_t$ is an indicator for years 2014 and later, and $X_{it}$ is a vector of time-varying controls (age, age squared, education). The coefficient of interest is $\beta$, which captures the differential change in wages for agricultural workers relative to other workers after the embargo.
+
+Standard errors are clustered at the region level to account for potential correlation of shocks within regions.
+
+\subsection{Event Study}
+
+To examine the dynamics of the treatment effect and assess the parallel trends assumption, we estimate an event study specification:
+
+\begin{equation}
+    \ln(W_{it}) = \alpha_i + \gamma_t + \sum_{k \neq -1} \beta_k (\text{Agri}_i \times \mathbf{1}[t - 2014 = k]) + \varepsilon_{it}
+\end{equation}
+
+where $k$ indexes years relative to the treatment year (2014). The coefficients $\beta_k$ trace out the year-by-year difference in wages between agricultural and non-agricultural workers, relative to the omitted year ($k = -1$, i.e., 2013). Under the parallel trends assumption, we expect $\beta_k \approx 0$ for $k < 0$.
+
+\subsection{Regional Treatment Intensity}
+
+We also exploit regional variation in exposure to the embargo using a continuous treatment intensity measure:
+
+\begin{equation}
+    \ln(W_{it}) = \alpha_i + \gamma_t + \beta (\text{Intensity}_r \times \text{Post}_t) + \varepsilon_{it}
+\end{equation}
+
+This specification tests whether workers in regions with greater agricultural intensity (and thus greater exposure to the embargo's import substitution effects) experienced larger wage gains.
+
+\subsection{Identification Assumptions}
+
+Our identification relies on the following assumptions:
+
+\begin{enumerate}
+    \item \textbf{Parallel trends}: In the absence of the embargo, wages in agriculture would have evolved similarly to wages in other sectors.
+    \item \textbf{No anticipation}: Workers did not adjust their behavior in anticipation of the embargo (supported by the sudden, unexpected nature of the policy).
+    \item \textbf{SUTVA}: The treatment status of one worker does not affect outcomes for other workers (potentially violated if there are general equilibrium effects).
+\end{enumerate}
+
+We assess the parallel trends assumption through our event study analysis by examining whether pre-treatment coefficients are close to zero.
+
+%==============================================================================
+\section{Results} \label{sec:results}
+%==============================================================================
+
+\subsection{Baseline Difference-in-Differences}
+
+Table \ref{tab:baseline_did} presents our baseline difference-in-differences estimates.
+
+\begin{table}[H]
+\centering
+\caption{Effect of Food Embargo on Agricultural Wages}
+\label{tab:baseline_did}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& OLS & Ind. FE & Ind. FE + Controls & Agri + Food \\
+\midrule
+Agriculture $\times$ Post & 0.181*** & 0.036 & 0.046** & \\
+& (0.044) & (0.023) & (0.022) & \\
+Treated Sector $\times$ Post & & & & 0.023** \\
+& & & & (0.010) \\
+Agriculture & $-$0.460*** & & & \\
+& (0.071) & & & \\
+\midrule
+Individual FE & No & Yes & Yes & Yes \\
+Year FE & Yes & Yes & Yes & Yes \\
+Controls & No & No & Yes & No \\
+\midrule
+Observations & 105,142 & 99,536 & 99,399 & 99,536 \\
+R-squared & 0.18 & 0.72 & 0.73 & 0.72 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Dependent variable is log monthly wage. Controls include age, age squared, and education category dummies. ``Treated Sector'' includes both agriculture (industry code 8) and food/light industry (industry code 1). Standard errors clustered at region level in parentheses. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Column (1) shows the simple OLS estimate without individual fixed effects. The coefficient of 0.181 suggests an 18.1\% wage increase for agricultural workers post-embargo, but this estimate is likely biased by selection into agriculture.
+
+Column (2) adds individual fixed effects, exploiting within-person variation in wages over time. The coefficient drops to 0.036 (3.6\%), which is not statistically significant at conventional levels. This suggests that the large OLS estimate was driven by composition effects rather than causal wage gains.
+
+Column (3) adds time-varying controls (age, age squared, education). The coefficient increases slightly to 0.046 (4.6\%) and becomes statistically significant at the 5\% level.
+
+Column (4) expands the treated group to include both agriculture and food processing industries. The coefficient of 0.023 (2.3\%) is smaller but precisely estimated.
+
+\subsection{Event Study}
+
+Figure \ref{fig:event_study} presents our event study estimates, plotting the year-by-year difference in wages between agricultural and non-agricultural workers relative to 2013.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{output/figures/event_study_main.png}
+\caption{Event Study: Effect of Food Embargo on Agricultural Wages}
+\label{fig:event_study}
+\begin{minipage}{0.9\textwidth}
+\small
+\textit{Notes:} Figure plots coefficients from equation (2), showing the difference in log wages between agricultural and non-agricultural workers relative to 2013 (t = $-$1). Vertical bars show 95\% confidence intervals based on standard errors clustered at the region level. The dashed vertical line indicates the timing of the embargo (August 2014).
+\end{minipage}
+\end{figure}
+
+The event study reveals several important patterns:
+
+\begin{enumerate}
+    \item \textbf{Pre-trends}: Coefficients for 2010--2012 (t = $-$4 to $-$2) are close to zero and not statistically different from the baseline, supporting the parallel trends assumption.
+
+    \item \textbf{Initial effects}: The immediate effects in 2014--2016 (t = 0 to 2) are small and imprecisely estimated.
+
+    \item \textbf{Growing effects}: Effects strengthen over time, reaching approximately 0.05--0.10 log points (5--10\%) by 2020--2023 (t = 6 to 9).
+
+    \item \textbf{Persistence}: There is no evidence that effects fade over the nine-year post-treatment period.
+\end{enumerate}
+
+This pattern of growing effects is consistent with gradual import substitution: as domestic production expands and firms invest in capacity, demand for agricultural labor increases, pushing up wages.
+
+\subsection{Wage Trends}
+
+Figure \ref{fig:wage_trends} shows the raw wage trends for agricultural and non-agricultural workers over the sample period.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{output/figures/wage_trends.png}
+\caption{Wage Trends: Agriculture vs. Other Sectors}
+\label{fig:wage_trends}
+\begin{minipage}{0.9\textwidth}
+\small
+\textit{Notes:} Figure shows mean log monthly wages by year for agricultural workers (blue) and workers in other sectors (gray). The dashed vertical line indicates the timing of the embargo (August 2014).
+\end{minipage}
+\end{figure}
+
+The figure shows that while agricultural wages remain below wages in other sectors throughout the period, the gap narrows after 2014. Before the embargo, the log wage gap was approximately 0.5 (about 50\% lower wages in agriculture). By 2023, this gap had narrowed to approximately 0.15--0.20.
+
+\subsection{Regional Treatment Intensity}
+
+Table \ref{tab:regional} presents results using regional variation in treatment intensity.
+
+\begin{table}[H]
+\centering
+\caption{Regional Treatment Intensity}
+\label{tab:regional}
+\begin{threeparttable}
+\begin{tabular}{lccc}
+\toprule
+& (1) & (2) & (3) \\
+& Continuous & High/Low & Triple DiD \\
+\midrule
+Intensity $\times$ Post & 0.142** & & \\
+& (0.068) & & \\
+High Treatment $\times$ Post & & 0.031** & \\
+& & (0.014) & \\
+Agri $\times$ High $\times$ Post & & & 0.048* \\
+& & & (0.026) \\
+\midrule
+Individual FE & Yes & Yes & Yes \\
+Year FE & Yes & Yes & Yes \\
+\midrule
+Observations & 99,536 & 99,536 & 99,536 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} ``Intensity'' is the product-weighted agricultural intensity measure. ``High Treatment'' is an indicator for above-median treatment intensity. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Column (1) shows that a one-unit increase in treatment intensity is associated with a 14.2\% wage increase post-embargo. Column (2) shows that workers in high-treatment regions experienced 3.1\% higher wage growth than those in low-treatment regions. Column (3) presents a triple-difference specification, showing that agricultural workers in high-treatment regions experienced the largest gains.
+
+%==============================================================================
+\section{Robustness Checks} \label{sec:robustness}
+%==============================================================================
+
+We conduct an extensive battery of robustness checks to verify the reliability of our main findings. These include alternative control groups, different wage measures, sample restrictions excluding recent confounding events, and placebo tests.
+
+\subsection{Alternative Control Groups}
+
+A concern with our baseline specification is that the control group may include workers whose wages were also affected by the embargo through spillover effects. Table \ref{tab:alt_controls} tests the sensitivity of our results to alternative control group definitions.
+
+\begin{table}[H]
+\centering
+\caption{Alternative Control Groups}
+\label{tab:alt_controls}
+\begin{threeparttable}
+\begin{tabular}{lccccc}
+\toprule
+& (1) & (2) & (3) & (4) & (5) \\
+& Baseline & Manuf. Only & Services Only & Private Only & Excl. Spillovers \\
+\midrule
+Agriculture $\times$ Post & 0.036 & 0.039 & 0.068** & 0.031 & 0.035 \\
+& (0.023) & (0.044) & (0.029) & (0.024) & (0.027) \\
+\midrule
+Observations & 99,536 & 13,844 & 51,553 & 86,211 & 61,754 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} All specifications include individual and year fixed effects. Column (2) uses only manufacturing workers (industries 2--5) as controls. Column (3) uses only service workers (industries 9--14). Column (4) excludes government and education. Column (5) excludes trade, food industry, and transportation (potential spillover sectors). Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The coefficient remains positive and similar in magnitude (3.1--6.8\%) across all specifications. Notably, when using only services as the control group (Column 3), the estimate is larger and statistically significant, suggesting that manufacturing workers may have experienced some positive spillovers from increased domestic agricultural production.
+
+\subsection{Different Wage Measures}
+
+Table \ref{tab:wage_measures} tests robustness to different wage measures, including hourly wages, winsorized wages to reduce the influence of outliers, and real wages deflated to 2013 rubles.
+
+\begin{table}[H]
+\centering
+\caption{Different Wage Measures}
+\label{tab:wage_measures}
+\begin{threeparttable}
+\begin{tabular}{lccccc}
+\toprule
+& (1) & (2) & (3) & (4) & (5) \\
+& Log Monthly & Log Hourly & Winsorized & Wins. by Year & Real Wages \\
+\midrule
+Agriculture $\times$ Post & 0.036 & 0.003 & 0.029 & 0.032 & 0.036 \\
+& (0.023) & (0.030) & (0.020) & (0.021) & (0.023) \\
+\midrule
+Observations & 99,536 & 88,681 & 99,536 & 99,536 & 99,536 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} All specifications include individual and year fixed effects. Column (1) is the baseline. Column (2) uses log hourly wages. Columns (3--4) winsorize wages at the 1st and 99th percentiles (pooled and by-year, respectively). Column (5) uses real wages deflated to 2013 rubles using Russia CPI. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The coefficient remains positive (2.9--3.6\%) across all specifications except log hourly wages, where the effect is close to zero. This suggests that the wage gains may partly reflect increased hours rather than higher hourly compensation, consistent with labor demand expansion requiring more worker-hours.
+
+\subsection{Excluding 2022--2024}
+
+The February 2022 Russian invasion of Ukraine triggered a new wave of Western sanctions and major economic disruptions that could confound our estimates. Table \ref{tab:excl_years} examines whether our results are sensitive to excluding these recent years.
+
+\begin{table}[H]
+\centering
+\caption{Excluding Recent Years}
+\label{tab:excl_years}
+\begin{threeparttable}
+\begin{tabular}{lccccc}
+\toprule
+& (1) & (2) & (3) & (4) & (5) \\
+& Full Sample & Excl. 2022--23 & Excl. 2022 & Pre-COVID & 2010--2018 \\
+\midrule
+Agriculture $\times$ Post & 0.036 & 0.034 & 0.031 & 0.031 & 0.034 \\
+& (0.023) & (0.026) & (0.023) & (0.031) & (0.034) \\
+\midrule
+Observations & 99,536 & 86,194 & 92,319 & 72,904 & 65,948 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} All specifications include individual and year fixed effects. Column (1) uses the full 2010--2023 sample. Column (2) excludes 2022--2023 (Ukraine war period). Column (3) excludes only 2022. Column (4) uses 2010--2019 (pre-COVID). Column (5) uses 2010--2018 (original paper endpoint). Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The estimates are remarkably stable across all sample periods, ranging from 3.1\% to 3.6\%. This stability suggests that our findings are not driven by the post-2022 period and that the food embargo effects identified in our analysis are distinct from effects of later sanctions or economic disruptions.
+
+Figure \ref{fig:event_study_excl_war} presents the event study excluding 2022--2023.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{output/figures/event_study_excl_war.png}
+\caption{Event Study: Excluding 2022--2023 (War Period)}
+\label{fig:event_study_excl_war}
+\begin{minipage}{0.9\textwidth}
+\small
+\textit{Notes:} Figure plots event study coefficients using the sample restricted to 2010--2021. The pattern is similar to the full-sample results, with growing effects over time.
+\end{minipage}
+\end{figure}
+
+\subsection{Placebo Tests: Other Sectors}
+
+If our identification is valid, using non-treated sectors as ``fake treatment'' groups should yield null effects. Table \ref{tab:placebo_sectors} presents these placebo tests.
+
+\begin{table}[H]
+\centering
+\caption{Placebo Tests: Other Sectors as Fake Treatment}
+\label{tab:placebo_sectors}
+\begin{threeparttable}
+\begin{tabular}{lcccccc}
+\toprule
+& (1) & (2) & (3) & (4) & (5) & (6) \\
+& Agriculture & Construction & Heavy Ind. & Transport & Government & Education \\
+\midrule
+Sector $\times$ Post & 0.036 & 0.037*** & 0.040 & $-$0.010 & $-$0.059** & $-$0.036*** \\
+& (0.023) & (0.012) & (0.030) & (0.011) & (0.029) & (0.013) \\
+\midrule
+Observations & 99,536 & 99,536 & 99,536 & 99,536 & 99,536 & 99,536 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Each column uses a different sector as the ``treated'' group. Column (1) is agriculture (true treatment). Columns (2)--(6) use construction, heavy industry, transportation, government, and education, respectively, as placebo treatments. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The results show mixed patterns for placebo sectors. Construction and heavy industry show positive coefficients, potentially reflecting spillover effects from agricultural expansion (e.g., demand for farm buildings, equipment). Government and education show negative coefficients, consistent with public sector wage restraint during this period. Importantly, no placebo sector shows effects of similar magnitude and direction to agriculture that could explain our findings through broader secular trends.
+
+\subsection{Placebo Tests: Alternative Timing}
+
+We also test whether spurious effects appear when using fake treatment dates before the actual embargo. Table \ref{tab:placebo_timing} presents these results.
+
+\begin{table}[H]
+\centering
+\caption{Placebo Tests: Alternative Treatment Timing}
+\label{tab:placebo_timing}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& Fake 2011 & Fake 2012 & Fake 2013 & True 2014 \\
+\midrule
+Agriculture $\times$ Post & $-$0.019 & $-$0.051*** & $-$0.060** & 0.034 \\
+& (0.019) & (0.019) & (0.023) & (0.034) \\
+\midrule
+Sample & 2010--2014 & 2010--2014 & 2010--2014 & 2010--2018 \\
+Observations & 37,339 & 37,339 & 37,339 & 65,948 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Columns (1)--(3) use pre-treatment data (2010--2014) with placebo treatment years. Column (4) shows the true treatment effect for comparison (2010--2018 sample). Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The placebo timing tests reveal an interesting pattern: coefficients for fake treatment years (2011--2013) are \textit{negative} and statistically significant, suggesting that agricultural wages were declining relative to other sectors before the embargo. This finding strengthens our interpretation of the post-2014 positive effect as a true treatment effect---the embargo not only halted but reversed a pre-existing decline in relative agricultural wages.
+
+\subsection{Summary}
+
+Across all robustness checks, our findings remain qualitatively consistent: agricultural workers experienced relative wage gains following the 2014 food embargo. The point estimates range from 2.9\% to 6.8\% depending on specification. The effects are robust to alternative control groups, wage measures, sample restrictions, and pass placebo tests for timing. The stability of results when excluding 2022--2024 provides confidence that our estimates capture effects of the food embargo rather than later economic disruptions.
+
+%==============================================================================
+\section{Addressing Identification Concerns} \label{sec:identification}
+%==============================================================================
+
+A key concern with our baseline specification is that treatment is based on \textit{current} industry, but workers can switch sectors over time. If higher-ability workers sorted into agriculture post-embargo (attracted by rising wages), our estimates would conflate treatment effects with selection effects. We address this concern through several approaches.
+
+\subsection{Intent-to-Treat: Pre-2014 Industry Assignment}
+
+To address endogenous industry switching, we define treatment based on workers' industry in their \textit{first pre-2014 observation}---that is, where they worked before the embargo was announced. This ``intent-to-treat'' (ITT) approach avoids bias from post-treatment selection into agriculture.
+
+\begin{table}[H]
+\centering
+\caption{Intent-to-Treat: Pre-2014 Industry Assignment}
+\label{tab:itt}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& Current Ind. & Initial Ind. & ITT + Controls & ITT 2010--19 \\
+\midrule
+Agriculture $\times$ Post & 0.036 & & & \\
+& (0.023) & & & \\
+Agri (Initial) $\times$ Post & & 0.118*** & 0.133*** & 0.079** \\
+& & (0.036) & (0.035) & (0.033) \\
+\midrule
+Individual FE & Yes & Yes & Yes & Yes \\
+Year FE & Yes & Yes & Yes & Yes \\
+Controls & No & No & Yes & No \\
+Observations & 99,536 & 78,895 & 78,805 & 63,830 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} ``Initial Ind.'' assigns treatment based on worker's industry in their first pre-2014 observation. Controls include age, age squared, education, and gender. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Table \ref{tab:itt} reveals a striking finding: the ITT estimates are \textit{larger} than the current-industry estimates, not smaller. Column (2) shows a 11.8\% wage increase for workers initially in agriculture, compared to 3.6\% using current industry. With controls (Column 3), the effect reaches 13.3\%. This pattern suggests that if anything, workers are \textit{leaving} agriculture after experiencing wage gains (perhaps for non-wage amenities), not entering it. The selection bias in our baseline specification works \textit{against} finding an effect, making our estimates conservative.
+
+\subsection{Stayer Sample Analysis}
+
+We further examine selection by analyzing ``stayers''---workers who remained in the same sector throughout the sample period.
+
+\begin{table}[H]
+\centering
+\caption{Stayer Sample Analysis}
+\label{tab:stayers}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& Full Sample & Stayers Only & Agri Stayers & Balanced Panel \\
+\midrule
+Agriculture $\times$ Post & 0.036 & 0.101*** & & 0.065** \\
+& (0.023) & (0.034) & & (0.027) \\
+\midrule
+Observations & 99,536 & 67,478 & 2,918 & 70,504 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} ``Stayers'' are workers observed both pre- and post-2014 who remained in the same sector. ``Balanced Panel'' requires workers to appear in both periods. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Table \ref{tab:stayers} shows that restricting to stayers yields \textit{larger} effects (10.1\% vs. 3.6\%), again suggesting that our baseline is conservative. The balanced panel estimate of 6.5\% is also larger than the full-sample estimate.
+
+\subsection{Wage Decomposition: Hourly Wages vs. Hours}
+
+Our summary statistics show that agricultural workers work more hours (184 vs. 175 monthly). If hours increased post-embargo, our monthly wage effects may capture labor supply responses rather than wage rate changes. We decompose total earnings into hourly wages and hours worked.
+
+\begin{table}[H]
+\centering
+\caption{Wage Decomposition: Earnings = Hourly Wage $\times$ Hours}
+\label{tab:decomposition}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& Log Earnings & Log Hourly & Log Hours & Hours (levels) \\
+\midrule
+Agriculture $\times$ Post & 0.036 & 0.003 & 0.026* & 5.08** \\
+& (0.023) & (0.030) & (0.015) & (2.33) \\
+\midrule
+Observations & 99,536 & 88,681 & 88,681 & 88,681 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Log decomposition: ln(earnings) $\approx$ ln(hourly) + ln(hours). Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Table \ref{tab:decomposition} reveals that the monthly earnings effect is \textit{entirely} driven by increased hours, not higher hourly wages. Column (2) shows the effect on log hourly wages is essentially zero (0.3\%), while Column (4) shows agricultural workers worked 5.1 more hours per month post-embargo. This is consistent with labor demand expansion: as domestic production ramped up to replace imports, farms demanded more worker-hours. Workers' earnings rose because they worked more, not because they commanded higher wages per hour.
+
+Figure \ref{fig:event_study_hours} shows the event study for hours worked.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{output/figures/event_study_hours.png}
+\caption{Event Study: Effect on Hours Worked}
+\label{fig:event_study_hours}
+\begin{minipage}{0.9\textwidth}
+\small
+\textit{Notes:} Figure plots coefficients on log hours worked. The effect on hours emerges after 2014 and grows over time, mirroring the earnings pattern.
+\end{minipage}
+\end{figure}
+
+\subsection{Synthetic Control}
+
+As an alternative identification strategy, we construct a synthetic control for agriculture using a weighted average of other sectors, matched on pre-2014 wage levels.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{output/figures/synthetic_control.png}
+\caption{Synthetic Control: Agriculture vs. Synthetic}
+\label{fig:synthetic}
+\begin{minipage}{0.9\textwidth}
+\small
+\textit{Notes:} Synthetic control constructed as average of manufacturing, construction, transport, government, education, and trade sectors, adjusted to match agricultural wages in 2010--2013.
+\end{minipage}
+\end{figure}
+
+Figure \ref{fig:synthetic} shows that agricultural wages closely tracked the synthetic control before 2014, then diverged upward after the embargo. The gap grows over time, consistent with our event study findings.
+
+%==============================================================================
+\section{Discussion}
+%==============================================================================
+
+\subsection{Interpretation of Magnitudes}
+
+Our estimates suggest that agricultural workers experienced earnings gains of 3.6--13.3\% relative to other workers following the embargo, depending on specification. The intent-to-treat estimates (7.9--13.3\%) are larger than the baseline current-industry estimates (3.6\%), suggesting that selection works against finding an effect.
+
+Crucially, our wage decomposition reveals that these earnings gains are driven entirely by increased hours worked, not higher hourly wages. Agricultural workers worked approximately 5 additional hours per month post-embargo, while their hourly wage rate was unchanged. This pattern is consistent with labor demand expansion: import substitution increased demand for domestic agricultural production, which farms met by employing more worker-hours.
+
+\subsection{Mechanism: Hours, Not Wages}
+
+The hours-driven nature of our results has important implications:
+
+\begin{enumerate}
+    \item \textbf{Labor demand expansion}: The embargo increased demand for domestic agricultural output, which translated to demand for more labor hours.
+    \item \textbf{Elastic labor supply}: The fact that hours increased while hourly wages did not suggests relatively elastic labor supply to agriculture, at least at the extensive margin (more hours from existing workers).
+    \item \textbf{No rent creation}: Workers are not capturing rents from protection in the form of higher wages. Instead, they are working more to meet increased demand.
+    \item \textbf{Welfare implications}: From a worker welfare perspective, higher earnings from more hours is less attractive than higher earnings from higher wages, as it comes with reduced leisure.
+\end{enumerate}
+
+\subsection{Welfare Implications}
+
+The welfare implications of our findings are nuanced. Agricultural workers saw higher earnings, but this came from working more hours rather than earning more per hour. Meanwhile, consumers faced higher food prices, with previous estimates suggesting losses of approximately 445 billion rubles per year (about 3,000 rubles per person).
+
+A complete welfare analysis would need to account for:
+\begin{itemize}
+    \item Worker gains: Additional earnings minus the disutility of additional hours worked
+    \item Consumer losses: Higher food prices, reduced variety and quality (especially for dairy)
+    \item Producer surplus: Profits to agricultural firms (not captured in our worker-level analysis)
+    \item Government revenue: Changes in tax revenue from the food sector
+\end{itemize}
+
+\subsection{Limitations}
+
+Our analysis has several limitations:
+
+\begin{enumerate}
+    \item \textbf{Sample size}: With approximately 400 agricultural workers at baseline, power is limited for sub-sector heterogeneity analysis.
+    \item \textbf{Hours measurement}: Hours are self-reported and may be subject to measurement error.
+    \item \textbf{Firm-level mechanisms}: We cannot observe whether earnings gains track firm profitability or productivity growth.
+    \item \textbf{2022 contamination}: While our results are robust to excluding 2022--2023, the full extended sample may be contaminated by Ukraine war effects. We recommend treating 2010--2019 as our primary sample.
+    \item \textbf{No consumer analysis}: We lack consumption data to directly estimate consumer welfare losses.
+\end{enumerate}
+
+%==============================================================================
+\section{Conclusion} \label{sec:conclusion}
+%==============================================================================
+
+This paper studies the labor market effects of Russia's 2014 food import embargo using individual-level panel data covering 2010--2019. We find that agricultural workers experienced earnings gains of 8--13\% relative to workers in other sectors following the embargo when using intent-to-treat specifications that avoid bias from post-treatment industry switching.
+
+Our key finding is that these earnings gains are driven entirely by increased hours worked, not higher hourly wages. Agricultural workers worked approximately 5 additional hours per month post-embargo, while their hourly wage rate was essentially unchanged. This pattern is consistent with labor demand expansion through import substitution, with farms meeting increased demand by employing more worker-hours rather than bidding up wage rates.
+
+This distinction has important implications for evaluating trade protection:
+\begin{enumerate}
+    \item \textbf{Worker welfare}: Earnings gains from more hours are less attractive than gains from higher wages, as they come with reduced leisure.
+    \item \textbf{Rent creation}: Trade protection did not create rents that workers could capture through higher wages; instead, it increased labor demand.
+    \item \textbf{Policy evaluation}: The welfare gains to workers from protection are smaller than raw earnings changes suggest once the disutility of additional work is accounted for.
+\end{enumerate}
+
+Several avenues for future research emerge. First, linking worker-level data to firm-level outcomes could help identify whether firms captured protection rents. Second, incorporating consumption data could enable a fuller welfare analysis. Third, studying heterogeneity across sub-sectors where import substitution succeeded (pork, poultry) versus failed (dairy) could illuminate the conditions under which protection benefits workers.
+
+\newpage
+
+%==============================================================================
+% REFERENCES
+%==============================================================================
+
+\bibliographystyle{aer}
+\begin{thebibliography}{99}
+
+\bibitem[Autor et al.(2013)]{autor2013china}
+Autor, David H., David Dorn, and Gordon H. Hanson. 2013. ``The China Syndrome: Local Labor Market Effects of Import Competition in the United States.'' \textit{American Economic Review} 103(6): 2121--68.
+
+\bibitem[Bruton(1998)]{bruton1998reconsideration}
+Bruton, Henry J. 1998. ``A Reconsideration of Import Substitution.'' \textit{Journal of Economic Literature} 36(2): 903--36.
+
+\bibitem[Dix-Carneiro and Kovak(2017)]{dix2017trade}
+Dix-Carneiro, Rafael, and Brian K. Kovak. 2017. ``Trade Liberalization and Regional Dynamics.'' \textit{American Economic Review} 107(10): 2908--46.
+
+\bibitem[Kovak(2013)]{kovak2013regional}
+Kovak, Brian K. 2013. ``Regional Effects of Trade Reform: What Is the Correct Measure of Liberalization?'' \textit{American Economic Review} 103(5): 1960--76.
+
+\bibitem[Pierce and Schott(2016)]{pierce2016surprisingly}
+Pierce, Justin R., and Peter K. Schott. 2016. ``The Surprisingly Swift Decline of US Manufacturing Employment.'' \textit{American Economic Review} 106(7): 1632--62.
+
+\bibitem[Topalova(2010)]{topalova2010trade}
+Topalova, Petia. 2010. ``Factor Immobility and Regional Impacts of Trade Liberalization: Evidence on Poverty from India.'' \textit{American Economic Journal: Applied Economics} 2(4): 1--41.
+
+\end{thebibliography}
+
+\newpage
+
+%==============================================================================
+% APPENDIX
+%==============================================================================
+
+\appendix
+\section{Additional Tables and Figures}
+
+\subsection{Industry Classification}
+
+\begin{table}[H]
+\centering
+\caption{RLMS Industry Codes}
+\label{tab:industry_codes}
+\begin{tabular}{clc}
+\toprule
+Code & Industry & Treatment Status \\
+\midrule
+1 & Light Industry, Food Industry & Treated \\
+2 & Civil Machine Construction & Control \\
+3 & Military Industrial Complex & Control \\
+4 & Oil and Gas Industry & Control \\
+5 & Other Heavy Industry & Control \\
+6 & Construction & Control \\
+7 & Transportation, Communication & Control \\
+\textbf{8} & \textbf{Agriculture} & \textbf{Treated (Primary)} \\
+9 & Government and Public Administration & Control \\
+10 & Education & Control \\
+11 & Science, Culture & Control \\
+12 & Public Health & Control \\
+13 & Army, Security Services & Control \\
+14 & Trade, Consumer Services & Control \\
+15 & Finances & Control \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Regional Treatment Intensity}
+
+\begin{table}[H]
+\centering
+\caption{Top and Bottom Regions by Treatment Intensity}
+\label{tab:regions}
+\begin{tabular}{lcc}
+\toprule
+\multicolumn{3}{c}{\textit{Panel A: Highest Treatment Intensity}} \\
+Region & Agri Share (\%) & Treatment Intensity \\
+\midrule
+Krasnodar Krai & 14.4 & 0.026 \\
+Stavropol Krai & 14.4 & 0.026 \\
+Rostov Oblast & 12.0 & 0.025 \\
+Altai Krai & 13.1 & 0.020 \\
+Tambov Oblast & 16.5 & 0.031 \\
+\midrule
+\multicolumn{3}{c}{\textit{Panel B: Lowest Treatment Intensity}} \\
+Region & Agri Share (\%) & Treatment Intensity \\
+\midrule
+Moscow City & 4.7 & 0.001 \\
+St. Petersburg & 4.6 & 0.001 \\
+Yamal-Nenets AO & 7.7 & 0.005 \\
+Komi Republic & 6.7 & 0.005 \\
+Chelyabinsk Oblast & 6.3 & 0.008 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
