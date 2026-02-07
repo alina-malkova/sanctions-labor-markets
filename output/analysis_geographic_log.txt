@@ -1,0 +1,620 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_geographic_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 14:01:34
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "GEOGRAPHIC HETEROGENEITY ANALYSIS"
+GEOGRAPHIC HETEROGENEITY ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Check region variable type
+. describe region
+
+              storage   display    value
+variable name   type    format     label      variable label
+------------------------------------------------------------------------------------------
+region          double  %12.0g     region      Region--cover.1
+
+. tab region if _n <= 20
+
+                        Region--cover.1 |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+       Altaiskij Kraj: Kur`inskij Rajon |          8       40.00       40.00
+               Altaiskij Kraj: Biisk CR |         12       60.00      100.00
+----------------------------------------+-----------------------------------
+                                  Total |         20      100.00
+
+. 
+. ********************************************************************************
+. * PART 1: Create regional agricultural intensity from data
+. ********************************************************************************
+. 
+. * Calculate regional agricultural employment share (treatment proxy)
+. bysort region: egen region_agri_share_2013 = mean(agri) if year == 2013
+(69404 missing values generated)
+
+. bysort region: egen region_agri_share = max(region_agri_share_2013)
+
+. drop region_agri_share_2013
+
+. 
+. * Create terciles
+. xtile treat_tercile = region_agri_share, nq(3)
+
+. label define tercile_lbl 1 "Low agri share" 2 "Medium" 3 "High agri share"
+
+. label values treat_tercile tercile_lbl
+
+. 
+. di _n "--- Regional agricultural share distribution ---"
+
+--- Regional agricultural share distribution ---
+
+. sum region_agri_share, detail
+
+                      region_agri_share
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs              78,095
+25%     .0046948              0       Sum of Wgt.      78,095
+
+50%     .0111732                      Mean           .0413259
+                        Largest       Std. Dev.      .0724484
+75%     .0414201       .3814433
+90%     .1117318       .3814433       Variance       .0052488
+95%     .1919192       .3814433       Skewness        2.85964
+99%     .3814433       .3814433       Kurtosis       12.08124
+
+. tab treat_tercile
+
+ 3 quantiles of |
+region_agri_sha |
+             re |      Freq.     Percent        Cum.
+----------------+-----------------------------------
+ Low agri share |     26,988       34.56       34.56
+         Medium |     25,115       32.16       66.72
+High agri share |     25,992       33.28      100.00
+----------------+-----------------------------------
+          Total |     78,095      100.00
+
+. 
+. di _n "--- Sample by treatment tercile ---"
+
+--- Sample by treatment tercile ---
+
+. tab treat_tercile agri
+
+ 3 quantiles of |
+region_agri_sha |  Agriculture sector
+             re |         0          1 |     Total
+----------------+----------------------+----------
+ Low agri share |    26,858        130 |    26,988 
+         Medium |    24,848        267 |    25,115 
+High agri share |    23,185      2,807 |    25,992 
+----------------+----------------------+----------
+          Total |    74,891      3,204 |    78,095 
+
+. 
+. ********************************************************************************
+. * PART 2: Effects by treatment tercile
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: EFFECTS BY AGRICULTURAL INTENSITY TERCILE"
+PART 2: EFFECTS BY AGRICULTURAL INTENSITY TERCILE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. cap drop agri_post
+
+. gen agri_post = agri * post
+
+. 
+. * Overall effect (baseline)
+. di _n "=== OVERALL ==="
+
+=== OVERALL ===
+
+. reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3176
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0310473   .0306432     1.01   0.318    -.0310417    .0931363
+       _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * By treatment tercile
+. di _n "=== LOW AGRICULTURAL INTENSITY (Tercile 1) ==="
+
+=== LOW AGRICULTURAL INTENSITY (Tercile 1) ===
+
+. reghdfe ln_wage agri_post if treat_tercile == 1, absorb(idind year) cluster(region)
+(dropped 2202 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     24,786
+Absorbing 2 HDFE groups                           F(   1,     11) =       0.07
+Statistics robust to heteroskedasticity           Prob > F        =     0.7909
+                                                  R-squared       =     0.8097
+                                                  Adj R-squared   =     0.7589
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         12         Root MSE        =     0.3419
+
+                                (Std. Err. adjusted for 12 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |    .026849   .0988313     0.27   0.791    -.1906772    .2443751
+       _cons |   9.972769   .0002672  3.7e+04   0.000     9.972181    9.973357
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      5216        5216           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== MEDIUM AGRICULTURAL INTENSITY (Tercile 2) ==="
+
+=== MEDIUM AGRICULTURAL INTENSITY (Tercile 2) ===
+
+. reghdfe ln_wage agri_post if treat_tercile == 2, absorb(idind year) cluster(region)
+(dropped 1757 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     23,358
+Absorbing 2 HDFE groups                           F(   1,     10) =       2.10
+Statistics robust to heteroskedasticity           Prob > F        =     0.1783
+                                                  R-squared       =     0.7731
+                                                  Adj R-squared   =     0.7179
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         11         Root MSE        =     0.3486
+
+                                (Std. Err. adjusted for 11 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |  -.0593099   .0409675    -1.45   0.178    -.1505912    .0319715
+       _cons |   9.879412   .0001824  5.4e+04   0.000     9.879005    9.879818
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      4560        4560           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== HIGH AGRICULTURAL INTENSITY (Tercile 3) ==="
+
+=== HIGH AGRICULTURAL INTENSITY (Tercile 3) ===
+
+. reghdfe ln_wage agri_post if treat_tercile == 3, absorb(idind year) cluster(region)
+(dropped 1232 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     24,760
+Absorbing 2 HDFE groups                           F(   1,     14) =       0.47
+Statistics robust to heteroskedasticity           Prob > F        =     0.5053
+                                                  R-squared       =     0.7773
+                                                  Adj R-squared   =     0.7258
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         15         Root MSE        =     0.3533
+
+                                (Std. Err. adjusted for 15 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0229456   .0335618     0.68   0.505    -.0490373    .0949285
+       _cons |   9.525199   .0018218  5228.54   0.000     9.521292    9.529107
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      4645        4645           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * PART 3: Continuous intensity specification
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: CONTINUOUS REGIONAL INTENSITY"
+PART 3: CONTINUOUS REGIONAL INTENSITY
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Standardize intensity
+. sum region_agri_share
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+region_agr~e |     78,095    .0413259    .0724484          0   .3814433
+
+. gen intensity_std = (region_agri_share - r(mean)) / r(sd)
+
+. 
+. * Triple-diff: Agri × Post × Regional Intensity
+. gen agri_intensity_post = agri * post * intensity_std
+
+. 
+. di _n "=== TRIPLE DIFFERENCE: Agri × Post × Regional Intensity (standardized) ==="
+
+=== TRIPLE DIFFERENCE: Agri × Post × Regional Intensity (standardized) ===
+
+. reghdfe ln_wage agri_post agri_intensity_post, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   2,     37) =       9.73
+Statistics robust to heteroskedasticity           Prob > F        =     0.0004
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0003
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                       (Std. Err. adjusted for 38 clusters in region)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------+----------------------------------------------------------------
+          agri_post |  -.0102433   .0349792    -0.29   0.771    -.0811178    .0606312
+agri_intensity_post |   .0257886   .0082326     3.13   0.003     .0091077    .0424694
+              _cons |   9.790477   .0005381  1.8e+04   0.000     9.789386    9.791567
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * PART 4: High vs Low agricultural regions
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: HIGH VS LOW AGRICULTURAL REGIONS"
+PART 4: HIGH VS LOW AGRICULTURAL REGIONS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Create high/low indicator (above median)
+. sum region_agri_share, detail
+
+                      region_agri_share
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs              78,095
+25%     .0046948              0       Sum of Wgt.      78,095
+
+50%     .0111732                      Mean           .0413259
+                        Largest       Std. Dev.      .0724484
+75%     .0414201       .3814433
+90%     .1117318       .3814433       Variance       .0052488
+95%     .1919192       .3814433       Skewness        2.85964
+99%     .3814433       .3814433       Kurtosis       12.08124
+
+. gen high_agri_region = (region_agri_share > r(p50))
+
+. 
+. di _n "=== HIGH AGRICULTURAL REGIONS (above median) ==="
+
+=== HIGH AGRICULTURAL REGIONS (above median) ===
+
+. reghdfe ln_wage agri_post if high_agri_region == 1, absorb(idind year) cluster(region)
+(dropped 2118 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     36,364
+Absorbing 2 HDFE groups                           F(   1,     19) =       0.46
+Statistics robust to heteroskedasticity           Prob > F        =     0.5072
+                                                  R-squared       =     0.7915
+                                                  Adj R-squared   =     0.7427
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         20         Root MSE        =     0.3583
+
+                                (Std. Err. adjusted for 20 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0214823    .031777     0.68   0.507    -.0450276    .0879923
+       _cons |   9.657491   .0012461  7750.04   0.000     9.654883      9.6601
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      6895        6895           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== LOW AGRICULTURAL REGIONS (below median) ==="
+
+=== LOW AGRICULTURAL REGIONS (below median) ===
+
+. reghdfe ln_wage agri_post if high_agri_region == 0, absorb(idind year) cluster(region)
+(dropped 3073 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     36,540
+Absorbing 2 HDFE groups                           F(   1,     17) =       0.08
+Statistics robust to heteroskedasticity           Prob > F        =     0.7839
+                                                  R-squared       =     0.8019
+                                                  Adj R-squared   =     0.7504
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         18         Root MSE        =     0.3373
+
+                                (Std. Err. adjusted for 18 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0201381   .0722854     0.28   0.784    -.1323706    .1726469
+       _cons |   9.923408   .0001761  5.6e+04   0.000     9.923037    9.923779
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      7526        7526           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * Formal interaction test
+. gen agri_post_high = agri_post * high_agri_region
+
+. 
+. di _n "=== INTERACTION TEST ==="
+
+=== INTERACTION TEST ===
+
+. reghdfe ln_wage agri_post agri_post_high, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   2,     37) =       0.52
+Statistics robust to heteroskedasticity           Prob > F        =     0.6009
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                  (Std. Err. adjusted for 38 clusters in region)
+--------------------------------------------------------------------------------
+               |               Robust
+       ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+     agri_post |   .0118851   .0697839     0.17   0.866    -.1295104    .1532806
+agri_post_high |   .0206024    .074646     0.28   0.784    -.1306448    .1718497
+         _cons |   9.790565     .00064  1.5e+04   0.000     9.789269    9.791862
+--------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * PART 5: Regional fixed effects heterogeneity
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 5: TOP AND BOTTOM REGIONS"
+PART 5: TOP AND BOTTOM REGIONS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Identify regions with highest/lowest agricultural shares
+. preserve
+
+. collapse (mean) region_agri_share, by(region)
+
+. gsort -region_agri_share
+
+. list in 1/10
+
+     +-------------------------+
+     |       region   region~e |
+     |-------------------------|
+  1. | Amurskaja Ob   .3814433 |
+  2. |  Penzenskaya   .2569444 |
+  3. | Volgograd Ob   .1919192 |
+  4. | Krasnojarski    .134715 |
+  5. | Altaiskij Kr   .1117318 |
+     |-------------------------|
+  6. | Krasnodarski   .1114754 |
+  7. | Udmurt ASSR:   .1054688 |
+  8. | Leningrad Ob   .0869565 |
+  9. | Kabardino-Ba   .0828025 |
+ 10. |  Kaluzhskaya   .0743243 |
+     +-------------------------+
+
+. gsort region_agri_share
+
+. list in 1/10
+
+     +-------------------------+
+     |       region   region~e |
+     |-------------------------|
+  1. | Tulskaja Obl          0 |
+  2. | Kalinin Obla          0 |
+  3. | St. Petersbu          0 |
+  4. | Komi-ASSR: U          0 |
+  5. | Orenburg Obl          0 |
+     |-------------------------|
+  6. |  Vladivostok          0 |
+  7. |  Smolensk CR          0 |
+  8. | Perm Territo   .0036101 |
+  9. |        Tomsk   .0039063 |
+ 10. |  Moscow City   .0046948 |
+     +-------------------------+
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 6: Export regional summary
+. ********************************************************************************
+. 
+. preserve
+
+. collapse (mean) region_agri_share (count) n_total=ln_wage (sum) n_agri=agri, by(region)
+
+. gen agri_share_pct = region_agri_share * 100
+
+. gsort -region_agri_share
+
+. export delimited using "output/tables/regional_intensity_summary.csv", replace
+(note: file output/tables/regional_intensity_summary.csv not found)
+file output/tables/regional_intensity_summary.csv saved
+
+. list region agri_share_pct n_agri n_total in 1/20
+
+     +--------------------------------------------+
+     |       region   agri_s~t   n_agri   n_total |
+     |--------------------------------------------|
+  1. | Amurskaja Ob   38.14433      618      1635 |
+  2. |  Penzenskaya   25.69444      291      1288 |
+  3. | Volgograd Ob   19.19192      304      1865 |
+  4. | Krasnojarski    13.4715      214      1725 |
+  5. | Altaiskij Kr   11.17318      181      1484 |
+     |--------------------------------------------|
+  6. | Krasnodarski   11.14754      309      2646 |
+  7. | Udmurt ASSR:   10.54688      226      2219 |
+  8. | Leningrad Ob   8.695652      155      1711 |
+  9. | Kabardino-Ba   8.280255       48       993 |
+ 10. |  Kaluzhskaya   7.432433      114      1319 |
+     |--------------------------------------------|
+ 11. | Tambov Oblas   5.882353      109      1918 |
+ 12. | Altaiskij Kr   4.142012       77      1453 |
+ 13. | Stavropolski   3.846154       60      1952 |
+ 14. |  Cheliabinsk   2.830189       90      1833 |
+ 15. |  Cheliabinsk   1.357466       11      1951 |
+     |--------------------------------------------|
+ 16. | Moscow Oblas   1.356589       57      4600 |
+ 17. | Krasnojarski   1.304348       16      2015 |
+ 18. | Chuvashskaya   1.293103       53      1989 |
+ 19. |       Kurgan   1.290323       18      1433 |
+ 20. |  Gorkovskaja   1.244813       24      2453 |
+     +--------------------------------------------+
+
+. restore
+
+. 
+. di ""
+
+
+. di "Analysis complete!"
+Analysis complete!
+
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_geographic_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 14:01:39
+------------------------------------------------------------------------------------------
