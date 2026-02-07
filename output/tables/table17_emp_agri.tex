@@ -1,0 +1,18 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Probability of Being Employed in Agriculture}
+\begin{tabular}{l*{3}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
+                    &\multicolumn{1}{c}{Year FE}&\multicolumn{1}{c}{+ Demographics}&\multicolumn{1}{c}{+ Region FE}\\
+\midrule
+Post-2014           &     -0.0150\sym{***}&     -0.0145\sym{***}&      0.0000         \\
+                    &    (0.0051)         &    (0.0047)         &         (.)         \\
+\midrule
+Observations        & 105142.0000         & 104987.0000         & 105142.0000         \\
+R-squared           &      0.0008         &      0.0239         &      0.1166         \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

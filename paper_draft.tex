@@ -682,6 +682,56 @@ Figure \ref{fig:event_study_hours} shows the event study for hours worked.
 \end{minipage}
 \end{figure}
 
+\subsection{Industry Switching as Outcome}
+
+We explicitly model industry switching to understand labor market dynamics. Table \ref{tab:switching} presents regressions where the dependent variable is the probability of switching into or out of agriculture.
+
+\begin{table}[H]
+\centering
+\caption{Industry Switching and Employment as Outcomes}
+\label{tab:switching}
+\begin{threeparttable}
+\begin{tabular}{lccc}
+\toprule
+& (1) & (2) & (3) \\
+& P(Switch In) & P(Switch Out) & P(In Agri) \\
+\midrule
+Post-2014 & $-$0.0003 & 0.020 & $-$0.015*** \\
+& (0.002) & (0.029) & (0.005) \\
+\midrule
+Sample & Non-agri at $t-1$ & Agri at $t-1$ & All workers \\
+Observations & 79,721 & 3,349 & 105,142 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Column (1): probability that a non-agricultural worker switches into agriculture. Column (2): probability that an agricultural worker leaves agriculture. Column (3): unconditional probability of being in agriculture. All specifications include year fixed effects. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The results reveal a striking pattern: despite the earnings gains documented above, the probability of switching \textit{into} agriculture did not increase (Column 1), while if anything, exits from agriculture slightly increased (Column 2). Most importantly, the overall share of employment in agriculture \textit{declined} by 1.5 percentage points after 2014 (Column 3).
+
+This finding has important implications:
+\begin{enumerate}
+    \item \textbf{No extensive margin response}: Higher earnings did not attract new workers into agriculture.
+    \item \textbf{Selection explains ITT $>$ current-industry}: Workers left agriculture despite earnings gains, biasing current-industry estimates downward.
+    \item \textbf{Non-wage amenities matter}: The decline in agricultural employment despite earnings gains suggests workers value non-wage job characteristics (e.g., working conditions, job security, urban location).
+\end{enumerate}
+
+Figure \ref{fig:switching_rates} shows switching rates over time.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{output/figures/switching_rates_time.png}
+\caption{Industry Switching Rates Over Time}
+\label{fig:switching_rates}
+\begin{minipage}{0.9\textwidth}
+\small
+\textit{Notes:} Figure shows the percentage of workers switching into agriculture (from non-agri) and out of agriculture (from agri) each year. No visible change in switching patterns after 2014.
+\end{minipage}
+\end{figure}
+
 \subsection{Synthetic Control}
 
 As an alternative identification strategy, we construct a synthetic control for agriculture using a weighted average of other sectors, matched on pre-2014 wage levels.
