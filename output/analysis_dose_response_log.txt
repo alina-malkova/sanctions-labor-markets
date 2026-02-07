@@ -1,0 +1,1058 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_dose_response_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 15:01:34
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "DOSE-RESPONSE ANALYSIS"
+DOSE-RESPONSE ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. ********************************************************************************
+. * STEP 1: Import and merge treatment intensity data
+. ********************************************************************************
+. 
+. di _n "=== STEP 1: Merge Treatment Intensity ==="
+
+=== STEP 1: Merge Treatment Intensity ===
+
+. 
+. * Import RFSD treatment intensity
+. preserve
+
+. import delimited "RFSD_data/output/rfsd_treatment_intensity.csv", clear
+(17 vars, 89 obs)
+
+. keep region_std baseline_treatment_product baseline_treatment_combined high_treatment
+
+. rename region_std region_rfsd
+
+. rename baseline_treatment_product treatment_intensity_product
+
+. rename baseline_treatment_combined treatment_intensity_combined
+
+. save "temp/treatment_intensity.dta", replace
+file temp/treatment_intensity.dta saved
+
+. restore
+
+. 
+. * Create region matching variable (same as in geographic analysis)
+. decode region, gen(region_str)
+
+. cap drop region_rfsd
+
+. gen region_rfsd = ""
+(78,095 missing values generated)
+
+. 
+. * Map RLMS regions to RFSD
+. replace region_rfsd = "moscow oblast" if strpos(region_str, "Moscow Oblast") > 0
+variable region_rfsd was str1 now str13
+(4,600 real changes made)
+
+. replace region_rfsd = "moscow" if strpos(region_str, "Moscow City") > 0
+(5,918 real changes made)
+
+. replace region_rfsd = "st. petersburg" if strpos(region_str, "St. Petersburg") > 0
+variable region_rfsd was str13 now str14
+(2,246 real changes made)
+
+. replace region_rfsd = "leningrad oblast" if strpos(region_str, "Leningrad") > 0
+variable region_rfsd was str14 now str16
+(1,711 real changes made)
+
+. replace region_rfsd = "krasnodar krai" if strpos(region_str, "Krasnodarsk") > 0
+(2,646 real changes made)
+
+. replace region_rfsd = "rostov oblast" if strpos(region_str, "Rostov") > 0 | strpos(regio
+> n_str, "Batajsk") > 0
+(2,113 real changes made)
+
+. replace region_rfsd = "chelyabinsk oblast" if strpos(region_str, "Cheliabinsk") > 0
+variable region_rfsd was str16 now str18
+(3,784 real changes made)
+
+. replace region_rfsd = "nizhny novgorod oblast" if strpos(region_str, "Gorkovsk") > 0 | s
+> trpos(region_str, "Nizhnij Novgorod") > 0
+variable region_rfsd was str18 now str22
+(2,453 real changes made)
+
+. replace region_rfsd = "novosibirsk oblast" if strpos(region_str, "Novosibirsk") > 0
+(1,606 real changes made)
+
+. replace region_rfsd = "tatarstan" if strpos(region_str, "Tatarsk") > 0 | strpos(region_s
+> tr, "Kazan") > 0
+(2,568 real changes made)
+
+. replace region_rfsd = "volgograd oblast" if strpos(region_str, "Volgograd") > 0
+(1,865 real changes made)
+
+. replace region_rfsd = "saratov oblast" if strpos(region_str, "Saratov") > 0
+(3,578 real changes made)
+
+. replace region_rfsd = "krasnoyarsk krai" if strpos(region_str, "Krasnojarsk") > 0
+(3,740 real changes made)
+
+. replace region_rfsd = "penza oblast" if strpos(region_str, "Penzensk") > 0
+(1,288 real changes made)
+
+. replace region_rfsd = "tula oblast" if strpos(region_str, "Tulsk") > 0
+(1,658 real changes made)
+
+. replace region_rfsd = "lipetzk" if strpos(region_str, "Lipetsk") > 0
+(2,691 real changes made)
+
+. replace region_rfsd = "tambov oblast" if strpos(region_str, "Tambov") > 0
+(3,553 real changes made)
+
+. replace region_rfsd = "kaluga oblast" if strpos(region_str, "Kaluzh") > 0 | strpos(regio
+> n_str, "Kuibyshev") > 0
+(1,319 real changes made)
+
+. replace region_rfsd = "smolensk oblast" if strpos(region_str, "Smolensk") > 0
+(1,258 real changes made)
+
+. replace region_rfsd = "stavropol krai" if strpos(region_str, "Stavropol") > 0
+(1,952 real changes made)
+
+. replace region_rfsd = "altai krai" if strpos(region_str, "Altaisk") > 0
+(2,937 real changes made)
+
+. replace region_rfsd = "amur oblast" if strpos(region_str, "Amursk") > 0
+(1,635 real changes made)
+
+. replace region_rfsd = "tomsk" if strpos(region_str, "Tomsk") > 0
+(2,107 real changes made)
+
+. replace region_rfsd = "komi republic" if strpos(region_str, "Komi") > 0
+(4,060 real changes made)
+
+. replace region_rfsd = "udmurt republic" if strpos(region_str, "Udmurt") > 0
+(2,219 real changes made)
+
+. replace region_rfsd = "chuvash republic" if strpos(region_str, "Chuvash") > 0
+(1,989 real changes made)
+
+. replace region_rfsd = "kurgan oblast" if strpos(region_str, "Kurgan") > 0
+(1,433 real changes made)
+
+. replace region_rfsd = "orenburg oblast" if strpos(region_str, "Orenburg") > 0 | strpos(r
+> egion_str, "Orsk") > 0
+(2,162 real changes made)
+
+. replace region_rfsd = "kabardino-balkaria" if strpos(region_str, "Kabardino") > 0
+(993 real changes made)
+
+. replace region_rfsd = "primorsky krai" if strpos(region_str, "Vladivostok") > 0
+(1,564 real changes made)
+
+. replace region_rfsd = "perm krai" if strpos(region_str, "Perm") > 0 | strpos(region_str,
+>  "Solikamsk") > 0
+(2,386 real changes made)
+
+. 
+. * Merge treatment intensity
+. merge m:1 region_rfsd using "temp/treatment_intensity.dta", keep(1 3) nogen
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         8,330
+        from master                     8,330  
+        from using                          0  
+
+    matched                            69,765  
+    -----------------------------------------
+
+. 
+. * Fill missing with median
+. sum treatment_intensity_product, detail
+
+                 treatment_intensity_product
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     .0243567       .0243567
+ 5%     .0289727       .0243567
+10%     .0289727       .0243567       Obs              69,765
+25%     .0964053       .0243567       Sum of Wgt.      69,765
+
+50%     .1721101                      Mean           .1413462
+                        Largest       Std. Dev.      .0593121
+75%     .1876722       .2242887
+90%     .2101918       .2242887       Variance       .0035179
+95%     .2165896       .2242887       Skewness      -.5568914
+99%     .2242887       .2242887       Kurtosis       2.187325
+
+. replace treatment_intensity_product = r(p50) if treatment_intensity_product == .
+(8,330 real changes made)
+
+. sum treatment_intensity_combined, detail
+
+                treatment_intensity_combined
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     .0011166       .0011166
+ 5%     .0013741       .0011166
+10%     .0013741       .0011166       Obs              69,765
+25%     .0075566       .0011166       Sum of Wgt.      69,765
+
+50%     .0125709                      Mean           .0151106
+                        Largest       Std. Dev.      .0100029
+75%      .023658       .0409187
+90%     .0262899       .0409187       Variance       .0001001
+95%     .0309309       .0409187       Skewness       .5184372
+99%     .0409187       .0409187       Kurtosis        2.58059
+
+. replace treatment_intensity_combined = r(p50) if treatment_intensity_combined == .
+(8,330 real changes made)
+
+. replace high_treatment = 0 if high_treatment == .
+(4,255 real changes made)
+
+. 
+. di _n "=== Treatment Intensity Distribution ==="
+
+=== Treatment Intensity Distribution ===
+
+. sum treatment_intensity_product treatment_intensity_combined, detail
+
+                 treatment_intensity_product
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     .0243567       .0243567
+ 5%     .0289727       .0243567
+10%     .0289727       .0243567       Obs              78,095
+25%      .096977       .0243567       Sum of Wgt.      78,095
+
+50%     .1721101                      Mean           .1446276
+                        Largest       Std. Dev.      .0568583
+75%     .1821574       .2242887
+90%     .2101918       .2242887       Variance       .0032329
+95%     .2165896       .2242887       Skewness      -.7211544
+99%     .2242887       .2242887       Kurtosis       2.469419
+
+                treatment_intensity_combined
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     .0011166       .0011166
+ 5%     .0013741       .0011166
+10%     .0013741       .0011166       Obs              78,095
+25%     .0079168       .0011166       Sum of Wgt.      78,095
+
+50%     .0125709                      Mean           .0148397
+                        Largest       Std. Dev.      .0094869
+75%     .0222041       .0409187
+90%     .0262899       .0409187       Variance         .00009
+95%     .0309309       .0409187       Skewness         .62655
+99%     .0409187       .0409187       Kurtosis       2.916614
+
+. 
+. ********************************************************************************
+. * PART 1: Linear Dose-Response
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 1: LINEAR DOSE-RESPONSE"
+PART 1: LINEAR DOSE-RESPONSE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. cap drop agri_post
+
+. gen agri_post = agri * post
+
+. 
+. * Standardize treatment intensity for interpretation
+. sum treatment_intensity_product
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+treatment_~t |     78,095    .1446276    .0568583   .0243567   .2242887
+
+. gen intensity_std = (treatment_intensity_product - r(mean)) / r(sd)
+
+. 
+. * Create interaction: Agri × Post × Intensity
+. gen agri_post_intensity = agri_post * intensity_std
+
+. 
+. di _n "=== Model 1: Baseline (no intensity) ==="
+
+=== Model 1: Baseline (no intensity) ===
+
+. reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3176
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0310473   .0306432     1.01   0.318    -.0310417    .0931363
+       _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estimates store m1
+
+. 
+. di _n "=== Model 2: Linear dose-response ==="
+
+=== Model 2: Linear dose-response ===
+
+. reghdfe ln_wage agri_post agri_post_intensity, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   2,     37) =       0.63
+Statistics robust to heteroskedasticity           Prob > F        =     0.5396
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                       (Std. Err. adjusted for 38 clusters in region)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------+----------------------------------------------------------------
+          agri_post |   .0547254   .0488646     1.12   0.270    -.0442836    .1537344
+agri_post_intensity |  -.0525482   .0556938    -0.94   0.352    -.1653946    .0602981
+              _cons |   9.790573   .0006309  1.6e+04   0.000     9.789295    9.791852
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estimates store m2
+
+. 
+. * Marginal effects at different intensity levels
+. di _n "=== Marginal effects at different intensity levels ==="
+
+=== Marginal effects at different intensity levels ===
+
+. di "At mean intensity (0 SD): " _b[agri_post]
+At mean intensity (0 SD): .05472539
+
+. di "At +1 SD intensity: " _b[agri_post] + _b[agri_post_intensity]
+At +1 SD intensity: .00217716
+
+. di "At +2 SD intensity: " _b[agri_post] + 2*_b[agri_post_intensity]
+At +2 SD intensity: -.05037108
+
+. di "At -1 SD intensity: " _b[agri_post] - _b[agri_post_intensity]
+At -1 SD intensity: .10727363
+
+. 
+. ********************************************************************************
+. * PART 2: Nonlinear Dose-Response (Quadratic)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: NONLINEAR DOSE-RESPONSE (QUADRATIC)"
+PART 2: NONLINEAR DOSE-RESPONSE (QUADRATIC)
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Create quadratic term
+. gen intensity_std_sq = intensity_std^2
+
+. gen agri_post_intensity_sq = agri_post * intensity_std_sq
+
+. 
+. di _n "=== Model 3: Quadratic dose-response ==="
+
+=== Model 3: Quadratic dose-response ===
+
+. reghdfe ln_wage agri_post agri_post_intensity agri_post_intensity_sq, absorb(idind year)
+>  cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   3,     37) =       1.00
+Statistics robust to heteroskedasticity           Prob > F        =     0.4035
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0003
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                          (Std. Err. adjusted for 38 clusters in region)
+----------------------------------------------------------------------------------------
+                       |               Robust
+               ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-----------------------+----------------------------------------------------------------
+             agri_post |   .0855652   .0532546     1.61   0.117    -.0223388    .1934693
+   agri_post_intensity |  -.0468762   .0532437    -0.88   0.384    -.1547581    .0610057
+agri_post_intensity_sq |  -.0528073   .0389056    -1.36   0.183    -.1316376    .0260229
+                 _cons |   9.790541   .0005854  1.7e+04   0.000     9.789355    9.791727
+----------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estimates store m3
+
+. 
+. * Test for nonlinearity
+. test agri_post_intensity_sq = 0
+
+ ( 1)  agri_post_intensity_sq = 0
+
+       F(  1,    37) =    1.84
+            Prob > F =    0.1829
+
+. local quad_pval = r(p)
+
+. di "Test for quadratic term: p = " `quad_pval'
+Test for quadratic term: p = .18290196
+
+. 
+. ********************************************************************************
+. * PART 3: Threshold Effects (by terciles)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: THRESHOLD EFFECTS (TERCILES)"
+PART 3: THRESHOLD EFFECTS (TERCILES)
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Create terciles of treatment intensity
+. xtile intensity_tercile = treatment_intensity_product, nq(3)
+
+. label define terc_lbl 1 "Low intensity" 2 "Medium" 3 "High intensity"
+
+. label values intensity_tercile terc_lbl
+
+. 
+. tab intensity_tercile
+
+3 quantiles of |
+treatment_inte |
+ nsity_product |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+ Low intensity |     26,850       34.38       34.38
+        Medium |     27,751       35.53       69.92
+High intensity |     23,494       30.08      100.00
+---------------+-----------------------------------
+         Total |     78,095      100.00
+
+. 
+. * Create tercile interactions
+. gen agri_post_t2 = agri_post * (intensity_tercile == 2)
+
+. gen agri_post_t3 = agri_post * (intensity_tercile == 3)
+
+. 
+. di _n "=== Model 4: Tercile interactions ==="
+
+=== Model 4: Tercile interactions ===
+
+. reghdfe ln_wage agri_post agri_post_t2 agri_post_t3, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   3,     37) =       0.74
+Statistics robust to heteroskedasticity           Prob > F        =     0.5365
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0887979   .1188609     0.75   0.460    -.1520371    .3296329
+agri_post_t2 |  -.0374638   .1256165    -0.30   0.767     -.291987    .2170595
+agri_post_t3 |  -.0978674   .1215495    -0.81   0.426    -.3441501    .1484152
+       _cons |   9.790559   .0005994  1.6e+04   0.000     9.789345    9.791774
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estimates store m4
+
+. 
+. di _n "Effects by tercile:"
+
+Effects by tercile:
+
+. di "  Low intensity (T1): " _b[agri_post]
+  Low intensity (T1): .08879787
+
+. di "  Medium intensity (T2): " _b[agri_post] + _b[agri_post_t2]
+  Medium intensity (T2): .05133411
+
+. di "  High intensity (T3): " _b[agri_post] + _b[agri_post_t3]
+  High intensity (T3): -.00906956
+
+. 
+. * Test for difference between high and low
+. test agri_post_t3 = 0
+
+ ( 1)  agri_post_t3 = 0
+
+       F(  1,    37) =    0.65
+            Prob > F =    0.4259
+
+. di "Test T3 vs T1: p = " r(p)
+Test T3 vs T1: p = .42586837
+
+. 
+. ********************************************************************************
+. * PART 4: Separate regressions by intensity level
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: SEPARATE REGRESSIONS BY INTENSITY"
+PART 4: SEPARATE REGRESSIONS BY INTENSITY
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "=== Low intensity regions (Tercile 1) ==="
+
+=== Low intensity regions (Tercile 1) ===
+
+. reghdfe ln_wage agri_post if intensity_tercile == 1, absorb(idind year) cluster(region)
+(dropped 1926 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     24,924
+Absorbing 2 HDFE groups                           F(   1,     10) =       0.58
+Statistics robust to heteroskedasticity           Prob > F        =     0.4633
+                                                  R-squared       =     0.7803
+                                                  Adj R-squared   =     0.7249
+                                                  Within R-sq.    =     0.0004
+Number of clusters (region)  =         11         Root MSE        =     0.3670
+
+                                (Std. Err. adjusted for 11 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0952213     .12486     0.76   0.463    -.1829842    .3734268
+       _cons |   10.00071   .0012624  7921.81   0.000     9.997894    10.00352
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      5011        5011           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== Medium intensity regions (Tercile 2) ==="
+
+=== Medium intensity regions (Tercile 2) ===
+
+. reghdfe ln_wage agri_post if intensity_tercile == 2, absorb(idind year) cluster(region)
+(dropped 1772 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     25,979
+Absorbing 2 HDFE groups                           F(   1,     12) =       1.78
+Statistics robust to heteroskedasticity           Prob > F        =     0.2064
+                                                  R-squared       =     0.7976
+                                                  Adj R-squared   =     0.7478
+                                                  Within R-sq.    =     0.0003
+Number of clusters (region)  =         13         Root MSE        =     0.3376
+
+                                (Std. Err. adjusted for 13 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0545945   .0408686     1.34   0.206    -.0344506    .1436396
+       _cons |   9.793783   .0009612  1.0e+04   0.000     9.791689    9.795877
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      5126        5126           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== High intensity regions (Tercile 3) ==="
+
+=== High intensity regions (Tercile 3) ===
+
+. reghdfe ln_wage agri_post if intensity_tercile == 3, absorb(idind year) cluster(region)
+(dropped 1493 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     22,001
+Absorbing 2 HDFE groups                           F(   1,     13) =       0.45
+Statistics robust to heteroskedasticity           Prob > F        =     0.5159
+                                                  R-squared       =     0.7918
+                                                  Adj R-squared   =     0.7413
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         14         Root MSE        =     0.3384
+
+                                (Std. Err. adjusted for 14 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |  -.0199944   .0299348    -0.67   0.516    -.0846646    .0446757
+       _cons |   9.548846   .0008871  1.1e+04   0.000      9.54693    9.550763
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      4284        4284           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. ********************************************************************************
+. * PART 5: High vs Low treatment (binary)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 5: HIGH VS LOW TREATMENT (BINARY)"
+PART 5: HIGH VS LOW TREATMENT (BINARY)
+
+. di "======================================================================"
+======================================================================
+
+. 
+. gen agri_post_high = agri_post * high_treatment
+
+. 
+. di _n "=== Model 5: Binary high treatment interaction ==="
+
+=== Model 5: Binary high treatment interaction ===
+
+. reghdfe ln_wage agri_post agri_post_high, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   2,     37) =       0.51
+Statistics robust to heteroskedasticity           Prob > F        =     0.6057
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                  (Std. Err. adjusted for 38 clusters in region)
+--------------------------------------------------------------------------------
+               |               Robust
+       ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+     agri_post |   .0542316   .0885437     0.61   0.544    -.1251749    .2336382
+agri_post_high |  -.0302194   .0935223    -0.32   0.748    -.2197136    .1592747
+         _cons |   9.790578   .0006324  1.5e+04   0.000     9.789297     9.79186
+--------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estimates store m5
+
+. 
+. di _n "Effects:"
+
+Effects:
+
+. di "  Low treatment regions: " _b[agri_post]
+  Low treatment regions: .05423162
+
+. di "  High treatment regions: " _b[agri_post] + _b[agri_post_high]
+  High treatment regions: .02401222
+
+. 
+. ********************************************************************************
+. * PART 6: Product-specific intensity
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 6: PRODUCT-SPECIFIC EFFECTS"
+PART 6: PRODUCT-SPECIFIC EFFECTS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Import product-level shares for regions
+. preserve
+
+. import delimited "RFSD_data/output/rfsd_regional_panel.csv", clear
+(23 vars, 359 obs)
+
+. keep if year == 2013
+(270 observations deleted)
+
+. keep region_std share_dairy share_meat_pork share_meat_poultry share_fruits_veg
+
+. rename region_std region_rfsd
+
+. save "temp/product_shares.dta", replace
+(note: file temp/product_shares.dta not found)
+file temp/product_shares.dta saved
+
+. restore
+
+. 
+. * Merge product shares
+. merge m:1 region_rfsd using "temp/product_shares.dta", keep(1 3) nogen
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         8,330
+        from master                     8,330  
+        from using                          0  
+
+    matched                            69,765  
+    -----------------------------------------
+
+. 
+. * Fill missing with zeros
+. foreach v in share_dairy share_meat_pork share_meat_poultry share_fruits_veg {
+  2.     replace `v' = 0 if `v' == .
+  3. }
+(8,330 real changes made)
+(8,330 real changes made)
+(8,330 real changes made)
+(8,330 real changes made)
+
+. 
+. * Standardize product shares
+. foreach v in share_dairy share_meat_pork share_meat_poultry share_fruits_veg {
+  2.     sum `v'
+  3.     gen `v'_std = (`v' - r(mean)) / r(sd)
+  4. }
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ share_dairy |     78,095    .0226646    .0195835          0   .0856653
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+share_meat~k |     78,095    .0031479    .0032135          0   .0216152
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+share_meat~y |     78,095    .0047786     .003757          0   .0196586
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+share_frui~g |     78,095    .1717027     .102195          0    .320898
+
+. 
+. * Create product-specific interactions
+. gen agri_post_dairy = agri_post * share_dairy_std
+
+. gen agri_post_pork = agri_post * share_meat_pork_std
+
+. gen agri_post_poultry = agri_post * share_meat_poultry_std
+
+. gen agri_post_veg = agri_post * share_fruits_veg_std
+
+. 
+. di _n "=== Model 6: Product-specific dose-response ==="
+
+=== Model 6: Product-specific dose-response ===
+
+. reghdfe ln_wage agri_post agri_post_dairy agri_post_pork agri_post_poultry agri_post_veg
+> , ///
+>     absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   5,     37) =      12.02
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0004
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                     (Std. Err. adjusted for 38 clusters in region)
+-----------------------------------------------------------------------------------
+                  |               Robust
+          ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+------------------+----------------------------------------------------------------
+        agri_post |   .0423617    .023665     1.79   0.082    -.0055881    .0903116
+  agri_post_dairy |  -.0012462    .017992    -0.07   0.945    -.0377015    .0352091
+   agri_post_pork |  -.0173476   .0145192    -1.19   0.240    -.0467664    .0120711
+agri_post_poultry |    .022063   .0221719     1.00   0.326    -.0228615    .0669875
+    agri_post_veg |  -.0553738    .019428    -2.85   0.007    -.0947387    -.016009
+            _cons |   9.790529   .0005229  1.9e+04   0.000      9.78947    9.791589
+-----------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estimates store m6
+
+. 
+. di _n "Product-specific effects (per SD increase in regional share):"
+
+Product-specific effects (per SD increase in regional share):
+
+. di "  Dairy regions: " _b[agri_post_dairy]
+  Dairy regions: -.00124623
+
+. di "  Pork regions: " _b[agri_post_pork]
+  Pork regions: -.01734764
+
+. di "  Poultry regions: " _b[agri_post_poultry]
+  Poultry regions: .02206298
+
+. di "  Fruits/Veg regions: " _b[agri_post_veg]
+  Fruits/Veg regions: -.05537381
+
+. 
+. ********************************************************************************
+. * PART 7: Summary Table
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "SUMMARY TABLE"
+SUMMARY TABLE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. esttab m1 m2 m3 m4 m5 m6, ///
+>     keep(agri_post agri_post_intensity agri_post_intensity_sq agri_post_t2 agri_post_t3 
+> ///
+>          agri_post_high agri_post_dairy agri_post_pork agri_post_poultry agri_post_veg) 
+> ///
+>     se star(* 0.10 ** 0.05 *** 0.01) ///
+>     mtitles("Baseline" "Linear" "Quadratic" "Terciles" "Binary" "Products") ///
+>     title("Dose-Response Analysis")
+
+Dose-Response Analysis
+------------------------------------------------------------------------------------------
+> ------------------
+                      (1)             (2)             (3)             (4)             (5) 
+>             (6)   
+                 Baseline          Linear       Quadratic        Terciles          Binary 
+>        Products   
+------------------------------------------------------------------------------------------
+> ------------------
+agri_post          0.0310          0.0547          0.0856          0.0888          0.0542 
+>          0.0424*  
+                 (0.0306)        (0.0489)        (0.0533)         (0.119)        (0.0885) 
+>        (0.0237)   
+
+agri_post~ty                      -0.0525         -0.0469                                 
+>                   
+                                 (0.0557)        (0.0532)                                 
+>                   
+
+agri_post_~q                                      -0.0528                                 
+>                   
+                                                 (0.0389)                                 
+>                   
+
+agri_post_t2                                                      -0.0375                 
+>                   
+                                                                  (0.126)                 
+>                   
+
+agri_post_t3                                                      -0.0979                 
+>                   
+                                                                  (0.122)                 
+>                   
+
+agri_post_~h                                                                      -0.0302 
+>                   
+                                                                                 (0.0935) 
+>                   
+
+agri_pos~iry                                                                              
+>        -0.00125   
+                                                                                          
+>        (0.0180)   
+
+agri_post_~k                                                                              
+>         -0.0173   
+                                                                                          
+>        (0.0145)   
+
+agri_pos~try                                                                              
+>          0.0221   
+                                                                                          
+>        (0.0222)   
+
+agri_post_~g                                                                              
+>         -0.0554***
+                                                                                          
+>        (0.0194)   
+------------------------------------------------------------------------------------------
+> ------------------
+N                   72904           72904           72904           72904           72904 
+>           72904   
+------------------------------------------------------------------------------------------
+> ------------------
+Standard errors in parentheses
+* p<0.10, ** p<0.05, *** p<0.01
+
+. 
+. ********************************************************************************
+. * PART 8: Visualization data export
+. ********************************************************************************
+. 
+. preserve
+
+. collapse (mean) ln_wage, by(agri intensity_tercile year)
+
+. reshape wide ln_wage, i(intensity_tercile year) j(agri)
+(note: j = 0 1)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                       60   ->      30
+Number of variables                   4   ->       4
+j variable (2 values)              agri   ->   (dropped)
+xij variables:
+                                ln_wage   ->   ln_wage0 ln_wage1
+-----------------------------------------------------------------------------
+
+. gen wage_gap = ln_wage1 - ln_wage0
+
+. export delimited using "output/tables/dose_response_by_tercile.csv", replace
+(note: file output/tables/dose_response_by_tercile.csv not found)
+file output/tables/dose_response_by_tercile.csv saved
+
+. restore
+
+. 
+. di ""
+
+
+. di "Analysis complete!"
+Analysis complete!
+
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_dose_response_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 15:01:53
+------------------------------------------------------------------------------------------

@@ -1045,6 +1045,56 @@ The results strongly support our main findings:
 
 \paragraph{Placebo tests.} We conduct placebo tests by treating each control sector as if treated. The placebo gaps (post-2014 average) are: food processing ($-$0.1\%), construction (+33\%), government ($-$18\%), education ($-$24\%), and trade ($-$0.5\%). Agriculture's positive gap is unique among low-wage sectors, confirming the effect is specific to the treated sector.
 
+\subsection{Dose-Response Tests}
+
+If treatment effects are driven by import substitution, we would expect larger effects in regions with higher pre-ban import shares or greater exposure to banned products. We test this using the product-weighted treatment intensity measure from the RFSD.
+
+Table \ref{tab:dose_response} presents the results. Column (1) shows the baseline effect. Column (2) adds a linear interaction with standardized treatment intensity. Column (3) tests for nonlinearity with a quadratic term. Column (4) allows for threshold effects using tercile indicators.
+
+\begin{table}[H]
+\centering
+\caption{Dose-Response: Effects by Treatment Intensity}
+\label{tab:dose_response}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& Baseline & Linear & Quadratic & Terciles \\
+\midrule
+Agriculture $\times$ Post & 0.031 & 0.055 & 0.086 & 0.089 \\
+& (0.031) & (0.049) & (0.053) & (0.119) \\
+$\times$ Intensity (std) & & $-$0.053 & $-$0.047 & \\
+& & (0.056) & (0.053) & \\
+$\times$ Intensity$^2$ & & & $-$0.053 & \\
+& & & (0.039) & \\
+$\times$ Medium tercile & & & & $-$0.038 \\
+& & & & (0.126) \\
+$\times$ High tercile & & & & $-$0.098 \\
+& & & & (0.122) \\
+\midrule
+Observations & 72,904 & 72,904 & 72,904 & 72,904 \\
+Test for nonlinearity & & & p=0.183 & p=0.424 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} All specifications include individual and year fixed effects. Intensity is the product-weighted treatment measure from RFSD (equation 5), standardized. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Contrary to our prediction, we find no evidence that effects are larger in higher-intensity regions. The linear interaction is negative (though not significant), suggesting if anything that effects are \textit{smaller} in regions with greater exposure to banned products. The quadratic term is also negative and not significant, providing no evidence of threshold effects or nonlinearity.
+
+\paragraph{Product-specific dose-response.} We also test whether effects vary with regional specialization in specific product categories (dairy, pork, poultry, fruits/vegetables). The only significant result is for fruits and vegetables: regions with higher pre-ban fruit/vegetable firm concentration show \textit{smaller} wage effects ($-$5.5\% per SD, p=0.007). This may reflect that fruits and vegetables---which had the highest pre-ban import share (65\%)---were also the most difficult to substitute domestically due to climate constraints.
+
+These null results on dose-response have several possible interpretations:
+\begin{enumerate}
+    \item \textbf{Spillovers}: Agricultural labor markets may be integrated enough that treatment effects spread from high-intensity to low-intensity regions.
+    \item \textbf{Measurement error}: Our region-level intensity measure may poorly proxy individual-level exposure.
+    \item \textbf{Ceiling effects}: Very high-intensity regions may have already been operating near capacity, limiting additional gains.
+    \item \textbf{True null}: Treatment intensity may genuinely not predict effect heterogeneity in this setting.
+\end{enumerate}
+
 %==============================================================================
 \section{Discussion}
 %==============================================================================
