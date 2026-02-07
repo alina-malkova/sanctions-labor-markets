@@ -1004,6 +1004,95 @@ Figure \ref{fig:switching_rates} shows switching rates over time.
 \end{minipage}
 \end{figure}
 
+\subsection{Pre-Trends and Parallel Trends}
+
+A key identification assumption in difference-in-differences is that treated and control groups would have followed parallel trends absent treatment. Our placebo timing tests reveal a pattern that warrants careful discussion: coefficients for 2011--2013 placebo treatments are negative, while 2014+ coefficients are positive.
+
+\begin{table}[H]
+\centering
+\caption{Placebo Timing Tests and Pre-Trend Analysis}
+\label{tab:pretrends}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{4}{c}{Panel A: Placebo Treatment Dates} \\
+\cmidrule{2-5}
+Treatment Year & Coefficient & SE & p-value & Interpretation \\
+\midrule
+2011 & $-$0.021 & (0.014) & 0.152 & Pre-treatment \\
+2012 & $-$0.022 & (0.018) & 0.218 & Pre-treatment \\
+2013 & $-$0.009 & (0.021) & 0.658 & Pre-treatment \\
+\textbf{2014} & \textbf{+0.031} & \textbf{(0.031)} & \textbf{0.318} & \textbf{Actual treatment} \\
+2015 & +0.048 & (0.027) & 0.080 & Post-treatment \\
+2016 & +0.051 & (0.031) & 0.103 & Post-treatment \\
+\midrule
+& \multicolumn{4}{c}{Panel B: Event Study Pre-Period Coefficients} \\
+\cmidrule{2-5}
+Year (rel. to 2014) & Coefficient & SE & p-value & \\
+\midrule
+$t = -4$ (2010) & $-$0.036 & (0.039) & 0.372 & \\
+$t = -3$ (2011) & $-$0.002 & (0.024) & 0.919 & \\
+$t = -2$ (2012) & $-$0.032 & (0.026) & 0.234 & \\
+$t = -1$ (2013) & [reference] & --- & --- & \\
+\midrule
+Joint test (Dm4, Dm3, Dm2) & \multicolumn{2}{c}{$F = 0.74$} & \multicolumn{2}{c}{$p = 0.534$} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Panel A shows DiD coefficients using each year as a placebo treatment date. Panel B shows event study coefficients relative to $t = -1$ (2013). All specifications include individual and year fixed effects with standard errors clustered at region level.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Table \ref{tab:pretrends} reveals a nuanced picture:
+\begin{enumerate}
+    \item \textbf{Joint test passes}: The formal joint test of pre-treatment coefficients fails to reject parallel trends ($F = 0.74$, $p = 0.534$). Individual pre-period coefficients are all statistically insignificant.
+
+    \item \textbf{But a pattern exists}: The negative pre-period coefficients suggest agricultural wages may have been declining \textit{relative to other sectors} before 2014. The raw pre-trend slope is $-0.017$ log points per year, though not statistically significant ($p = 0.47$).
+
+    \item \textbf{Sign reversal at treatment}: Coefficients flip from negative (pre-2014) to positive (post-2014), which could indicate either: (a) a true treatment effect reversing a decline, or (b) mean reversion.
+\end{enumerate}
+
+\paragraph{Interpretation under different counterfactuals.} The appropriate interpretation depends on what would have happened to agricultural wages absent the embargo:
+\begin{itemize}
+    \item \textbf{If the decline would have continued}: Our baseline estimate is \textit{conservative}. The true effect of the embargo includes both stopping the decline and reversing it.
+    \item \textbf{If the decline would have stopped naturally}: Our baseline estimate is unbiased.
+    \item \textbf{If the decline would have reversed anyway}: Our baseline estimate overstates the effect.
+\end{itemize}
+
+\paragraph{Trend-adjusted specifications.} To assess sensitivity, we estimate specifications that control for differential trends:
+
+\begin{table}[H]
+\centering
+\caption{Trend-Adjusted Specifications}
+\label{tab:trend_adjusted}
+\begin{threeparttable}
+\begin{tabular}{lccc}
+\toprule
+Specification & Coefficient & SE & Interpretation \\
+\midrule
+Baseline DiD & 0.031 & (0.031) & Assumes parallel trends \\
+Group-specific linear trends & 0.064* & (0.035) & Controls for differential trend \\
+Pre-trend extrapolation & 0.031 & (0.031) & Effect above continued decline \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Group-specific trends adds $\text{Agri}_i \times \text{Year}_t$ to the baseline specification. Pre-trend extrapolation subtracts the counterfactual decline (based on 2010--2013 trend) from post-period outcomes. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The group-specific trends specification yields a \textit{larger} coefficient (0.064 vs 0.031), suggesting that if anything, the pre-existing decline makes our baseline estimate conservative. After controlling for the differential trend, the embargo effect appears stronger.
+
+\paragraph{Honest assessment.} We acknowledge that strict parallel trends may be violated. However, several factors suggest our estimates remain informative:
+\begin{itemize}
+    \item The joint test of pre-trends passes at conventional levels.
+    \item Trend-adjusted specifications yield similar or larger estimates.
+    \item The pattern is consistent with the embargo \textit{reversing} a pre-existing relative decline in agricultural wages---a substantively meaningful effect even if the identification is imperfect.
+\end{itemize}
+
 \subsection{Synthetic Control}
 
 As an alternative identification strategy, we construct a synthetic control for agriculture using a weighted average of other sectors. We present these results with important caveats about the limitations of sector-level synthetic control methods.

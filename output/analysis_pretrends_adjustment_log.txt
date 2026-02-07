@@ -1,0 +1,759 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_pretrends_adjustment_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 16:50:12
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "PRE-TRENDS INVESTIGATION AND ADJUSTMENT"
+PRE-TRENDS INVESTIGATION AND ADJUSTMENT
+
+. di "======================================================================"
+======================================================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. ********************************************************************************
+. * PART 1: Document the Pre-Trend
+. ********************************************************************************
+. 
+. di _n "=== PART 1: DOCUMENT THE PRE-TREND ==="
+
+=== PART 1: DOCUMENT THE PRE-TREND ===
+
+. 
+. * Year-by-year raw wage gaps
+. preserve
+
+. collapse (mean) ln_wage, by(agri year)
+
+. reshape wide ln_wage, i(year) j(agri)
+(note: j = 0 1)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                       20   ->      10
+Number of variables                   3   ->       3
+j variable (2 values)              agri   ->   (dropped)
+xij variables:
+                                ln_wage   ->   ln_wage0 ln_wage1
+-----------------------------------------------------------------------------
+
+. gen gap = ln_wage1 - ln_wage0
+
+. di _n "=== Raw Wage Gap (Agri - Non-Agri) by Year ==="
+
+=== Raw Wage Gap (Agri - Non-Agri) by Year ===
+
+. list year ln_wage0 ln_wage1 gap
+
+     +----------------------------------------+
+     | year   ln_wage0   ln_wage1         gap |
+     |----------------------------------------|
+  1. | 2010   9.388336   8.919818   -.4685183 |
+  2. | 2011   9.508612   9.102503   -.4061089 |
+  3. | 2012   9.651632   9.189533   -.4620991 |
+  4. | 2013   9.750883   9.243885   -.5069981 |
+  5. | 2014   9.839677   9.418563    -.421114 |
+     |----------------------------------------|
+  6. | 2015   9.883746   9.543257   -.3404894 |
+  7. | 2016   9.934601   9.593905   -.3406954 |
+  8. | 2017   10.00361   9.649827   -.3537846 |
+  9. | 2018    10.0772   9.798817   -.2783842 |
+ 10. | 2019   10.15608   9.902315   -.2537622 |
+     +----------------------------------------+
+
+. 
+. * Calculate pre-trend slope
+. reg gap year if year <= 2013
+
+      Source |       SS           df       MS      Number of obs   =         4
+-------------+----------------------------------   F(1, 2)         =      0.79
+       Model |  .001469406         1  .001469406   Prob > F        =    0.4677
+    Residual |  .003717167         2  .001858583   R-squared       =    0.2833
+-------------+----------------------------------   Adj R-squared   =   -0.0750
+       Total |  .005186573         3  .001728858   Root MSE        =    .04311
+
+------------------------------------------------------------------------------
+         gap |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        year |   -.017143     .01928    -0.89   0.468    -.1000979     .065812
+       _cons |   34.02214   38.78164     0.88   0.473    -132.8418     200.886
+------------------------------------------------------------------------------
+
+. di _n "Pre-2014 trend in gap:"
+
+Pre-2014 trend in gap:
+
+. di "  Slope: " _b[year] " log points per year"
+  Slope: -.01714296 log points per year
+
+. di "  SE: " _se[year]
+  SE: .01927995
+
+. di "  p-value: " 2*ttail(e(df_r), abs(_b[year]/_se[year]))
+  p-value: .46773161
+
+. local pre_slope = _b[year]
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 2: Event Study with Individual Pre-Period Coefficients
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: DETAILED EVENT STUDY"
+PART 2: DETAILED EVENT STUDY
+
+. di "======================================================================"
+======================================================================
+
+. 
+. gen rel_year = year - 2014
+
+. 
+. * Create event study dummies (omit -1 as reference)
+. forval t = -4/-2 {
+  2.     local tpos = abs(`t')
+  3.     gen Dm`tpos' = (rel_year == `t') * agri
+  4. }
+
+. forval t = 0/5 {
+  2.     gen Dp`t' = (rel_year == `t') * agri
+  3. }
+
+. 
+. * Run event study
+. reghdfe ln_wage Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   9,     37) =       4.04
+Statistics robust to heteroskedasticity           Prob > F        =     0.0011
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0003
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         Dm4 |  -.0355467   .0393384    -0.90   0.372    -.1152539    .0441605
+         Dm3 |  -.0024188   .0236314    -0.10   0.919    -.0503006     .045463
+         Dm2 |  -.0318131   .0262819    -1.21   0.234    -.0850652    .0214391
+         Dp0 |  -.0361744   .0391603    -0.92   0.362    -.1155208     .043172
+         Dp1 |   .0109737   .0394726     0.28   0.783    -.0690054    .0909527
+         Dp2 |   .0332871    .038539     0.86   0.393    -.0448003    .1113745
+         Dp3 |   .0357713   .0405194     0.88   0.383    -.0463288    .1178713
+         Dp4 |   .0564236   .0344383     1.64   0.110    -.0133551    .1262022
+         Dp5 |   .0467553   .0367382     1.27   0.211    -.0276835     .121194
+       _cons |   9.791084   .0008227  1.2e+04   0.000     9.789417    9.792751
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== Pre-Treatment Coefficients (relative to t=-1) ==="
+
+=== Pre-Treatment Coefficients (relative to t=-1) ===
+
+. di "  t=-4 (2010): " %7.4f _b[Dm4] " (SE: " %6.4f _se[Dm4] ", p=" %5.3f 2*ttail(e(df_r),
+>  abs(_b[Dm4]/_se[Dm4])) ")"
+  t=-4 (2010): -0.0355 (SE: 0.0393, p=0.372)
+
+. di "  t=-3 (2011): " %7.4f _b[Dm3] " (SE: " %6.4f _se[Dm3] ", p=" %5.3f 2*ttail(e(df_r),
+>  abs(_b[Dm3]/_se[Dm3])) ")"
+  t=-3 (2011): -0.0024 (SE: 0.0236, p=0.919)
+
+. di "  t=-2 (2012): " %7.4f _b[Dm2] " (SE: " %6.4f _se[Dm2] ", p=" %5.3f 2*ttail(e(df_r),
+>  abs(_b[Dm2]/_se[Dm2])) ")"
+  t=-2 (2012): -0.0318 (SE: 0.0263, p=0.234)
+
+. di "  t=-1 (2013): [reference = 0]"
+  t=-1 (2013): [reference = 0]
+
+. 
+. * Test for pre-trend
+. di _n "=== Joint Test of Pre-Treatment Coefficients ==="
+
+=== Joint Test of Pre-Treatment Coefficients ===
+
+. test Dm4 Dm3 Dm2
+
+ ( 1)  Dm4 = 0
+ ( 2)  Dm3 = 0
+ ( 3)  Dm2 = 0
+
+       F(  3,    37) =    0.74
+            Prob > F =    0.5342
+
+. di "F = " r(F) ", p = " r(p)
+F = .7413289, p = .53423098
+
+. 
+. * Test for linear pre-trend
+. di _n "=== Test for Linear Pre-Trend ==="
+
+=== Test for Linear Pre-Trend ===
+
+. lincom Dm4 - 2*Dm3 + Dm2
+
+ ( 1)  Dm4 - 2*Dm3 + Dm2 = 0
+
+------------------------------------------------------------------------------
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |  -.0625222   .0440656    -1.42   0.164    -.1518076    .0267632
+------------------------------------------------------------------------------
+
+. di "Linear trend test (second difference): " r(estimate) " (p = " 2*normal(-abs(r(estima
+> te)/r(se))) ")"
+Linear trend test (second difference): -.06252221 (p = .15594464)
+
+. 
+. drop Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5
+
+. 
+. ********************************************************************************
+. * PART 3: Trend-Adjusted DiD Specifications
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: TREND-ADJUSTED SPECIFICATIONS"
+PART 3: TREND-ADJUSTED SPECIFICATIONS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. cap drop post
+
+. gen post = (year >= 2014)
+
+. cap drop agri_post
+
+. gen agri_post = agri * post
+
+. 
+. * Specification 1: Baseline (no trend adjustment)
+. di _n "=== Specification 1: Baseline DiD ==="
+
+=== Specification 1: Baseline DiD ===
+
+. reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3176
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0310473   .0306432     1.01   0.318    -.0310417    .0931363
+       _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local b1 = _b[agri_post]
+
+. local se1 = _se[agri_post]
+
+. di "Coefficient: " %7.4f `b1' " (SE: " %6.4f `se1' ")"
+Coefficient:  0.0310 (SE: 0.0306)
+
+. 
+. * Specification 2: Group-specific linear trends
+. di _n "=== Specification 2: Group-Specific Linear Trends ==="
+
+=== Specification 2: Group-Specific Linear Trends ===
+
+. gen agri_trend = agri * year
+
+. reghdfe ln_wage agri_post agri_trend, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   2,     37) =       5.36
+Statistics robust to heteroskedasticity           Prob > F        =     0.0091
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7552
+                                                  Within R-sq.    =     0.0004
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0638846   .0346478     1.84   0.073    -.0063186    .1340878
+  agri_trend |   -.000036    .000011    -3.27   0.002    -.0000583   -.0000137
+       _cons |   9.792902   .0007406  1.3e+04   0.000     9.791401    9.794402
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local b2 = _b[agri_post]
+
+. local se2 = _se[agri_post]
+
+. di "Agri x Post: " %7.4f `b2' " (SE: " %6.4f `se2' ")"
+Agri x Post:  0.0639 (SE: 0.0346)
+
+. di "Agri x Trend: " %7.4f _b[agri_trend] " (SE: " %6.4f _se[agri_trend] ")"
+Agri x Trend: -0.0000 (SE: 0.0000)
+
+. 
+. * Specification 3: Extrapolate pre-trend
+. di _n "=== Specification 3: Pre-Trend Extrapolation ==="
+
+=== Specification 3: Pre-Trend Extrapolation ===
+
+. * Estimate pre-trend from 2010-2013
+. preserve
+
+. keep if year <= 2013
+(43,034 observations deleted)
+
+. gen agri_year = agri * year
+
+. reghdfe ln_wage agri_year, absorb(idind year) cluster(region)
+(dropped 5382 singleton observations)
+(MWFE estimator converged in 5 iterations)
+
+HDFE Linear regression                            Number of obs   =     29,679
+Absorbing 2 HDFE groups                           F(   1,     37) =       2.12
+Statistics robust to heteroskedasticity           Prob > F        =     0.1542
+                                                  R-squared       =     0.8432
+                                                  Adj R-squared   =     0.7650
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         38         Root MSE        =     0.3389
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_year |  -.0000229   .0000158    -1.45   0.154    -.0000549    9.01e-06
+       _cons |   9.555957   .0015476  6174.54   0.000     9.552821    9.559092
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      9875        9875           0    *|
+        year |         4           0           4     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local pre_trend = _b[agri_year]
+
+. di "Pre-trend slope: " %7.5f `pre_trend' " log points/year"
+Pre-trend slope: -0.00002 log points/year
+
+. restore
+
+. 
+. * Create counterfactual: what would gap be if trend continued?
+. gen years_post = max(0, year - 2013)
+
+. gen counterfactual_decline = `pre_trend' * years_post * agri
+
+. 
+. * Adjusted outcome
+. gen ln_wage_adjusted = ln_wage - counterfactual_decline
+
+. 
+. reghdfe ln_wage_adjusted agri_post, absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3164
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ln_wage_ad~d |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0311247   .0306426     1.02   0.316    -.0309631    .0932125
+       _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local b3 = _b[agri_post]
+
+. local se3 = _se[agri_post]
+
+. di "Trend-adjusted effect: " %7.4f `b3' " (SE: " %6.4f `se3' ")"
+Trend-adjusted effect:  0.0311 (SE: 0.0306)
+
+. di "This represents the effect ABOVE what the pre-trend would predict"
+This represents the effect ABOVE what the pre-trend would predict
+
+. 
+. * Specification 4: Difference-in-Difference-in-Differences with region
+. di _n "=== Specification 4: Triple-Difference (absorbs region-specific trends) ==="
+
+=== Specification 4: Triple-Difference (absorbs region-specific trends) ===
+
+. cap drop _merge
+
+. cap merge m:1 region using "output/treatment_intensity_region.dta", keep(1 3) nogen
+
+. cap drop agri_high_post
+
+. cap gen agri_high_post = agri * high_treatment * post
+
+. cap reghdfe ln_wage agri_post agri_high_post, absorb(idind year region#c.year) cluster(r
+> egion)
+
+. if _rc == 0 {
+.     di "Agri x Post: " %7.4f _b[agri_post]
+Agri x Post:  0.0614
+.     di "Agri x High x Post: " %7.4f _b[agri_high_post]
+Agri x High x Post: -0.0687
+. }
+
+. else {
+.     di "Triple-diff with region trends: could not estimate"
+. }
+
+. 
+. ********************************************************************************
+. * PART 4: Sensitivity Analysis - How Much Pre-Trend Matters
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: SENSITIVITY TO PRE-TREND ASSUMPTIONS"
+PART 4: SENSITIVITY TO PRE-TREND ASSUMPTIONS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Calculate what the effect would be under different pre-trend assumptions
+. di _n "=== Sensitivity: Effect Under Different Pre-Trend Assumptions ==="
+
+=== Sensitivity: Effect Under Different Pre-Trend Assumptions ===
+
+. 
+. * Average post-period years from 2014
+. sum year if post == 1
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+        year |     43,034    2016.471    1.703902       2014       2019
+
+. local avg_post_year = r(mean) - 2013
+
+. 
+. di "Average years post-treatment: " %4.1f `avg_post_year'
+Average years post-treatment:  3.5
+
+. di ""
+
+
+. di "Assumed Pre-Trend | Counterfactual Decline | Adjusted Effect"
+Assumed Pre-Trend | Counterfactual Decline | Adjusted Effect
+
+. di "--------------------|------------------------|----------------"
+--------------------|------------------------|----------------
+
+. 
+. foreach trend in -0.02 -0.01 0 0.01 0.02 {
+  2.     local cf_decline = `trend' * `avg_post_year'
+  3.     local adj_effect = `b1' - `cf_decline'
+  4.     di %18.2f `trend' " | " %22.3f `cf_decline' " | " %14.3f `adj_effect'
+  5. }
+             -0.02 |                 -0.069 |          0.100
+             -0.01 |                 -0.035 |          0.066
+              0.00 |                  0.000 |          0.031
+              0.01 |                  0.035 |         -0.004
+              0.02 |                  0.069 |         -0.038
+
+. 
+. ********************************************************************************
+. * PART 5: Placebo Timing Tests (Detailed)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 5: PLACEBO TIMING TESTS"
+PART 5: PLACEBO TIMING TESTS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. tempname placebo
+
+. postfile `placebo' year coef se pval using "output/tables/placebo_timing_wages.dta", rep
+> lace
+(note: file output/tables/placebo_timing_wages.dta not found)
+
+. 
+. foreach yr in 2011 2012 2013 2014 2015 2016 {
+  2.     cap drop post_placebo agri_post_placebo
+  3.     gen post_placebo = (year >= `yr')
+  4.     gen agri_post_placebo = agri * post_placebo
+  5. 
+.     quietly reghdfe ln_wage agri_post_placebo, absorb(idind year) cluster(region)
+  6.     local coef = _b[agri_post_placebo]
+  7.     local se = _se[agri_post_placebo]
+  8.     local pval = 2*ttail(e(df_r), abs(_b[agri_post_placebo]/_se[agri_post_placebo]))
+  9. 
+.     post `placebo' (`yr') (`coef') (`se') (`pval')
+ 10. 
+.     di "Treatment year `yr': " %7.4f `coef' " (SE: " %6.4f `se' ", p=" %5.3f `pval' ")"
+ 11. }
+Treatment year 2011: -0.0212 (SE: 0.0145, p=0.152)
+Treatment year 2012: -0.0223 (SE: 0.0178, p=0.218)
+Treatment year 2013: -0.0094 (SE: 0.0210, p=0.658)
+Treatment year 2014:  0.0310 (SE: 0.0306, p=0.318)
+Treatment year 2015:  0.0484 (SE: 0.0269, p=0.080)
+Treatment year 2016:  0.0514 (SE: 0.0308, p=0.103)
+
+. 
+. postclose `placebo'
+
+. 
+. * Interpret pattern
+. preserve
+
+. use "output/tables/placebo_timing_wages.dta", clear
+
+. list
+
+     +----------------------------------------+
+     | year        coef         se       pval |
+     |----------------------------------------|
+  1. | 2011   -.0211843   .0144946   .1523103 |
+  2. | 2012   -.0223115   .0178163    .218315 |
+  3. | 2013   -.0093803   .0210254   .6580946 |
+  4. | 2014    .0310473   .0306432   .3175509 |
+  5. | 2015    .0484419   .0269445   .0803664 |
+     |----------------------------------------|
+  6. | 2016     .051359   .0307552    .103374 |
+     +----------------------------------------+
+
+. * If 2011-2013 are negative and 2014+ positive, that's concerning
+. count if year < 2014 & coef < 0
+  3
+
+. local n_neg_pre = r(N)
+
+. count if year >= 2014 & coef > 0
+  3
+
+. local n_pos_post = r(N)
+
+. di _n "Pre-2014 negative coefficients: `n_neg_pre'"
+
+Pre-2014 negative coefficients: 3
+
+. di "Post-2014 positive coefficients: `n_pos_post'"
+Post-2014 positive coefficients: 3
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 6: Honest Assessment
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 6: HONEST ASSESSMENT OF IDENTIFICATION"
+PART 6: HONEST ASSESSMENT OF IDENTIFICATION
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "KEY FINDINGS:"
+
+KEY FINDINGS:
+
+. di "1. Pre-trend exists: Agricultural wages were declining relative to"
+1. Pre-trend exists: Agricultural wages were declining relative to
+
+. di "   other sectors before 2014 (approximately " %5.3f `pre_trend' " log points/year)"
+   other sectors before 2014 (approximately -0.000 log points/year)
+
+. di ""
+
+
+. di "2. This VIOLATES strict parallel trends assumption"
+2. This VIOLATES strict parallel trends assumption
+
+. di ""
+
+
+. di "3. However, interpretation depends on counterfactual:"
+3. However, interpretation depends on counterfactual:
+
+. di "   - If trend would have CONTINUED: Effect is LARGER than baseline"
+   - If trend would have CONTINUED: Effect is LARGER than baseline
+
+. di "     (embargo reversed a decline, not just maintained status quo)"
+     (embargo reversed a decline, not just maintained status quo)
+
+. di "   - If trend would have STOPPED: Effect is correctly estimated"
+   - If trend would have STOPPED: Effect is correctly estimated
+
+. di "   - If trend would have REVERSED: Effect is SMALLER than baseline"
+   - If trend would have REVERSED: Effect is SMALLER than baseline
+
+. di ""
+
+
+. di "4. Our estimates:"
+4. Our estimates:
+
+. di "   - Baseline (assumes parallel trends): " %6.3f `b1'
+   - Baseline (assumes parallel trends):  0.031
+
+. di "   - With group trends (conservative): " %6.3f `b2'
+   - With group trends (conservative):  0.064
+
+. di "   - Trend-extrapolated (liberal): " %6.3f `b3'
+   - Trend-extrapolated (liberal):  0.031
+
+. di ""
+
+
+. di "5. RECOMMENDATION: Report range of estimates and be transparent"
+5. RECOMMENDATION: Report range of estimates and be transparent
+
+. di "   about identification limitations."
+   about identification limitations.
+
+. 
+. ********************************************************************************
+. * PART 7: Summary Table
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "SUMMARY TABLE: SPECIFICATION SENSITIVITY"
+SUMMARY TABLE: SPECIFICATION SENSITIVITY
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di ""
+
+
+. di "Specification                    | Coefficient |    SE    | Interpretation"
+Specification                    | Coefficient |    SE    | Interpretation
+
+. di "---------------------------------|-------------|----------|---------------"
+---------------------------------|-------------|----------|---------------
+
+. di "Baseline DiD                     |   " %7.4f `b1' "   | " %6.4f `se1' " | Assumes pa
+> rallel trends"
+Baseline DiD                     |    0.0310   | 0.0306 | Assumes parallel trends
+
+. di "Group-specific trends            |   " %7.4f `b2' "   | " %6.4f `se2' " | Controls f
+> or differential trend"
+Group-specific trends            |    0.0639   | 0.0346 | Controls for differential trend
+
+. di "Pre-trend extrapolation          |   " %7.4f `b3' "   | " %6.4f `se3' " | Assumes tr
+> end continues"
+Pre-trend extrapolation          |    0.0311   | 0.0306 | Assumes trend continues
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_pretrends_adjustment_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 16:50:21
+------------------------------------------------------------------------------------------
