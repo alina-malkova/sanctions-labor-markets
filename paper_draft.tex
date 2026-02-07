@@ -45,7 +45,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent We study how domestic labor markets respond to sudden trade barriers using Russia's 2014 food import embargo as a natural experiment. Using individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS), we employ a difference-in-differences design comparing agricultural workers to those in other sectors. \textbf{Our primary sample covers 2010--2019}, providing a clean 5-year pre/post window uncontaminated by later shocks (COVID-19, Ukraine war). Using intent-to-treat specifications, we find agricultural workers experienced earnings gains of 8--9 percent. However, our wage decomposition reveals these gains are driven entirely by increased hours worked (+5 hours/month), not higher hourly wages. Strikingly, agricultural employment \textit{declined} 36\% despite these earnings gains, suggesting workers value non-wage amenities over the protection premium. We present 2020--2023 results separately with explicit caveats about confounding from pandemic and war disruptions. Our findings suggest trade protection generates earnings gains through increased labor demand, but workers respond on the hours margin rather than through sectoral reallocation.
+\noindent We study how domestic labor markets respond to sudden trade barriers using Russia's 2014 food import embargo as a natural experiment. Using individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS), we employ a difference-in-differences design comparing agricultural workers to those in other sectors. \textbf{Our primary sample covers 2010--2019}, providing a clean 5-year pre/post window uncontaminated by later shocks (COVID-19, Ukraine war). Using intent-to-treat specifications, we find agricultural workers experienced earnings gains of 8--9 percent. Our wage decomposition suggests these gains partly reflect differences in hours worked, though pre-existing hours differences between sectors complicate causal interpretation. Strikingly, agricultural employment \textit{declined} 36\% despite these earnings gains, suggesting workers value non-wage amenities over the protection premium. We present 2020--2023 results separately with explicit caveats about confounding from pandemic and war disruptions. Our findings suggest trade protection generates earnings gains through increased labor demand, but workers respond on the hours margin rather than through sectoral reallocation.
 
 \bigskip
 \noindent \textbf{JEL Codes:} F13, F14, J22, J31, Q17
@@ -900,7 +900,7 @@ Observations & 99,536 & 88,681 & 88,681 & 88,681 \\
 \end{threeparttable}
 \end{table}
 
-Table \ref{tab:decomposition} reveals that the monthly earnings effect is \textit{entirely} driven by increased hours, not higher hourly wages. Column (2) shows the effect on log hourly wages is essentially zero (0.3\%), while Column (4) shows agricultural workers worked 5.1 more hours per month post-embargo. This is consistent with labor demand expansion: as domestic production ramped up to replace imports, farms demanded more worker-hours. Workers' earnings rose because they worked more, not because they commanded higher wages per hour.
+Table \ref{tab:decomposition} shows that the monthly earnings effect appears related to hours differences, not higher hourly wages. Column (2) shows the effect on log hourly wages is essentially zero (0.3\%), while Column (4) shows agricultural workers worked 5.1 more hours per month post-embargo. However, as we discuss in Section \ref{sec:hours_pretrends}, this hours difference requires careful interpretation: agricultural workers worked substantially more hours than non-agricultural workers even before the embargo, and the post-treatment hours gap is not statistically different from the pre-treatment gap ($p = 0.36$).
 
 Figure \ref{fig:event_study_hours} shows the event study for hours worked.
 
@@ -1103,18 +1103,34 @@ These null results on dose-response have several possible interpretations:
 
 Our estimates suggest that agricultural workers experienced earnings gains of 3.6--13.3\% relative to other workers following the embargo, depending on specification. The intent-to-treat estimates (7.9--13.3\%) are larger than the baseline current-industry estimates (3.6\%), suggesting that selection works against finding an effect.
 
-Crucially, our wage decomposition reveals that these earnings gains are driven entirely by increased hours worked, not higher hourly wages. Agricultural workers worked approximately 5 additional hours per month post-embargo, while their hourly wage rate was unchanged. This pattern is consistent with labor demand expansion: import substitution increased demand for domestic agricultural production, which farms met by employing more worker-hours.
+Our wage decomposition suggests that earnings gains may partly reflect differences in hours worked rather than higher hourly wages. However, the hours mechanism requires careful interpretation due to pre-existing differences between agricultural and non-agricultural workers.
 
-\subsection{Mechanism: Hours, Not Wages}
+\subsection{Mechanism: Hours---A More Nuanced View}
+\label{sec:hours_pretrends}
 
-The hours-driven nature of our results has important implications:
+\subsubsection{Pre-Existing Hours Gap}
 
+Agricultural workers consistently work more hours than non-agricultural workers, both before and after the embargo. Raw data show that agricultural workers averaged approximately 27 hours more per month than other workers in the pre-treatment period (2010--2013). This gap reflects the seasonal and intensive nature of farm work.
+
+Critically, our hours event study shows positive coefficients across \textit{all} periods, including pre-treatment years. When we test whether post-treatment hours effects differ from pre-treatment effects, we find:
+\begin{itemize}
+    \item Average pre-treatment coefficient: +6.4 hours (SE: 3.09, $p = 0.046$)
+    \item Average post-treatment coefficient: +4.3 hours (SE: 2.83, $p = 0.137$)
+    \item Difference (post $-$ pre): $-2.1$ hours (SE: 2.25, $p = 0.360$)
+\end{itemize}
+
+The post-treatment hours effect is \textit{not} statistically different from the pre-treatment effect. Indeed, the raw hours gap actually \textit{narrowed} from 27.3 hours (pre-embargo) to 24.8 hours (post-embargo)---a reduction of 2.5 hours.
+
+\subsubsection{Implications for Interpretation}
+
+The hours evidence is therefore ambiguous:
 \begin{enumerate}
-    \item \textbf{Labor demand expansion}: The embargo increased demand for domestic agricultural output, which translated to demand for more labor hours.
-    \item \textbf{Elastic labor supply}: The fact that hours increased while hourly wages did not suggests relatively elastic labor supply to agriculture, at least at the extensive margin (more hours from existing workers).
-    \item \textbf{No rent creation}: Workers are not capturing rents from protection in the form of higher wages. Instead, they are working more to meet increased demand.
-    \item \textbf{Welfare implications}: From a worker welfare perspective, higher earnings from more hours is less attractive than higher earnings from higher wages, as it comes with reduced leisure.
+    \item \textbf{Joint test passes}: The joint test of pre-trends for hours ($F = 1.56$, $p = 0.216$) fails to reject the null of parallel trends, as do the individual pre-period coefficients.
+    \item \textbf{But levels are similar}: The persistence of positive coefficients across all periods suggests agricultural workers always worked more hours, regardless of the embargo.
+    \item \textbf{Contrast with wages}: Wages show cleaner dynamics---pre-period coefficients cluster near zero ($-0.036$, $-0.002$, $-0.032$, all $p > 0.20$) while post-period coefficients are positive, consistent with a treatment effect.
 \end{enumerate}
+
+We therefore interpret the hours results cautiously. While we cannot rule out that the embargo increased hours worked, the evidence is less compelling than for monthly earnings. The cleaner wage event study (where pre-treatment coefficients are centered on zero) provides stronger support for the causal effect of protection on agricultural workers' economic outcomes.
 
 \subsection{Labor Supply Elasticity: Heterogeneity Analysis}
 
@@ -1514,12 +1530,12 @@ Our analysis has several limitations:
 
 This paper studies the labor market effects of Russia's 2014 food import embargo using individual-level panel data. Our \textbf{primary sample covers 2010--2019}, providing a clean medium-run window uncontaminated by COVID-19 or the Ukraine war. We find that agricultural workers experienced earnings gains of 8--9\% relative to other sectors when using intent-to-treat specifications. Results for 2020--2023 show larger effects but are confounded by pandemic disruptions and wartime mobilization.
 
-Our key finding is that these earnings gains are driven entirely by increased hours worked, not higher hourly wages. Agricultural workers worked approximately 5 additional hours per month post-embargo, while their hourly wage rate was essentially unchanged. This pattern is consistent with labor demand expansion through import substitution, with farms meeting increased demand by employing more worker-hours rather than bidding up wage rates.
+Our wage decomposition reveals that earnings gains appear related to differences in hours worked, not higher hourly wages. However, this finding requires nuance: agricultural workers worked substantially more hours than non-agricultural workers \textit{before} the embargo (27 hours more per month), and formal tests show the post-treatment hours gap is not statistically different from the pre-treatment gap ($p = 0.36$). The raw hours gap actually \textit{narrowed} from 27.3 to 24.8 hours post-embargo. We therefore interpret the hours mechanism cautiously.
 
-This distinction has important implications for evaluating trade protection:
+This nuance has important implications for evaluating trade protection:
 \begin{enumerate}
-    \item \textbf{Worker welfare}: Earnings gains from more hours are less attractive than gains from higher wages, as they come with reduced leisure.
-    \item \textbf{Rent creation}: Trade protection did not create rents that workers could capture through higher wages; instead, it increased labor demand.
+    \item \textbf{Pre-existing differences}: Sectoral differences in hours may reflect structural features of agricultural work rather than embargo-induced labor demand.
+    \item \textbf{Wage evidence is cleaner}: The event study for monthly earnings shows parallel pre-trends and a clear post-treatment break, providing stronger causal evidence than the hours decomposition.
     \item \textbf{Policy evaluation}: The welfare gains to workers from protection are smaller than raw earnings changes suggest once the disutility of additional work is accounted for.
 \end{enumerate}
 

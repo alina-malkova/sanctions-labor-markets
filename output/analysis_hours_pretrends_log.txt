@@ -1,0 +1,600 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_hours_pretrends_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 15:48:52
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "HOURS PRE-TRENDS ANALYSIS"
+HOURS PRE-TRENDS ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. ********************************************************************************
+. * PART 1: Event Study for Hours
+. ********************************************************************************
+. 
+. di _n "=== PART 1: Hours Event Study ==="
+
+=== PART 1: Hours Event Study ===
+
+. 
+. * Create relative time indicators
+. gen rel_year = year - 2014
+
+. 
+. * Create event study dummies (excluding -1 as reference)
+. gen Dm4 = (rel_year == -4) * agri
+
+. gen Dm3 = (rel_year == -3) * agri
+
+. gen Dm2 = (rel_year == -2) * agri
+
+. gen Dp0 = (rel_year == 0) * agri
+
+. gen Dp1 = (rel_year == 1) * agri
+
+. gen Dp2 = (rel_year == 2) * agri
+
+. gen Dp3 = (rel_year == 3) * agri
+
+. gen Dp4 = (rel_year == 4) * agri
+
+. gen Dp5 = (rel_year == 5) * agri
+
+. 
+. * Run event study for hours
+. reghdfe hours_month Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5, absorb(idind year) cluster(regi
+> on)
+(dropped 5277 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     65,361
+Absorbing 2 HDFE groups                           F(   9,     37) =       0.94
+Statistics robust to heteroskedasticity           Prob > F        =     0.5002
+                                                  R-squared       =     0.5264
+                                                  Adj R-squared   =     0.4029
+                                                  Within R-sq.    =     0.0003
+Number of clusters (region)  =         38         Root MSE        =    38.3079
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         Dm4 |   7.177047   5.037944     1.42   0.163    -3.030798    17.38489
+         Dm3 |     5.5414   5.080483     1.09   0.282    -4.752637    15.83544
+         Dm2 |   6.384516   3.402872     1.88   0.069    -.5103566    13.27939
+         Dp0 |   6.517106   4.771053     1.37   0.180    -3.149966    16.18418
+         Dp1 |   7.552598   3.446985     2.19   0.035     .5683417    14.53685
+         Dp2 |   4.266416   4.554162     0.94   0.355    -4.961192    13.49402
+         Dp3 |   4.187808   4.505403     0.93   0.359    -4.941006    13.31662
+         Dp4 |   3.477035   4.264743     0.82   0.420    -5.164155    12.11822
+         Dp5 |  -.1626643    4.02121    -0.04   0.968    -8.310411    7.985082
+       _cons |   176.5631   .0943711  1870.94   0.000     176.3718    176.7543
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     13509       13509           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _n "=== Event Study Coefficients ==="
+
+=== Event Study Coefficients ===
+
+. di "Pre-treatment (relative to -1):"
+Pre-treatment (relative to -1):
+
+. di "  Year -4: " _b[Dm4] " (SE: " _se[Dm4] ")"
+  Year -4: 7.1770466 (SE: 5.0379444)
+
+. di "  Year -3: " _b[Dm3] " (SE: " _se[Dm3] ")"
+  Year -3: 5.5414 (SE: 5.0804831)
+
+. di "  Year -2: " _b[Dm2] " (SE: " _se[Dm2] ")"
+  Year -2: 6.3845161 (SE: 3.4028716)
+
+. di "Post-treatment:"
+Post-treatment:
+
+. di "  Year 0: " _b[Dp0] " (SE: " _se[Dp0] ")"
+  Year 0: 6.5171057 (SE: 4.7710528)
+
+. di "  Year 1: " _b[Dp1] " (SE: " _se[Dp1] ")"
+  Year 1: 7.5525977 (SE: 3.4469855)
+
+. di "  Year 2: " _b[Dp2] " (SE: " _se[Dp2] ")"
+  Year 2: 4.2664163 (SE: 4.5541618)
+
+. di "  Year 3: " _b[Dp3] " (SE: " _se[Dp3] ")"
+  Year 3: 4.1878082 (SE: 4.5054032)
+
+. di "  Year 4: " _b[Dp4] " (SE: " _se[Dp4] ")"
+  Year 4: 3.477035 (SE: 4.2647429)
+
+. di "  Year 5: " _b[Dp5] " (SE: " _se[Dp5] ")"
+  Year 5: -.16266431 (SE: 4.0212105)
+
+. 
+. ********************************************************************************
+. * PART 2: Test Pre vs Post Difference
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: TEST PRE VS POST DIFFERENCE"
+PART 2: TEST PRE VS POST DIFFERENCE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Average pre-treatment effect
+. lincom (Dm4 + Dm3 + Dm2) / 3
+
+ ( 1)  .3333333*Dm4 + .3333333*Dm3 + .3333333*Dm2 = 0
+
+------------------------------------------------------------------------------
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |   6.367654   3.090708     2.06   0.046     .1052843    12.63002
+------------------------------------------------------------------------------
+
+. local pre_avg = r(estimate)
+
+. local pre_se = r(se)
+
+. di "Average pre-treatment effect: " `pre_avg' " (SE: " `pre_se' ")"
+Average pre-treatment effect: 6.3676542 (SE: 3.0907083)
+
+. 
+. * Average post-treatment effect
+. lincom (Dp0 + Dp1 + Dp2 + Dp3 + Dp4 + Dp5) / 6
+
+ ( 1)  .1666667*Dp0 + .1666667*Dp1 + .1666667*Dp2 + .1666667*Dp3 + .1666667*Dp4 +
+       .1666667*Dp5 = 0
+
+------------------------------------------------------------------------------
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |   4.306383   2.834311     1.52   0.137    -1.436477    10.04924
+------------------------------------------------------------------------------
+
+. local post_avg = r(estimate)
+
+. local post_se = r(se)
+
+. di "Average post-treatment effect: " `post_avg' " (SE: " `post_se' ")"
+Average post-treatment effect: 4.3063831 (SE: 2.8343111)
+
+. 
+. * Test difference
+. di _n "=== Test: Post average = Pre average ==="
+
+=== Test: Post average = Pre average ===
+
+. lincom ((Dp0 + Dp1 + Dp2 + Dp3 + Dp4 + Dp5) / 6) - ((Dm4 + Dm3 + Dm2) / 3)
+
+ ( 1)  - .3333333*Dm4 - .3333333*Dm3 - .3333333*Dm2 + .1666667*Dp0 + .1666667*Dp1 +
+       .1666667*Dp2 + .1666667*Dp3 + .1666667*Dp4 + .1666667*Dp5 = 0
+
+------------------------------------------------------------------------------
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |  -2.061271   2.252711    -0.92   0.366    -6.625697    2.503154
+------------------------------------------------------------------------------
+
+. local diff = r(estimate)
+
+. local diff_se = r(se)
+
+. local diff_p = 2 * (1 - normal(abs(r(estimate) / r(se))))
+
+. di "Difference (post - pre): " `diff'
+Difference (post - pre): -2.0612711
+
+. di "SE: " `diff_se'
+SE: 2.2527107
+
+. di "p-value: " `diff_p'
+p-value: .36018211
+
+. 
+. ********************************************************************************
+. * PART 3: Simple DiD with Pre-Period Average
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: ALTERNATIVE SPECIFICATION"
+PART 3: ALTERNATIVE SPECIFICATION
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Drop event study vars
+. drop Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5
+
+. 
+. * Create pre-period average hours gap
+. cap drop agri_post
+
+. gen agri_post = agri * post
+
+. 
+. * Simple DiD
+. di _n "=== Simple DiD for Hours ==="
+
+=== Simple DiD for Hours ===
+
+. reghdfe hours_month agri_post, absorb(idind year) cluster(region)
+(dropped 5277 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     65,361
+Absorbing 2 HDFE groups                           F(   1,     37) =       0.89
+Statistics robust to heteroskedasticity           Prob > F        =     0.3508
+                                                  R-squared       =     0.5263
+                                                  Adj R-squared   =     0.4028
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         38         Root MSE        =    38.3105
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   2.064307   2.184292     0.95   0.351    -2.361489    6.490102
+       _cons |   176.7048   .0427093  4137.38   0.000     176.6183    176.7914
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     13509       13509           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local did_coef = _b[agri_post]
+
+. local did_se = _se[agri_post]
+
+. 
+. di "DiD coefficient: " `did_coef'
+DiD coefficient: 2.064307
+
+. di "SE: " `did_se'
+SE: 2.1842918
+
+. 
+. * Now with agri main effect (capturing pre-period difference)
+. di _n "=== DiD with Agri Level Effect ==="
+
+=== DiD with Agri Level Effect ===
+
+. reghdfe hours_month agri agri_post, absorb(idind year) cluster(region)
+(dropped 5277 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     65,361
+Absorbing 2 HDFE groups                           F(   2,     37) =       3.90
+Statistics robust to heteroskedasticity           Prob > F        =     0.0290
+                                                  R-squared       =     0.5266
+                                                  Adj R-squared   =     0.4031
+                                                  Within R-sq.    =     0.0006
+Number of clusters (region)  =         38         Root MSE        =    38.2994
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        agri |   10.70351   3.888884     2.75   0.009     2.823877    18.58313
+   agri_post |  -2.804166   2.120227    -1.32   0.194    -7.100155    1.491822
+       _cons |    176.379    .145271  1214.14   0.000     176.0847    176.6733
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     13509       13509           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di "Agri level (pre-period gap): " _b[agri]
+Agri level (pre-period gap): 10.703506
+
+. di "Agri × Post (treatment effect): " _b[agri_post]
+Agri × Post (treatment effect): -2.8041664
+
+. 
+. * Test if post effect is different from pre level
+. test agri_post = agri
+
+ ( 1)  - agri + agri_post = 0
+
+       F(  1,    37) =    7.35
+            Prob > F =    0.0101
+
+. di "Test agri_post = agri: p = " r(p)
+Test agri_post = agri: p = .01012968
+
+. 
+. ********************************************************************************
+. * PART 4: Pre-Period Hours Gap Analysis
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: PRE-PERIOD HOURS GAP"
+PART 4: PRE-PERIOD HOURS GAP
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Calculate raw hours by group and year
+. preserve
+
+. collapse (mean) hours_month, by(agri year)
+
+. reshape wide hours_month, i(year) j(agri)
+(note: j = 0 1)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                       20   ->      10
+Number of variables                   3   ->       3
+j variable (2 values)              agri   ->   (dropped)
+xij variables:
+                            hours_month   ->   hours_month0 hours_month1
+-----------------------------------------------------------------------------
+
+. gen hours_gap = hours_month1 - hours_month0
+
+. 
+. di _n "=== Raw Hours Gap by Year ==="
+
+=== Raw Hours Gap by Year ===
+
+. list year hours_month0 hours_month1 hours_gap
+
+     +---------------------------------------------+
+     | year   hours_mon~0   hours_mon~1   hours_~p |
+     |---------------------------------------------|
+  1. | 2010   173.7265749   199.2152231   25.48865 |
+  2. | 2011   174.8431478   202.5353261   27.69218 |
+  3. | 2012   176.0482864   201.4915254   25.44324 |
+  4. | 2013   175.7790282   206.2587859   30.47976 |
+  5. | 2014   175.9140841   204.1198347   28.20575 |
+     |---------------------------------------------|
+  6. | 2015   175.3286657   200.1813725   24.85271 |
+  7. | 2016   176.0746503    203.481982   27.40733 |
+  8. | 2017   175.9601973   201.3601695   25.39997 |
+  9. | 2018   175.3792303    199.027027    23.6478 |
+ 10. | 2019   176.9998348   196.0147059   19.01487 |
+     +---------------------------------------------+
+
+. 
+. * Pre-period average gap
+. sum hours_gap if year < 2014
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+   hours_gap |          4    27.27596    2.379839   25.44324   30.47976
+
+. local pre_gap = r(mean)
+
+. di "Pre-2014 average gap: " `pre_gap'
+Pre-2014 average gap: 27.275956
+
+. 
+. * Post-period average gap
+. sum hours_gap if year >= 2014
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+   hours_gap |          6    24.75474    3.272401   19.01487   28.20575
+
+. local post_gap = r(mean)
+
+. di "Post-2014 average gap: " `post_gap'
+Post-2014 average gap: 24.754738
+
+. 
+. di "Change in gap (post - pre): " `post_gap' - `pre_gap'
+Change in gap (post - pre): -2.5212172
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 5: Compare to Wages Event Study
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 5: COMPARE HOURS VS WAGES PRE-TRENDS"
+PART 5: COMPARE HOURS VS WAGES PRE-TRENDS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Recreate event study dummies
+. gen Dm4 = (rel_year == -4) * agri
+
+. gen Dm3 = (rel_year == -3) * agri
+
+. gen Dm2 = (rel_year == -2) * agri
+
+. gen Dp0 = (rel_year == 0) * agri
+
+. gen Dp1 = (rel_year == 1) * agri
+
+. gen Dp2 = (rel_year == 2) * agri
+
+. gen Dp3 = (rel_year == 3) * agri
+
+. gen Dp4 = (rel_year == 4) * agri
+
+. gen Dp5 = (rel_year == 5) * agri
+
+. 
+. * Hours event study
+. di _n "=== Hours Event Study ==="
+
+=== Hours Event Study ===
+
+. quietly reghdfe hours_month Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5, absorb(idind year) clus
+> ter(region)
+
+. di "Pre-treatment coefficients:"
+Pre-treatment coefficients:
+
+. di "  Dm4: " %6.3f _b[Dm4] " (p=" %5.3f 2*ttail(e(df_r), abs(_b[Dm4]/_se[Dm4])) ")"
+  Dm4:  7.177 (p=0.163)
+
+. di "  Dm3: " %6.3f _b[Dm3] " (p=" %5.3f 2*ttail(e(df_r), abs(_b[Dm3]/_se[Dm3])) ")"
+  Dm3:  5.541 (p=0.282)
+
+. di "  Dm2: " %6.3f _b[Dm2] " (p=" %5.3f 2*ttail(e(df_r), abs(_b[Dm2]/_se[Dm2])) ")"
+  Dm2:  6.385 (p=0.069)
+
+. 
+. * Test joint significance of pre-trends
+. test Dm4 Dm3 Dm2
+
+ ( 1)  Dm4 = 0
+ ( 2)  Dm3 = 0
+ ( 3)  Dm2 = 0
+
+       F(  3,    37) =    1.56
+            Prob > F =    0.2163
+
+. di "Joint test of pre-trends (hours): F=" %6.2f r(F) ", p=" %5.3f r(p)
+Joint test of pre-trends (hours): F=  1.56, p=0.216
+
+. 
+. * Wages event study
+. di _n "=== Wages Event Study ==="
+
+=== Wages Event Study ===
+
+. quietly reghdfe ln_wage Dm4 Dm3 Dm2 Dp0 Dp1 Dp2 Dp3 Dp4 Dp5, absorb(idind year) cluster(
+> region)
+
+. di "Pre-treatment coefficients:"
+Pre-treatment coefficients:
+
+. di "  Dm4: " %6.3f _b[Dm4] " (p=" %5.3f 2*ttail(e(df_r), abs(_b[Dm4]/_se[Dm4])) ")"
+  Dm4: -0.036 (p=0.372)
+
+. di "  Dm3: " %6.3f _b[Dm3] " (p=" %5.3f 2*ttail(e(df_r), abs(_b[Dm3]/_se[Dm3])) ")"
+  Dm3: -0.002 (p=0.919)
+
+. di "  Dm2: " %6.3f _b[Dm2] " (p=" %5.3f 2*ttail(e(df_r), abs(_b[Dm2]/_se[Dm2])) ")"
+  Dm2: -0.032 (p=0.234)
+
+. 
+. * Test joint significance of pre-trends
+. test Dm4 Dm3 Dm2
+
+ ( 1)  Dm4 = 0
+ ( 2)  Dm3 = 0
+ ( 3)  Dm2 = 0
+
+       F(  3,    37) =    0.74
+            Prob > F =    0.5342
+
+. di "Joint test of pre-trends (wages): F=" %6.2f r(F) ", p=" %5.3f r(p)
+Joint test of pre-trends (wages): F=  0.74, p=0.534
+
+. 
+. ********************************************************************************
+. * PART 6: Summary Statistics
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "SUMMARY"
+SUMMARY
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "Key findings:"
+
+Key findings:
+
+. di "1. Pre-treatment hours coefficients are [X] on average"
+1. Pre-treatment hours coefficients are [X] on average
+
+. di "2. Post-treatment hours coefficients are [Y] on average"
+2. Post-treatment hours coefficients are [Y] on average
+
+. di "3. Difference is [Z] (p = [P])"
+3. Difference is [Z] (p = [P])
+
+. di "4. This [does/does not] support a clean causal interpretation"
+4. This [does/does not] support a clean causal interpretation
+
+. 
+. di ""
+
+
+. di "Analysis complete!"
+Analysis complete!
+
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_hours_pretrends_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 15:48:57
+------------------------------------------------------------------------------------------
