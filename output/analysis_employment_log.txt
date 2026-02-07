@@ -1,0 +1,188 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/analysis_employment_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 11:37:37
+
+. 
+. ********************************************************************************
+. * PART 1: Agricultural Employment Trends
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 1: Agricultural Employment Trends"
+PART 1: Agricultural Employment Trends
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. * Count employment by year and sector
+. preserve
+
+. gen n = 1
+
+. collapse (sum) n, by(year agri)
+
+. reshape wide n, i(year) j(agri)
+(j = 0 1)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations               28   ->   14          
+Number of variables                   3   ->   3           
+j variable (2 values)              agri   ->   (dropped)
+xij variables:
+                                      n   ->   n0 n1
+-----------------------------------------------------------------------------
+
+. rename n0 emp_nonagri
+
+. rename n1 emp_agri
+
+. gen emp_total = emp_nonagri + emp_agri
+
+. gen agri_share = emp_agri / emp_total * 100
+
+. gen agri_pct_change = (emp_agri / emp_agri[_n-1] - 1) * 100 if _n > 1
+(1 missing value generated)
+
+. 
+. * Display
+. list year emp_agri emp_nonagri emp_total agri_share agri_pct_change
+
+     +--------------------------------------------------------------+
+     | year   emp_agri   emp_no~i   emp_to~l   agri_s~e   agri_pc~e |
+     |--------------------------------------------------------------|
+  1. | 2010        430       8181       8611   4.993613           . |
+  2. | 2011        422       8308       8730   4.833906   -1.860465 |
+  3. | 2012        413       8616       9029    4.57415   -2.132701 |
+  4. | 2013        368       8323       8691   4.234265   -10.89588 |
+  5. | 2014        273       7086       7359   3.709743   -25.81522 |
+     |--------------------------------------------------------------|
+  6. | 2015        253       6897       7150   3.538461   -7.326007 |
+  7. | 2016        261       7036       7297   3.576813    3.162055 |
+  8. | 2017        276       6990       7266   3.798514    5.747127 |
+  9. | 2018        264       6739       7003   3.769813   -4.347826 |
+ 10. | 2019        244       6715       6959   3.506251   -7.575758 |
+     |--------------------------------------------------------------|
+ 11. | 2020        242       6443       6685   3.620045   -.8196721 |
+ 12. | 2021        233       6544       6777   3.438099   -3.719008 |
+ 13. | 2022        224       6601       6825   3.282051   -3.862661 |
+ 14. | 2023        236       6524       6760   3.491124    5.357143 |
+     +--------------------------------------------------------------+
+
+. 
+. * Save
+. export delimited using "output/tables/employment_levels_by_year.csv", replace
+(file output/tables/employment_levels_by_year.csv not found)
+file output/tables/employment_levels_by_year.csv saved
+
+. 
+. * Plot: Agricultural employment level
+. twoway (bar emp_agri year, barwidth(0.7) color(navy%70)), ///
+>     xline(2013.5, lcolor(red) lpattern(dash)) ///
+>     xlabel(2010(2)2023) ///
+>     ylabel(0(100)600, format(%9.0f)) ///
+>     xtitle("Year") ///
+>     ytitle("Agricultural Workers (count)") ///
+>     title("Agricultural Employment Over Time") ///
+>     note("Sample: RLMS employed workers with wages. Vertical line: 2014 embargo.") ///
+>     scheme(s2color)
+
+. graph export "output/figures/agri_employment_level.png", replace width(1200)
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/agri_employment_level.png saved as PNG format
+
+. 
+. * Plot: Agricultural share
+. twoway (line agri_share year, lcolor(navy) lpattern(solid) lwidth(medthick)), ///
+>     xline(2014, lcolor(red) lpattern(dash)) ///
+>     xlabel(2010(2)2023) ///
+>     ylabel(3(0.5)6, format(%9.1f)) ///
+>     xtitle("Year") ///
+>     ytitle("Agricultural Share of Employment (%)") ///
+>     title("Agricultural Employment Share") ///
+>     note("Share of employed workers in agriculture sector.") ///
+>     scheme(s2color)
+
+. graph export "output/figures/agri_employment_share_line.png", replace width(1200)
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/agri_employment_share_line.png saved as PNG format
+
+. 
+. * Calculate pre vs post averages
+. sum agri_share if year < 2014
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+  agri_share |          4    4.658984    .3317413   4.234265   4.993613
+
+. local pre_share = r(mean)
+
+. sum agri_share if year >= 2014
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+  agri_share |         10    3.573091    .1583665   3.282051   3.798514
+
+. local post_share = r(mean)
+
+. local diff = `post_share' - `pre_share'
+
+. 
+. di ""
+
+
+. di "AGRICULTURAL EMPLOYMENT SHARE:"
+AGRICULTURAL EMPLOYMENT SHARE:
+
+. di "Pre-2014 average:  " %5.2f `pre_share' "%"
+Pre-2014 average:   4.66%
+
+. di "Post-2014 average: " %5.2f `post_share' "%"
+Post-2014 average:  3.57%
+
+. di "Difference:        " %5.2f `diff' " pp"
+Difference:        -1.09 pp
+
+. di ""
+
+
+. 
+. restore
+
+. 
+. ********************************************************************************
+. * PART 2: Employment Growth by Sector
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 2: Employment Growth by Sector"
+PART 2: Employment Growth by Sector
+
+. di as text "=========================================="
+==========================================
+
+. 
+. * Calculate employment by detailed sector
+. preserve
+
+. gen n = 1
+
+. collapse (sum) n, by(year industry)
+
+. drop if industry == .
+(0 observations deleted)
+
+. 
+. * Reshape
+. reshape wide n, i(year) j(industry)

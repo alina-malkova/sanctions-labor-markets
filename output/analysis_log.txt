@@ -1,0 +1,48 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/analysis_log.txt
+  log type:  text
+ opened on:   6 Feb 2026, 14:32:26
+
+. 
+. ********************************************************************************
+. * PART 0: Install Required Packages
+. ********************************************************************************
+. 
+. * Uncomment to install (run once)
+. /*
+> ssc install reghdfe, replace
+> ssc install ftools, replace
+> ssc install coefplot, replace
+> ssc install estout, replace
+> ssc install binscatter, replace
+> ssc install csdid, replace
+> ssc install drdid, replace
+> ssc install eventstudyinteract, replace
+> ssc install did_multiplegt, replace
+> ssc install avar, replace
+> ssc install event_plot, replace
+> */
+. 
+. ********************************************************************************
+. * PART 1: Load and Clean RLMS Data
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 1: Loading RLMS Data"
+PART 1: Loading RLMS Data
+
+. di as text "=========================================="
+==========================================
+
+. 
+. * Load individual-level data
+. use "IND/RLMS_IND_1994_2023_eng_dta.dta", clear
+file IND/RLMS_IND_1994_2023_eng_dta.dta not Stata format
+r(610);
+
+end of do-file
+r(610);

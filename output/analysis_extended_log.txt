@@ -1,0 +1,1338 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/analysis_extended_log.txt
+  log type:  text
+ opened on:   6 Feb 2026, 15:00:29
+
+. 
+. ********************************************************************************
+. * PART 1: Intent-to-Treat Analysis (Pre-2014 Industry Assignment)
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 1: Intent-to-Treat (Pre-2014 Industry)"
+PART 1: Intent-to-Treat (Pre-2014 Industry)
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. * Create initial (pre-2014) industry assignment
+. preserve
+
+. keep if year < 2014 & industry != .
+(70,081 observations deleted)
+
+. bysort idind (year): gen first_obs = (_n == 1)
+
+. keep if first_obs == 1
+(19,804 observations deleted)
+
+. keep idind industry
+
+. rename industry initial_industry
+
+. tempfile initial_ind
+
+. save `initial_ind'
+file /var/folders/nh/wb1gprtx2tq7s8ykylw3q82rp3jc5y/T//S_39306.000002 saved as .dta format
+
+. restore
+
+. 
+. merge m:1 idind using `initial_ind', keep(1 3)
+(label j4_1 already defined)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                        22,756
+        from master                    22,756  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                            82,386  (_merge==3)
+    -----------------------------------------
+
+. gen matched_initial = (_merge == 3)
+
+. drop _merge
+
+. 
+. * Intent-to-treat: based on initial industry
+. gen agri_initial = (initial_industry == 8)
+
+. gen agri_initial_post = agri_initial * post
+
+. label var agri_initial "Agriculture (initial assignment)"
+
+. label var agri_initial_post "Agri (initial) × Post"
+
+. 
+. eststo clear
+
+. 
+. * (1) Baseline: Current industry
+. eststo itt1: reghdfe ln_wage agri_post, ///
+>     absorb(idind year) cluster(region)
+(dropped 5606 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     99,536
+Absorbing 2 HDFE groups                           F(   1,     38) =       2.48
+Statistics robust to heteroskedasticity           Prob > F        =     0.1235
+                                                  R-squared       =     0.8062
+                                                  Adj R-squared   =     0.7677
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         39         Root MSE        =     0.3469
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0358967    .022789     1.58   0.124    -.0102372    .0820305
+       _cons |   9.934851   .0005582  1.8e+04   0.000     9.933721    9.935981
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     16466       16466           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (2) Intent-to-treat: Initial industry
+. eststo itt2: reghdfe ln_wage agri_initial_post if matched_initial == 1, ///
+>     absorb(idind year) cluster(region)
+(dropped 3491 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     78,895
+Absorbing 2 HDFE groups                           F(   1,     37) =      10.68
+Statistics robust to heteroskedasticity           Prob > F        =     0.0023
+                                                  R-squared       =     0.7965
+                                                  Adj R-squared   =     0.7608
+                                                  Within R-sq.    =     0.0011
+Number of clusters (region)  =         38         Root MSE        =     0.3534
+
+                                     (Std. err. adjusted for 38 clusters in region)
+-----------------------------------------------------------------------------------
+                  |               Robust
+          ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+agri_initial_post |   .1183194   .0362131     3.27   0.002     .0449448    .1916941
+            _cons |   9.863236   .0010121  9745.29   0.000     9.861185    9.865287
+-----------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     11766       11766           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (3) ITT with controls
+. eststo itt3: reghdfe ln_wage agri_initial_post age age_sq i.educ_cat female ///
+>     if matched_initial == 1, ///
+>     absorb(idind year) cluster(region)
+(dropped 3487 singleton observations)
+note: female is probably collinear with the fixed effects (all partialled-out values are close to zero; 
+> tol = 1.0e-09)
+(MWFE estimator converged in 7 iterations)
+note: female omitted because of collinearity
+
+HDFE Linear regression                            Number of obs   =     78,805
+Absorbing 2 HDFE groups                           F(   6,     37) =      36.91
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.8002
+                                                  Adj R-squared   =     0.7651
+                                                  Within R-sq.    =     0.0186
+Number of clusters (region)  =         38         Root MSE        =     0.3502
+
+                                     (Std. err. adjusted for 38 clusters in region)
+-----------------------------------------------------------------------------------
+                  |               Robust
+          ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+agri_initial_post |   .1325187   .0346445     3.83   0.000     .0623222    .2027152
+              age |   .0602977   .0092193     6.54   0.000     .0416176    .0789777
+           age_sq |  -.0006647   .0000494   -13.47   0.000    -.0007647   -.0005647
+                  |
+         educ_cat |
+       Secondary  |  -.1082954   .1486697    -0.73   0.471    -.4095288    .1929379
+    Some college  |  -.1192629   .1505543    -0.79   0.433    -.4243149    .1857891
+     University+  |  -.0568118    .148547    -0.38   0.704    -.3577967     .244173
+                  |
+           female |          0  (omitted)
+            _cons |   8.662447   .3785766    22.88   0.000     7.895378    9.429516
+-----------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     11749       11749           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (4) Primary sample: 2010-2019
+. eststo itt4: reghdfe ln_wage agri_initial_post if matched_initial == 1 & year <= 2019, ///
+>     absorb(idind year) cluster(region)
+(dropped 3556 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     63,830
+Absorbing 2 HDFE groups                           F(   1,     37) =       5.60
+Statistics robust to heteroskedasticity           Prob > F        =     0.0233
+                                                  R-squared       =     0.7995
+                                                  Adj R-squared   =     0.7545
+                                                  Within R-sq.    =     0.0005
+Number of clusters (region)  =         38         Root MSE        =     0.3510
+
+                                     (Std. err. adjusted for 38 clusters in region)
+-----------------------------------------------------------------------------------
+                  |               Robust
+          ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+agri_initial_post |   .0788847   .0333298     2.37   0.023     .0113521    .1464173
+            _cons |   9.761212   .0007681  1.3e+04   0.000     9.759656    9.762768
+-----------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     11701       11701           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. esttab itt1 itt2 itt3 itt4 using "output/tables/table10_itt.tex", ///
+>     replace booktabs label ///
+>     title("Intent-to-Treat: Pre-2014 Industry Assignment") ///
+>     mtitles("Current Ind" "Initial Ind" "ITT + Controls" "ITT 2010-19") ///
+>     keep(agri_post agri_initial_post) ///
+>     stats(N r2_a, labels("Observations" "Adj. R-squared")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(3) b(3)
+(file output/tables/table10_itt.tex not found)
+(output written to output/tables/table10_itt.tex)
+
+. 
+. esttab itt1 itt2 itt3 itt4 using "output/tables/table10_itt.csv", ///
+>     replace csv label
+(file output/tables/table10_itt.csv not found)
+(output written to output/tables/table10_itt.csv)
+
+. 
+. ********************************************************************************
+. * PART 2: Stayer Sample Analysis
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 2: Stayer Sample"
+PART 2: Stayer Sample
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. * Identify stayers
+. bysort idind: egen ever_agri_pre = max(agri * (year < 2014))
+
+. bysort idind: egen ever_agri_post = max(agri * (year >= 2014))
+
+. bysort idind: egen has_pre = max(year < 2014)
+
+. bysort idind: egen has_post = max(year >= 2014)
+
+. gen balanced = (has_pre == 1 & has_post == 1)
+
+. 
+. gen agri_stayer = (ever_agri_pre == 1 & ever_agri_post == 1 & balanced == 1)
+
+. gen nonagri_stayer = (ever_agri_pre == 0 & ever_agri_post == 0 & balanced == 1)
+
+. gen switcher_into_agri = (ever_agri_pre == 0 & ever_agri_post == 1 & balanced == 1)
+
+. gen switcher_out_agri = (ever_agri_pre == 1 & ever_agri_post == 0 & balanced == 1)
+
+. 
+. di "Sample composition:"
+Sample composition:
+
+. tab agri_stayer if year == 2013
+
+agri_stayer |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      8,415       96.82       96.82
+          1 |        276        3.18      100.00
+------------+-----------------------------------
+      Total |      8,691      100.00
+
+. tab nonagri_stayer if year == 2013
+
+nonagri_sta |
+        yer |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,341       26.94       26.94
+          1 |      6,350       73.06      100.00
+------------+-----------------------------------
+      Total |      8,691      100.00
+
+. tab switcher_into_agri if year == 2013
+
+switcher_in |
+    to_agri |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      8,561       98.50       98.50
+          1 |        130        1.50      100.00
+------------+-----------------------------------
+      Total |      8,691      100.00
+
+. tab switcher_out_agri if year == 2013
+
+switcher_ou |
+     t_agri |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      8,561       98.50       98.50
+          1 |        130        1.50      100.00
+------------+-----------------------------------
+      Total |      8,691      100.00
+
+. 
+. eststo clear
+
+. 
+. * (1) Full sample
+. eststo stay1: reghdfe ln_wage agri_post, ///
+>     absorb(idind year) cluster(region)
+(dropped 5606 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     99,536
+Absorbing 2 HDFE groups                           F(   1,     38) =       2.48
+Statistics robust to heteroskedasticity           Prob > F        =     0.1235
+                                                  R-squared       =     0.8062
+                                                  Adj R-squared   =     0.7677
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         39         Root MSE        =     0.3469
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0358967    .022789     1.58   0.124    -.0102372    .0820305
+       _cons |   9.934851   .0005582  1.8e+04   0.000     9.933721    9.935981
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     16466       16466           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (2) Stayers only
+. eststo stay2: reghdfe ln_wage agri_post if agri_stayer == 1 | nonagri_stayer == 1, ///
+>     absorb(idind year) cluster(region)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     67,478
+Absorbing 2 HDFE groups                           F(   1,     37) =       8.93
+Statistics robust to heteroskedasticity           Prob > F        =     0.0050
+                                                  R-squared       =     0.7831
+                                                  Adj R-squared   =     0.7526
+                                                  Within R-sq.    =     0.0008
+Number of clusters (region)  =         38         Root MSE        =     0.3532
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .1011375   .0338463     2.99   0.005     .0325583    .1697166
+       _cons |     9.9164   .0007378  1.3e+04   0.000     9.914905    9.917895
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      8285        8285           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (3) Agricultural stayers only
+. preserve
+
+. keep if agri_stayer == 1
+(102,224 observations deleted)
+
+. eststo stay3: reghdfe ln_wage post, ///
+>     absorb(idind year) cluster(region)
+note: post is probably collinear with the fixed effects (all partialled-out values are close to zero; to
+> l = 1.0e-09)
+(MWFE estimator converged in 7 iterations)
+note: post omitted because of collinearity
+
+HDFE Linear regression                            Number of obs   =      2,918
+Absorbing 2 HDFE groups                           F(   0,     27) =          .
+Statistics robust to heteroskedasticity           Prob > F        =          .
+                                                  R-squared       =     0.7273
+                                                  Adj R-squared   =     0.6901
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         28         Root MSE        =     0.4014
+
+                                (Std. err. adjusted for 28 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |          0  (omitted)
+       _cons |   9.601132   1.39e-14  6.9e+14   0.000     9.601132    9.601132
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |       337         337           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. restore
+
+. 
+. * (4) Balanced panel
+. eststo stay4: reghdfe ln_wage agri_post if balanced == 1, ///
+>     absorb(idind year) cluster(region)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     70,504
+Absorbing 2 HDFE groups                           F(   1,     37) =       5.81
+Statistics robust to heteroskedasticity           Prob > F        =     0.0210
+                                                  R-squared       =     0.7818
+                                                  Adj R-squared   =     0.7512
+                                                  Within R-sq.    =     0.0004
+Number of clusters (region)  =         38         Root MSE        =     0.3552
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0651533    .027028     2.41   0.021     .0103894    .1199172
+       _cons |    9.90863    .000728  1.4e+04   0.000     9.907155    9.910105
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |      8643        8643           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. esttab stay1 stay2 stay3 stay4 using "output/tables/table11_stayers.tex", ///
+>     replace booktabs label ///
+>     title("Stayer Sample Analysis") ///
+>     mtitles("Full Sample" "Stayers Only" "Agri Stayers" "Balanced Panel") ///
+>     keep(agri_post post) ///
+>     stats(N r2_a, labels("Observations" "Adj. R-squared")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(3) b(3)
+(file output/tables/table11_stayers.tex not found)
+(output written to output/tables/table11_stayers.tex)
+
+. 
+. esttab stay1 stay2 stay3 stay4 using "output/tables/table11_stayers.csv", ///
+>     replace csv label
+(file output/tables/table11_stayers.csv not found)
+(output written to output/tables/table11_stayers.csv)
+
+. 
+. save "output/rlms_analysis_extended.dta", replace
+(file output/rlms_analysis_extended.dta not found)
+file output/rlms_analysis_extended.dta saved
+
+. 
+. ********************************************************************************
+. * PART 3: Extensive Margin (Simplified - using wage sample)
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 3: Extensive Margin (Employment Shares)"
+PART 3: Extensive Margin (Employment Shares)
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. * Employment share in agriculture over time
+. preserve
+
+. gen n = 1
+
+. collapse (sum) n, by(year agri)
+
+. reshape wide n, i(year) j(agri)
+(j = 0 1)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations               28   ->   14          
+Number of variables                   3   ->   3           
+j variable (2 values)              agri   ->   (dropped)
+xij variables:
+                                      n   ->   n0 n1
+-----------------------------------------------------------------------------
+
+. gen agri_share = n1 / (n0 + n1) * 100
+
+. gen total_n = n0 + n1
+
+. 
+. list year agri_share total_n n1
+
+     +---------------------------------+
+     | year   agri_s~e   total_n    n1 |
+     |---------------------------------|
+  1. | 2010   4.993613      8611   430 |
+  2. | 2011   4.833906      8730   422 |
+  3. | 2012    4.57415      9029   413 |
+  4. | 2013   4.234265      8691   368 |
+  5. | 2014   3.709743      7359   273 |
+     |---------------------------------|
+  6. | 2015   3.538461      7150   253 |
+  7. | 2016   3.576813      7297   261 |
+  8. | 2017   3.798514      7266   276 |
+  9. | 2018   3.769813      7003   264 |
+ 10. | 2019   3.506251      6959   244 |
+     |---------------------------------|
+ 11. | 2020   3.620045      6685   242 |
+ 12. | 2021   3.438099      6777   233 |
+ 13. | 2022   3.282051      6825   224 |
+ 14. | 2023   3.491124      6760   236 |
+     +---------------------------------+
+
+. 
+. twoway (line agri_share year, lcolor(navy) lpattern(solid)), ///
+>     xline(2014, lcolor(red) lpattern(dash)) ///
+>     xlabel(2010(2)2023) ///
+>     ylabel(, format(%9.1f)) ///
+>     xtitle("Year") ///
+>     ytitle("Share of Employment in Agriculture (%)") ///
+>     title("Agricultural Employment Share Over Time") ///
+>     note("Sample: Employed workers with wages. Vertical line: August 2014.") ///
+>     scheme(s2color)
+
+. graph export "output/figures/agri_employment_share.png", replace width(1200)
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/agri_employment_share.png saved as PNG format
+
+. 
+. export delimited year agri_share total_n n1 using "output/tables/employment_shares.csv", replace
+(file output/tables/employment_shares.csv not found)
+file output/tables/employment_shares.csv saved
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 4: Wage Decomposition
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 4: Wage Decomposition"
+PART 4: Wage Decomposition
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. gen ln_hours = ln(hours_month) if hours_month > 0 & hours_month < .
+(10,762 missing values generated)
+
+. 
+. eststo clear
+
+. 
+. * (1) Log monthly earnings
+. eststo dec1: reghdfe ln_wage agri_post, ///
+>     absorb(idind year) cluster(region)
+(dropped 5606 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     99,536
+Absorbing 2 HDFE groups                           F(   1,     38) =       2.48
+Statistics robust to heteroskedasticity           Prob > F        =     0.1235
+                                                  R-squared       =     0.8062
+                                                  Adj R-squared   =     0.7677
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         39         Root MSE        =     0.3469
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0358967    .022789     1.58   0.124    -.0102372    .0820305
+       _cons |   9.934851   .0005582  1.8e+04   0.000     9.933721    9.935981
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     16466       16466           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (2) Log hourly wage
+. eststo dec2: reghdfe ln_wage_hourly agri_post if ln_wage_hourly != ., ///
+>     absorb(idind year) cluster(region)
+(dropped 5699 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     88,681
+Absorbing 2 HDFE groups                           F(   1,     38) =       0.01
+Statistics robust to heteroskedasticity           Prob > F        =     0.9095
+                                                  R-squared       =     0.7612
+                                                  Adj R-squared   =     0.7109
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         39         Root MSE        =     0.3960
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ln_wage_ho~y | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0033574   .0293268     0.11   0.909    -.0560116    .0627264
+       _cons |   4.798308   .0006614  7254.77   0.000     4.796969    4.799647
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     15406       15406           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (3) Log hours
+. eststo dec3: reghdfe ln_hours agri_post if ln_hours != ., ///
+>     absorb(idind year) cluster(region)
+(dropped 5699 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     88,681
+Absorbing 2 HDFE groups                           F(   1,     38) =       2.99
+Statistics robust to heteroskedasticity           Prob > F        =     0.0917
+                                                  R-squared       =     0.4689
+                                                  Adj R-squared   =     0.3571
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         39         Root MSE        =     0.2767
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+    ln_hours | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0255155   .0147487     1.73   0.092    -.0043416    .0553726
+       _cons |   5.125231   .0003326  1.5e+04   0.000     5.124558    5.125905
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     15406       15406           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (4) Hours in levels
+. eststo dec4: reghdfe hours_month agri_post if hours_month != ., ///
+>     absorb(idind year) cluster(region)
+(dropped 5699 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     88,681
+Absorbing 2 HDFE groups                           F(   1,     38) =       4.75
+Statistics robust to heteroskedasticity           Prob > F        =     0.0355
+                                                  R-squared       =     0.4978
+                                                  Adj R-squared   =     0.3921
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         39         Root MSE        =    38.2103
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+ hours_month | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   5.080682   2.330663     2.18   0.036     .3625004    9.798863
+       _cons |   176.3317   .0525629  3354.68   0.000     176.2253    176.4381
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     15406       15406           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. esttab dec1 dec2 dec3 dec4 using "output/tables/table13_decomposition.tex", ///
+>     replace booktabs label ///
+>     title("Wage Decomposition: Earnings = Hourly Wage × Hours") ///
+>     mtitles("Log Earnings" "Log Hourly" "Log Hours" "Hours (levels)") ///
+>     keep(agri_post) ///
+>     stats(N r2_a, labels("Observations" "Adj. R-squared")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(3) b(3)
+(file output/tables/table13_decomposition.tex not found)
+(output written to output/tables/table13_decomposition.tex)
+
+. 
+. esttab dec1 dec2 dec3 dec4 using "output/tables/table13_decomposition.csv", ///
+>     replace csv label
+(file output/tables/table13_decomposition.csv not found)
+(output written to output/tables/table13_decomposition.csv)
+
+. 
+. * Event study for hours
+. forval t = -4/9 {
+  2.     if `t' < 0 {
+  3.         local tname = "m" + string(abs(`t'))
+  4.     }
+  5.     else {
+  6.         local tname = "p" + string(`t')
+  7.     }
+  8.     capture gen H_`tname' = (event_time == `t') * agri
+  9. }
+
+. capture drop H_m1
+
+. 
+. reghdfe ln_hours H_m4 H_m3 H_m2 H_p0 H_p1 H_p2 H_p3 H_p4 H_p5 H_p6 H_p7 H_p8 H_p9 ///
+>     if ln_hours != ., absorb(idind year) cluster(region)
+(dropped 5699 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     88,681
+Absorbing 2 HDFE groups                           F(  13,     38) =       5.57
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.4690
+                                                  Adj R-squared   =     0.3572
+                                                  Within R-sq.    =     0.0003
+Number of clusters (region)  =         39         Root MSE        =     0.2767
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+    ln_hours | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        H_m4 |   .0405582   .0322278     1.26   0.216    -.0246836    .1057999
+        H_m3 |   .0392294   .0258741     1.52   0.138    -.0131499    .0916088
+        H_m2 |   .0408194   .0194513     2.10   0.043     .0014422    .0801966
+        H_p0 |   .0378196    .021591     1.75   0.088    -.0058892    .0815283
+        H_p1 |   .0566842    .020252     2.80   0.008      .015686    .0976823
+        H_p2 |   .0172631   .0282178     0.61   0.544    -.0398609    .0743871
+        H_p3 |   .0379927   .0284324     1.34   0.189    -.0195656     .095551
+        H_p4 |   .0142667   .0338819     0.42   0.676    -.0543236    .0828571
+        H_p5 |   .0126364   .0281619     0.45   0.656    -.0443744    .0696471
+        H_p6 |   .0497888   .0234241     2.13   0.040     .0023692    .0972084
+        H_p7 |   .0691955   .0291783     2.37   0.023     .0101271     .128264
+        H_p8 |   .0650462   .0172591     3.77   0.001     .0301069    .0999854
+        H_p9 |   .0229552   .0230244     1.00   0.325    -.0236554    .0695657
+       _cons |   5.124505   .0006035  8490.98   0.000     5.123283    5.125727
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     15406       15406           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. matrix b_hrs = e(b)
+
+. matrix V_hrs = e(V)
+
+. 
+. preserve
+
+. clear
+
+. set obs 13
+Number of observations (_N) was 0, now 13.
+
+. gen event_time = _n - 5
+
+. replace event_time = event_time + 1 if event_time >= 0
+(9 real changes made)
+
+. 
+. gen coef = .
+(13 missing values generated)
+
+. gen se = .
+(13 missing values generated)
+
+. 
+. local i = 1
+
+. foreach t in m4 m3 m2 p0 p1 p2 p3 p4 p5 p6 p7 p8 p9 {
+  2.     replace coef = b_hrs[1, `i'] in `i'
+  3.     replace se = sqrt(V_hrs[`i', `i']) in `i'
+  4.     local i = `i' + 1
+  5. }
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+
+. 
+. set obs 14
+Number of observations (_N) was 13, now 14.
+
+. replace event_time = -1 in 14
+(1 real change made)
+
+. replace coef = 0 in 14
+(1 real change made)
+
+. replace se = 0 in 14
+(1 real change made)
+
+. sort event_time
+
+. 
+. gen ci_lo = coef - 1.96*se
+
+. gen ci_hi = coef + 1.96*se
+
+. 
+. twoway (rcap ci_lo ci_hi event_time, lcolor(maroon)) ///
+>        (scatter coef event_time, mcolor(maroon) msymbol(circle)), ///
+>     xline(-0.5, lcolor(red) lpattern(dash)) ///
+>     yline(0, lcolor(gray) lpattern(solid)) ///
+>     xlabel(-4(1)9) ///
+>     ylabel(, format(%9.2f)) ///
+>     xtitle("Years Relative to 2014 Food Embargo") ///
+>     ytitle("Effect on Log Hours") ///
+>     title("Event Study: Effect on Hours Worked") ///
+>     note("Reference period: 2013 (t=-1). 95% CIs shown.") ///
+>     legend(off) ///
+>     scheme(s2color)
+
+. graph export "output/figures/event_study_hours.png", replace width(1200)
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/event_study_hours.png saved as PNG format
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 5: Synthetic Control
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 5: Synthetic Control"
+PART 5: Synthetic Control
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. preserve
+
+. collapse (mean) ln_wage wage_month hours_month [pw=inwgt], by(year industry)
+
+. drop if industry == .
+(0 observations deleted)
+
+. 
+. reshape wide ln_wage wage_month hours_month, i(year) j(industry)
+(j = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 20 21 22 23 24 25 26 27 28 29 30 31 32)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations              393   ->   14          
+Number of variables                   5   ->   94          
+j variable (31 values)         industry   ->   (dropped)
+xij variables:
+                                ln_wage   ->   ln_wage1 ln_wage2 ... ln_wage32
+                             wage_month   ->   wage_month1 wage_month2 ... wage_month32
+                            hours_month   ->   hours_month1 hours_month2 ... hours_month32
+-----------------------------------------------------------------------------
+
+. 
+. * Synthetic: average of control sectors
+. egen synth_simple = rowmean(ln_wage2 ln_wage5 ln_wage6 ln_wage7 ln_wage9 ln_wage10 ln_wage14)
+
+. 
+. * Adjust to match pre-period
+. sum ln_wage8 if year <= 2013
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+    ln_wage8 |          4    9.112216    .1364589   8.918281   9.225834
+
+. local agri_pre = r(mean)
+
+. sum synth_simple if year <= 2013
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+synth_simple |          4    9.592084    .1534789   9.411359   9.754972
+
+. local synth_pre = r(mean)
+
+. local adjust = `agri_pre' - `synth_pre'
+
+. 
+. gen synth_adjusted = synth_simple + `adjust'
+
+. 
+. * Calculate gap
+. gen gap = ln_wage8 - synth_adjusted
+
+. 
+. twoway (line ln_wage8 year, lcolor(navy) lpattern(solid) lwidth(medthick)) ///
+>        (line synth_adjusted year, lcolor(maroon) lpattern(dash) lwidth(medthick)), ///
+>     xline(2014, lcolor(red) lpattern(dash)) ///
+>     xlabel(2010(2)2023) ///
+>     ylabel(, format(%9.2f)) ///
+>     xtitle("Year") ///
+>     ytitle("Mean Log Wage") ///
+>     title("Synthetic Control: Agriculture vs. Synthetic") ///
+>     legend(order(1 "Agriculture (actual)" 2 "Synthetic control") ///
+>         position(6) rows(1)) ///
+>     note("Synthetic: average of manufacturing, construction, transport, government, education, trade."
+> ) ///
+>     scheme(s2color)
+
+. graph export "output/figures/synthetic_control.png", replace width(1200)
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/synthetic_control.png saved as PNG format
+
+. graph export "output/figures/synthetic_control.pdf", replace
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/synthetic_control.pdf saved as PDF format
+
+. 
+. list year ln_wage8 synth_adjusted gap
+
+     +----------------------------------------+
+     | year   ln_wage8   synth_~d         gap |
+     |----------------------------------------|
+  1. | 2010   8.918281   8.931491   -.0132103 |
+  2. | 2011   9.119836   9.045921    .0739145 |
+  3. | 2012   9.184915   9.196347   -.0114326 |
+  4. | 2013   9.225834   9.275105   -.0492706 |
+  5. | 2014   9.421116   9.350295    .0708208 |
+     |----------------------------------------|
+  6. | 2015   9.540637   9.402127    .1385098 |
+  7. | 2016   9.589513   9.441719    .1477938 |
+  8. | 2017   9.683886   9.526275    .1576109 |
+  9. | 2018   9.831056   9.592553    .2385025 |
+ 10. | 2019   9.923994   9.689832    .2341623 |
+     |----------------------------------------|
+ 11. | 2020   9.986006   9.716752    .2692537 |
+ 12. | 2021   10.09623   9.805326    .2909031 |
+ 13. | 2022    10.2311   9.909816    .3212891 |
+ 14. | 2023   10.34919   10.06186    .2873287 |
+     +----------------------------------------+
+
+. export delimited year ln_wage8 synth_adjusted gap using "output/tables/synthetic_control_gap.csv", rep
+> lace
+(file output/tables/synthetic_control_gap.csv not found)
+file output/tables/synthetic_control_gap.csv saved
+
+. 
+. restore
+
+. 
+. ********************************************************************************
+. * PART 6: Structural Break Test (Pre/Post 2022)
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 6: Pre/Post 2022 Structural Break"
+PART 6: Pre/Post 2022 Structural Break
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. * Period indicators
+. gen period = 1 if year >= 2010 & year <= 2013
+(70,081 missing values generated)
+
+. replace period = 2 if year >= 2014 & year <= 2019
+(43,034 real changes made)
+
+. replace period = 3 if year >= 2020 & year <= 2021
+(13,462 real changes made)
+
+. replace period = 4 if year >= 2022
+(13,585 real changes made)
+
+. 
+. gen agri_p2 = agri * (period == 2)
+
+. gen agri_p3 = agri * (period == 3)
+
+. gen agri_p4 = agri * (period == 4)
+
+. 
+. eststo clear
+
+. 
+. * (1) Single post-treatment effect
+. eststo brk1: reghdfe ln_wage agri_post, ///
+>     absorb(idind year) cluster(region)
+(dropped 5606 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     99,536
+Absorbing 2 HDFE groups                           F(   1,     38) =       2.48
+Statistics robust to heteroskedasticity           Prob > F        =     0.1235
+                                                  R-squared       =     0.8062
+                                                  Adj R-squared   =     0.7677
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         39         Root MSE        =     0.3469
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0358967    .022789     1.58   0.124    -.0102372    .0820305
+       _cons |   9.934851   .0005582  1.8e+04   0.000     9.933721    9.935981
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     16466       16466           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (2) Separate by period
+. eststo brk2: reghdfe ln_wage agri_p2 agri_p3 agri_p4, ///
+>     absorb(idind year) cluster(region)
+(dropped 5606 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     99,536
+Absorbing 2 HDFE groups                           F(   3,     38) =       3.13
+Statistics robust to heteroskedasticity           Prob > F        =     0.0369
+                                                  R-squared       =     0.8062
+                                                  Adj R-squared   =     0.7677
+                                                  Within R-sq.    =     0.0003
+Number of clusters (region)  =         39         Root MSE        =     0.3469
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     agri_p2 |   .0121579   .0244932     0.50   0.622    -.0374261    .0617419
+     agri_p3 |   .0704808   .0265483     2.65   0.012     .0167366     .124225
+     agri_p4 |   .0936839   .0373737     2.51   0.017     .0180249     .169343
+       _cons |     9.9348   .0005772  1.7e+04   0.000     9.933632    9.935969
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     16466       16466           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * Test structural break
+. reghdfe ln_wage agri_p2 agri_p3 agri_p4, absorb(idind year) cluster(region)
+(dropped 5606 singleton observations)
+(MWFE estimator converged in 8 iterations)
+
+HDFE Linear regression                            Number of obs   =     99,536
+Absorbing 2 HDFE groups                           F(   3,     38) =       3.13
+Statistics robust to heteroskedasticity           Prob > F        =     0.0369
+                                                  R-squared       =     0.8062
+                                                  Adj R-squared   =     0.7677
+                                                  Within R-sq.    =     0.0003
+Number of clusters (region)  =         39         Root MSE        =     0.3469
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     agri_p2 |   .0121579   .0244932     0.50   0.622    -.0374261    .0617419
+     agri_p3 |   .0704808   .0265483     2.65   0.012     .0167366     .124225
+     agri_p4 |   .0936839   .0373737     2.51   0.017     .0180249     .169343
+       _cons |     9.9348   .0005772  1.7e+04   0.000     9.933632    9.935969
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     16466       16466           0    *|
+        year |        14           0          14     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. test agri_p2 == agri_p4
+
+ ( 1)  agri_p2 - agri_p4 = 0
+
+       F(  1,    38) =    6.25
+            Prob > F =    0.0169
+
+. local pval_diff = r(p)
+
+. di "P-value for H0: Effect(2014-19) = Effect(2022+): `pval_diff'"
+P-value for H0: Effect(2014-19) = Effect(2022+): .0168764250736941
+
+. 
+. * (3) Primary: 2010-2019
+. preserve
+
+. keep if year <= 2019
+(27,047 observations deleted)
+
+. eststo brk3: reghdfe ln_wage agri_post, ///
+>     absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3176
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0310473   .0306432     1.01   0.318    -.0310417    .0931363
+       _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. restore
+
+. 
+. * (4) Post-2014 only
+. preserve
+
+. keep if year >= 2014
+(35,061 observations deleted)
+
+. gen post_2022 = (year >= 2022)
+
+. gen agri_post22 = agri * post_2022
+
+. eststo brk4: reghdfe ln_wage agri_post22, ///
+>     absorb(idind year) cluster(region)
+(dropped 3387 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     66,694
+Absorbing 2 HDFE groups                           F(   1,     38) =       2.76
+Statistics robust to heteroskedasticity           Prob > F        =     0.1052
+                                                  R-squared       =     0.8063
+                                                  Adj R-squared   =     0.7634
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         39         Root MSE        =     0.3183
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ agri_post22 |   .0372774   .0224581     1.66   0.105    -.0081867    .0827415
+       _cons |   10.11696   .0001465  6.9e+04   0.000     10.11666    10.11725
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     12071       12071           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. restore
+
+. 
+. esttab brk1 brk2 brk3 brk4 using "output/tables/table14_structural_break.tex", ///
+>     replace booktabs label ///
+>     title("Pre vs. Post 2022: Structural Break Analysis") ///
+>     mtitles("Pooled" "By Period" "2010-2019" "Post-2014 Only") ///
+>     keep(agri_post agri_p2 agri_p3 agri_p4 agri_post22) ///
+>     stats(N r2_a, labels("Observations" "Adj. R-squared")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(3) b(3)
+(file output/tables/table14_structural_break.tex not found)
+(output written to output/tables/table14_structural_break.tex)
+
+. 
+. esttab brk1 brk2 brk3 brk4 using "output/tables/table14_structural_break.csv", ///
+>     replace csv label
+(file output/tables/table14_structural_break.csv not found)
+(output written to output/tables/table14_structural_break.csv)
+
+. 
+. ********************************************************************************
+. * PART 7: Sample Diagnostics
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 7: Sample Diagnostics"
+PART 7: Sample Diagnostics
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. di "=== SAMPLE SIZE DIAGNOSTICS ==="
+=== SAMPLE SIZE DIAGNOSTICS ===
+
+. tab year agri
+
+           |  Agriculture sector
+      Year |         0          1 |     Total
+-----------+----------------------+----------
+      2010 |     8,181        430 |     8,611 
+      2011 |     8,308        422 |     8,730 
+      2012 |     8,616        413 |     9,029 
+      2013 |     8,323        368 |     8,691 
+      2014 |     7,086        273 |     7,359 
+      2015 |     6,897        253 |     7,150 
+      2016 |     7,036        261 |     7,297 
+      2017 |     6,990        276 |     7,266 
+      2018 |     6,739        264 |     7,003 
+      2019 |     6,715        244 |     6,959 
+      2020 |     6,443        242 |     6,685 
+      2021 |     6,544        233 |     6,777 
+      2022 |     6,601        224 |     6,825 
+      2023 |     6,524        236 |     6,760 
+-----------+----------------------+----------
+     Total |   101,003      4,139 |   105,142 
+
+. di ""
+
+
+. di "Unique individuals total:"
+Unique individuals total:
+
+. distinct idind

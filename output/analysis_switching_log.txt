@@ -1,0 +1,1267 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/analysis_switching_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 11:22:19
+
+. 
+. ********************************************************************************
+. * PART 1: Prepare Panel for Transition Analysis
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 1: Prepare Transition Panel"
+PART 1: Prepare Transition Panel
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. * Sort by individual and year
+. sort idind year
+
+. 
+. * Create lagged industry
+. by idind: gen industry_lag = industry[_n-1]
+(22,072 missing values generated)
+
+. by idind: gen agri_lag = agri[_n-1]
+(22,072 missing values generated)
+
+. by idind: gen year_lag = year[_n-1]
+(22,072 missing values generated)
+
+. 
+. * Only keep observations where we have prior year
+. keep if industry_lag != . & agri_lag != .
+(22,072 observations deleted)
+
+. 
+. * Transition indicators
+. gen switch_into_agri = (agri == 1 & agri_lag == 0)
+
+. gen switch_out_agri = (agri == 0 & agri_lag == 1)
+
+. gen stay_in_agri = (agri == 1 & agri_lag == 1)
+
+. gen stay_out_agri = (agri == 0 & agri_lag == 0)
+
+. 
+. label var switch_into_agri "Switched into agriculture"
+
+. label var switch_out_agri "Switched out of agriculture"
+
+. 
+. * Summary
+. di "Switching rates by year:"
+Switching rates by year:
+
+. tab year switch_into_agri, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+           |     Switched into
+           |      agriculture
+      Year |         0          1 |     Total
+-----------+----------------------+----------
+      2011 |     5,830         47 |     5,877 
+           |     99.20       0.80 |    100.00 
+-----------+----------------------+----------
+      2012 |     6,727         61 |     6,788 
+           |     99.10       0.90 |    100.00 
+-----------+----------------------+----------
+      2013 |     7,087         52 |     7,139 
+           |     99.27       0.73 |    100.00 
+-----------+----------------------+----------
+      2014 |     6,395         40 |     6,435 
+           |     99.38       0.62 |    100.00 
+-----------+----------------------+----------
+      2015 |     6,338         37 |     6,375 
+           |     99.42       0.58 |    100.00 
+-----------+----------------------+----------
+      2016 |     6,528         42 |     6,570 
+           |     99.36       0.64 |    100.00 
+-----------+----------------------+----------
+      2017 |     6,500         47 |     6,547 
+           |     99.28       0.72 |    100.00 
+-----------+----------------------+----------
+      2018 |     6,312         51 |     6,363 
+           |     99.20       0.80 |    100.00 
+-----------+----------------------+----------
+      2019 |     6,349         40 |     6,389 
+           |     99.37       0.63 |    100.00 
+-----------+----------------------+----------
+      2020 |     6,057         34 |     6,091 
+           |     99.44       0.56 |    100.00 
+-----------+----------------------+----------
+      2021 |     6,196         33 |     6,229 
+           |     99.47       0.53 |    100.00 
+-----------+----------------------+----------
+      2022 |     6,017         40 |     6,057 
+           |     99.34       0.66 |    100.00 
+-----------+----------------------+----------
+      2023 |     6,161         49 |     6,210 
+           |     99.21       0.79 |    100.00 
+-----------+----------------------+----------
+     Total |    82,497        573 |    83,070 
+           |     99.31       0.69 |    100.00 
+
+. tab year switch_out_agri, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+           |    Switched out of
+           |      agriculture
+      Year |         0          1 |     Total
+-----------+----------------------+----------
+      2011 |     5,829         48 |     5,877 
+           |     99.18       0.82 |    100.00 
+-----------+----------------------+----------
+      2012 |     6,711         77 |     6,788 
+           |     98.87       1.13 |    100.00 
+-----------+----------------------+----------
+      2013 |     7,074         65 |     7,139 
+           |     99.09       0.91 |    100.00 
+-----------+----------------------+----------
+      2014 |     6,366         69 |     6,435 
+           |     98.93       1.07 |    100.00 
+-----------+----------------------+----------
+      2015 |     6,338         37 |     6,375 
+           |     99.42       0.58 |    100.00 
+-----------+----------------------+----------
+      2016 |     6,529         41 |     6,570 
+           |     99.38       0.62 |    100.00 
+-----------+----------------------+----------
+      2017 |     6,516         31 |     6,547 
+           |     99.53       0.47 |    100.00 
+-----------+----------------------+----------
+      2018 |     6,316         47 |     6,363 
+           |     99.26       0.74 |    100.00 
+-----------+----------------------+----------
+      2019 |     6,338         51 |     6,389 
+           |     99.20       0.80 |    100.00 
+-----------+----------------------+----------
+      2020 |     6,049         42 |     6,091 
+           |     99.31       0.69 |    100.00 
+-----------+----------------------+----------
+      2021 |     6,182         47 |     6,229 
+           |     99.25       0.75 |    100.00 
+-----------+----------------------+----------
+      2022 |     6,001         56 |     6,057 
+           |     99.08       0.92 |    100.00 
+-----------+----------------------+----------
+      2023 |     6,173         37 |     6,210 
+           |     99.40       0.60 |    100.00 
+-----------+----------------------+----------
+     Total |    82,422        648 |    83,070 
+           |     99.22       0.78 |    100.00 
+
+. 
+. save "output/rlms_transitions.dta", replace
+(file output/rlms_transitions.dta not found)
+file output/rlms_transitions.dta saved
+
+. 
+. ********************************************************************************
+. * PART 2: Aggregate Switching Rates Over Time
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 2: Switching Rates by Year"
+PART 2: Switching Rates by Year
+
+. di as text "=========================================="
+==========================================
+
+. 
+. * Calculate switching rates by year
+. preserve
+
+. 
+. * For switching INTO: base is non-agri workers
+. keep if agri_lag == 0
+(3,349 observations deleted)
+
+. collapse (mean) switch_rate_in = switch_into_agri (count) n_nonagri = idind, by(year)
+
+. replace switch_rate_in = switch_rate_in * 100
+(13 real changes made)
+
+. tempfile switch_in
+
+. save `switch_in'
+file /var/folders/nh/wb1gprtx2tq7s8ykylw3q82rp3jc5y/T//S_62295.000002 saved as .dta format
+
+. restore
+
+. 
+. preserve
+
+. * For switching OUT: base is agri workers
+. keep if agri_lag == 1
+(79,721 observations deleted)
+
+. collapse (mean) switch_rate_out = switch_out_agri (count) n_agri = idind, by(year)
+
+. replace switch_rate_out = switch_rate_out * 100
+(13 real changes made)
+
+. tempfile switch_out
+
+. save `switch_out'
+file /var/folders/nh/wb1gprtx2tq7s8ykylw3q82rp3jc5y/T//S_62295.000004 saved as .dta format
+
+. restore
+
+. 
+. * Merge
+. use `switch_in', clear
+
+. merge 1:1 year using `switch_out', nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                13  
+    -----------------------------------------
+
+. 
+. * Calculate net flow
+. gen net_rate = switch_rate_in - switch_rate_out
+
+. 
+. list year switch_rate_in switch_rate_out net_rate n_nonagri n_agri
+
+     +------------------------------------------------------------+
+     | year   switch~n   switch~t    net_rate   n_nona~i   n_agri |
+     |------------------------------------------------------------|
+  1. | 2011   .8433519   15.78947   -14.94612       5573      304 |
+  2. | 2012   .9485306   21.56863    -20.6201       6431      357 |
+  3. | 2013   .7639195   19.57831   -18.81439       6807      332 |
+  4. | 2014    .648824   25.55556   -24.90673       6165      270 |
+  5. | 2015    .602704   15.67797   -15.07526       6139      236 |
+     |------------------------------------------------------------|
+  6. | 2016   .6638217   16.87243   -16.20861       6327      243 |
+  7. | 2017   .7450856   12.97071   -12.22563       6308      239 |
+  8. | 2018    .832653    19.7479   -18.91525       6125      238 |
+  9. | 2019   .6500894   21.61017   -20.96008       6153      236 |
+ 10. | 2020   .5803038   18.10345   -17.52314       5859      232 |
+     |------------------------------------------------------------|
+ 11. | 2021   .5497251   20.79646   -20.24673       6003      226 |
+ 12. | 2022    .686224    24.5614   -23.87518       5829      228 |
+ 13. | 2023   .8163946   17.78846   -16.97207       6002      208 |
+     +------------------------------------------------------------+
+
+. 
+. * Plot switching rates
+. twoway (line switch_rate_in year, lcolor(navy) lpattern(solid) lwidth(medthick)) ///
+>        (line switch_rate_out year, lcolor(maroon) lpattern(dash) lwidth(medthick)), ///
+>     xline(2014, lcolor(red) lpattern(dash)) ///
+>     xlabel(2011(2)2023) ///
+>     ylabel(0(2)10, format(%9.1f)) ///
+>     xtitle("Year") ///
+>     ytitle("Switching Rate (%)") ///
+>     title("Industry Switching Rates Over Time") ///
+>     legend(order(1 "Into agriculture (from non-agri)" 2 "Out of agriculture (from agri)") ///
+>         position(6) rows(1)) ///
+>     note("Switching into: % of non-agri workers who moved to agri. Switching out: % of agri workers wh
+> o left.") ///
+>     scheme(s2color)
+
+. graph export "output/figures/switching_rates_time.png", replace width(1200)
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/switching_rates_time.png saved as PNG format
+
+. 
+. export delimited using "output/tables/switching_rates_by_year.csv", replace
+(file output/tables/switching_rates_by_year.csv not found)
+file output/tables/switching_rates_by_year.csv saved
+
+. 
+. ********************************************************************************
+. * PART 3: Regression Analysis of Switching
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 3: Regression - Switching Outcomes"
+PART 3: Regression - Switching Outcomes
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_transitions.dta", clear
+
+. 
+. eststo clear
+
+. 
+. * ============================================
+. * A. Probability of switching INTO agriculture
+. * Sample: Workers in non-agriculture at t-1
+. * ============================================
+. 
+. preserve
+
+. keep if agri_lag == 0
+(3,349 observations deleted)
+
+. 
+. * (1) OLS with year FE only (no individual FE to avoid collinearity)
+. eststo in1: reg switch_into_agri post i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =     79,721
+                                                F(12, 38)         =       0.90
+                                                Prob > F          =     0.5580
+                                                R-squared         =     0.0002
+                                                Root MSE          =     .08447
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+switch_int~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |  -.0002696   .0014874    -0.18   0.857    -.0032807    .0027416
+             |
+        year |
+       2012  |   .0010518   .0015717     0.67   0.507      -.00213    .0042336
+       2013  |  -.0007943   .0014751    -0.54   0.593    -.0037806     .002192
+       2014  |  -.0016757   .0014838    -1.13   0.266    -.0046796    .0013281
+       2015  |  -.0021369   .0012482    -1.71   0.095    -.0046638      .00039
+       2016  |  -.0015257   .0017618    -0.87   0.392    -.0050924    .0020409
+       2017  |  -.0007131   .0020246    -0.35   0.727    -.0048117    .0033855
+       2018  |   .0001626   .0018241     0.09   0.929      -.00353    .0038552
+       2019  |  -.0016631   .0018966    -0.88   0.386    -.0055026    .0021765
+       2020  |  -.0023609   .0013802    -1.71   0.095    -.0051551    .0004332
+       2021  |  -.0026667   .0013936    -1.91   0.063    -.0054878    .0001544
+       2022  |  -.0013017   .0012464    -1.04   0.303    -.0038249    .0012215
+       2023  |          0  (omitted)
+             |
+       _cons |   .0084335   .0017445     4.83   0.000      .004902     .011965
+------------------------------------------------------------------------------
+
+. 
+. * (2) Add demographics
+. eststo in2: reg switch_into_agri post age age_sq female i.educ_cat i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =     79,674
+                                                F(18, 38)         =       3.43
+                                                Prob > F          =     0.0007
+                                                R-squared         =     0.0023
+                                                Root MSE          =     .08441
+
+                                 (Std. err. adjusted for 39 clusters in region)
+-------------------------------------------------------------------------------
+              |               Robust
+switch_into~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+         post |  -.0002884   .0015071    -0.19   0.849    -.0033394    .0027626
+          age |   .0008128   .0002176     3.74   0.001     .0003724    .0012533
+       age_sq |  -9.25e-06   2.63e-06    -3.52   0.001    -.0000146   -3.92e-06
+       female |   -.005231   .0011938    -4.38   0.000    -.0076478   -.0028143
+              |
+     educ_cat |
+   Secondary  |   .0139393   .0040446     3.45   0.001     .0057514    .0221271
+Some college  |    .009627   .0021488     4.48   0.000     .0052769     .013977
+ University+  |   .0065756   .0014879     4.42   0.000     .0035635    .0095878
+              |
+         year |
+        2012  |    .000639   .0015428     0.41   0.681    -.0024843    .0037623
+        2013  |  -.0009092   .0014507    -0.63   0.535    -.0038461    .0020277
+        2014  |  -.0017625   .0014663    -1.20   0.237    -.0047309     .001206
+        2015  |  -.0021734   .0012597    -1.73   0.093    -.0047235    .0003767
+        2016  |  -.0016101   .0017488    -0.92   0.363    -.0051503    .0019301
+        2017  |  -.0007625   .0020011    -0.38   0.705    -.0048134    .0032884
+        2018  |   .0001605   .0018244     0.09   0.930    -.0035328    .0038538
+        2019  |  -.0017209   .0018681    -0.92   0.363    -.0055027     .002061
+        2020  |  -.0024212   .0013721    -1.76   0.086    -.0051988    .0003564
+        2021  |  -.0027241    .001395    -1.95   0.058     -.005548    .0000999
+        2022  |  -.0013793   .0012397    -1.11   0.273     -.003889    .0011303
+        2023  |          0  (omitted)
+              |
+        _cons |   -.013506   .0044037    -3.07   0.004    -.0224209   -.0045912
+-------------------------------------------------------------------------------
+
+. 
+. * (3) Add region FE
+. eststo in3: reghdfe switch_into_agri post age age_sq female i.educ_cat, ///
+>     absorb(year region) cluster(region)
+note: post is probably collinear with the fixed effects (all partialled-out values are close to zero; to
+> l = 1.0e-09)
+(MWFE estimator converged in 4 iterations)
+note: post omitted because of collinearity
+
+HDFE Linear regression                            Number of obs   =     79,674
+Absorbing 2 HDFE groups                           F(   6,     38) =       7.05
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.0144
+                                                  Adj R-squared   =     0.0137
+                                                  Within R-sq.    =     0.0018
+Number of clusters (region)  =         39         Root MSE        =     0.0839
+
+                                 (Std. err. adjusted for 39 clusters in region)
+-------------------------------------------------------------------------------
+              |               Robust
+switch_into~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+         post |          0  (omitted)
+          age |   .0006103    .000215     2.84   0.007     .0001751    .0010455
+       age_sq |  -7.12e-06   2.61e-06    -2.73   0.009    -.0000124   -1.85e-06
+       female |  -.0056349   .0012628    -4.46   0.000    -.0081912   -.0030786
+              |
+     educ_cat |
+   Secondary  |   .0150233   .0039568     3.80   0.001     .0070131    .0230336
+Some college  |   .0115083   .0032244     3.57   0.001     .0049808    .0180357
+ University+  |   .0094386    .002752     3.43   0.001     .0038675    .0150096
+              |
+        _cons |  -.0125558   .0051444    -2.44   0.019    -.0229701   -.0021415
+-------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+        year |        13           0          13     |
+      region |        39          39           0    *|
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * (4) 2010-2019 only
+. eststo in4: reg switch_into_agri post i.year if year <= 2019, cluster(region)
+note: 2019.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =     56,028
+                                                F(8, 37)          =       1.04
+                                                Prob > F          =     0.4244
+                                                R-squared         =     0.0002
+                                                Root MSE          =     .08595
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+switch_int~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |  -.0019326    .001984    -0.97   0.336    -.0059525    .0020873
+             |
+        year |
+       2012  |   .0010518   .0015723     0.67   0.508    -.0021339    .0042375
+       2013  |  -.0007943   .0014757    -0.54   0.594    -.0037843    .0021956
+       2014  |  -.0000127   .0017863    -0.01   0.994    -.0036321    .0036068
+       2015  |  -.0004739   .0015001    -0.32   0.754    -.0035133    .0025656
+       2016  |   .0001373   .0017261     0.08   0.937    -.0033601    .0036348
+       2017  |     .00095   .0010549     0.90   0.374    -.0011875    .0030874
+       2018  |   .0018256    .002016     0.91   0.371    -.0022591    .0059104
+       2019  |          0  (omitted)
+             |
+       _cons |   .0084335   .0017451     4.83   0.000     .0048977    .0119694
+------------------------------------------------------------------------------
+
+. 
+. restore
+
+. 
+. * ============================================
+. * B. Probability of switching OUT OF agriculture
+. * Sample: Workers in agriculture at t-1
+. * ============================================
+. 
+. preserve
+
+. keep if agri_lag == 1
+(79,721 observations deleted)
+
+. 
+. * (1) OLS with year FE
+. eststo out1: reg switch_out_agri post i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =      3,349
+                                                F(12, 38)         =       2.52
+                                                Prob > F          =     0.0149
+                                                R-squared         =     0.0075
+                                                Root MSE          =     .39432
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+switch_out~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |   .0199899   .0286985     0.70   0.490    -.0381073    .0780871
+             |
+        year |
+       2012  |   .0577915   .0303518     1.90   0.064    -.0036525    .1192356
+       2013  |   .0378884   .0226909     1.67   0.103    -.0080469    .0838237
+       2014  |   .0776709    .038944     1.99   0.053    -.0011671     .156509
+       2015  |   -.021105   .0318613    -0.66   0.512    -.0856048    .0433948
+       2016  |  -.0091603   .0342019    -0.27   0.790    -.0783985    .0600778
+       2017  |  -.0481775   .0330629    -1.46   0.153    -.1151099    .0187549
+       2018  |   .0195944   .0382843     0.51   0.612    -.0579081    .0970969
+       2019  |   .0382171    .036619     1.04   0.303    -.0359142    .1123484
+       2020  |   .0031499   .0279025     0.11   0.911    -.0533358    .0596355
+       2021  |     .03008   .0278709     1.08   0.287    -.0263418    .0865018
+       2022  |   .0677294   .0373176     1.81   0.077    -.0078161     .143275
+       2023  |          0  (omitted)
+             |
+       _cons |   .1578947   .0146672    10.77   0.000     .1282026    .1875869
+------------------------------------------------------------------------------
+
+. 
+. * (2) Add demographics
+. eststo out2: reg switch_out_agri post age age_sq female i.educ_cat i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =      3,348
+                                                F(18, 38)         =      10.23
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0259
+                                                Root MSE          =     .39082
+
+                                 (Std. err. adjusted for 39 clusters in region)
+-------------------------------------------------------------------------------
+              |               Robust
+switch_out_~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+         post |   .0288201   .0292662     0.98   0.331    -.0304262    .0880665
+          age |  -.0037808   .0058775    -0.64   0.524    -.0156792    .0081175
+       age_sq |  -1.23e-07   .0000649    -0.00   0.998    -.0001314    .0001312
+       female |   .0138127   .0176484     0.78   0.439    -.0219147      .04954
+              |
+     educ_cat |
+   Secondary  |   .1790047   .0317565     5.64   0.000      .114717    .2432924
+Some college  |   .2339606   .0385796     6.06   0.000     .1558603    .3120608
+ University+  |   .2640018   .0319255     8.27   0.000     .1993721    .3286316
+              |
+         year |
+        2012  |   .0631727   .0298098     2.12   0.041     .0028259    .1235196
+        2013  |   .0372264   .0221158     1.68   0.101    -.0075446    .0819975
+        2014  |   .0666847   .0379521     1.76   0.087    -.0101452    .1435147
+        2015  |  -.0269966   .0328643    -0.82   0.417    -.0935269    .0395338
+        2016  |  -.0171116   .0351277    -0.49   0.629     -.088224    .0540007
+        2017  |  -.0522323   .0326258    -1.60   0.118    -.1182798    .0138152
+        2018  |   .0149347   .0379097     0.39   0.696    -.0618094    .0916788
+        2019  |   .0316503   .0364194     0.87   0.390     -.042077    .1053776
+        2020  |  -.0049615    .027917    -0.18   0.860    -.0614765    .0515534
+        2021  |   .0213596   .0276928     0.77   0.445    -.0347015    .0774207
+        2022  |   .0610626   .0380225     1.61   0.117    -.0159099     .138035
+        2023  |          0  (omitted)
+              |
+        _cons |   .0874607    .126767     0.69   0.494    -.1691657    .3440872
+-------------------------------------------------------------------------------
+
+. 
+. * (3) 2010-2019
+. eststo out3: reg switch_out_agri post i.year if year <= 2019, cluster(region)
+note: 2019.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =      2,455
+                                                F(8, 37)          =       2.27
+                                                Prob > F          =     0.0436
+                                                R-squared         =     0.0083
+                                                Root MSE          =     .39124
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+switch_out~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |    .058207    .033653     1.73   0.092    -.0099806    .1263945
+             |
+        year |
+       2012  |   .0577915   .0303574     1.90   0.065    -.0037184    .1193014
+       2013  |   .0378884   .0226951     1.67   0.103    -.0080962     .083873
+       2014  |   .0394539   .0331289     1.19   0.241    -.0276716    .1065793
+       2015  |   -.059322   .0274345    -2.16   0.037    -.1149096   -.0037344
+       2016  |  -.0473774   .0324865    -1.46   0.153    -.1132014    .0184466
+       2017  |  -.0863946   .0378098    -2.28   0.028    -.1630046   -.0097846
+       2018  |  -.0186227   .0352906    -0.53   0.601    -.0901283    .0528829
+       2019  |          0  (omitted)
+             |
+       _cons |   .1578947   .0146699    10.76   0.000     .1281707    .1876188
+------------------------------------------------------------------------------
+
+. 
+. restore
+
+. 
+. * ============================================
+. * C. Combined table
+. * ============================================
+. 
+. esttab in1 in2 in3 in4 using "output/tables/table15_switch_into.tex", ///
+>     replace booktabs label ///
+>     title("Probability of Switching INTO Agriculture") ///
+>     mtitles("Year FE" "+ Demographics" "+ Region FE" "2010-2019") ///
+>     keep(post) ///
+>     stats(N r2, labels("Observations" "R-squared")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(4) b(4)
+(file output/tables/table15_switch_into.tex not found)
+(output written to output/tables/table15_switch_into.tex)
+
+. 
+. esttab in1 in2 in3 in4 using "output/tables/table15_switch_into.csv", ///
+>     replace csv label
+(file output/tables/table15_switch_into.csv not found)
+(output written to output/tables/table15_switch_into.csv)
+
+. 
+. esttab out1 out2 out3 using "output/tables/table16_switch_out.tex", ///
+>     replace booktabs label ///
+>     title("Probability of Switching OUT OF Agriculture") ///
+>     mtitles("Year FE" "+ Demographics" "2010-2019") ///
+>     keep(post) ///
+>     stats(N r2, labels("Observations" "R-squared")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(4) b(4)
+(file output/tables/table16_switch_out.tex not found)
+(output written to output/tables/table16_switch_out.tex)
+
+. 
+. esttab out1 out2 out3 using "output/tables/table16_switch_out.csv", ///
+>     replace csv label
+(file output/tables/table16_switch_out.csv not found)
+(output written to output/tables/table16_switch_out.csv)
+
+. 
+. ********************************************************************************
+. * PART 4: Event Study for Switching
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 4: Event Study - Switching Into Agri"
+PART 4: Event Study - Switching Into Agri
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_transitions.dta", clear
+
+. keep if agri_lag == 0
+(3,349 observations deleted)
+
+. 
+. * Event time dummies
+. forval t = -3/9 {
+  2.     if `t' < 0 {
+  3.         local tname = "m" + string(abs(`t'))
+  4.     }
+  5.     else {
+  6.         local tname = "p" + string(`t')
+  7.     }
+  8.     gen E_`tname' = (event_time == `t')
+  9. }
+
+. * Omit t=-1 as reference
+. drop E_m1
+
+. 
+. * Event study regression
+. reg switch_into_agri E_m3 E_m2 E_p0 E_p1 E_p2 E_p3 E_p4 E_p5 E_p6 E_p7 E_p8 E_p9 i.region, cluster(reg
+> ion)
+
+Linear regression                               Number of obs     =     79,721
+                                                F(11, 38)         =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.0126
+                                                Root MSE          =     .08397
+
+                                                         (Std. err. adjusted for 39 clusters in region)
+-------------------------------------------------------------------------------------------------------
+                                      |               Robust
+                     switch_into_agri | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------------------------+----------------------------------------------------------------
+                                 E_m3 |   .0005878   .0013791     0.43   0.672    -.0022042    .0033797
+                                 E_m2 |   .0018238   .0018537     0.98   0.331    -.0019288    .0055764
+                                 E_p0 |  -.0009778   .0012548    -0.78   0.441    -.0035181    .0015625
+                                 E_p1 |  -.0014074   .0012831    -1.10   0.280    -.0040049    .0011901
+                                 E_p2 |  -.0007472   .0015417    -0.48   0.631    -.0038682    .0023738
+                                 E_p3 |   .0002942   .0017924     0.16   0.870    -.0033343    .0039228
+                                 E_p4 |   .0010745   .0018404     0.58   0.563    -.0026512    .0048003
+                                 E_p5 |   -.000717   .0017958    -0.40   0.692    -.0043525    .0029185
+                                 E_p6 |  -.0015998   .0011561    -1.38   0.174    -.0039402    .0007406
+                                 E_p7 |  -.0016606   .0012086    -1.37   0.178    -.0041073    .0007861
+                                 E_p8 |  -.0002952   .0012592    -0.23   0.816    -.0028442    .0022539
+                                 E_p9 |   .0010492   .0013467     0.78   0.441    -.0016771    .0037754
+                                      |
+                               region |
+                        Krasnodar CR  |  -.0115514   .0000552  -209.15   0.000    -.0116632   -.0114396
+              Udmurt ASSR: Glasov CR  |    .003055   .0000336    90.82   0.000     .0029869     .003123
+Perm Territory: Solikamsk City & R..  |   -.010341   .0000588  -175.88   0.000      -.01046    -.010222
+ Kaluzhskaya Oblast: Kuibyshev Rajon  |   .0032729    .000045    72.72   0.000     .0031818     .003364
+           Tambov Oblast: Uvarovo CR  |   .0040781   .0000387   105.31   0.000     .0039997    .0041565
+ Volgograd Oblast: Rudnjanskij Rajon  |   .0127577   .0000371   343.90   0.000     .0126826    .0128328
+              Tatarskaja ASSR: Kazan  |  -.0126937   .0000469  -270.72   0.000    -.0127887   -.0125988
+                              Kurgan  |  -.0118019   .0000649  -181.93   0.000    -.0119332   -.0116705
+               Orenburg Oblast: Orsk  |  -.0141461   .0000631  -224.18   0.000    -.0142739   -.0140184
+     Chuvashskaya ASSR: Shumerlja CR  |  -.0072742   .0000451  -161.23   0.000    -.0073656   -.0071829
+ Stavropolskij Kraj: Georgievskij CR  |  -.0018897   .0000733   -25.77   0.000    -.0020382   -.0017413
+    Altaiskij Kraj: Kur`inskij Rajon  |   .0076877   .0000393   195.43   0.000      .007608    .0077673
+    Krasnojarskij Kraij: Krasnojarsk  |   -.009853   .0000574  -171.52   0.000    -.0099693   -.0097367
+            Kalinin Oblast: Rzhev CR  |  -.0092043   .0000428  -214.95   0.000     -.009291   -.0091176
+                          Saratov CR  |  -.0136459   .0000482  -282.82   0.000    -.0137435   -.0135482
+                               Tomsk  |  -.0136707   .0000606  -225.73   0.000    -.0137933   -.0135481
+       Lipetskaya Oblast: Lipetsk CR  |  -.0118546   .0000596  -198.76   0.000    -.0119753   -.0117338
+    Krasnojarskij Kraij: Nazarovo CR  |  -.0065814   .0000578  -113.81   0.000    -.0066985   -.0064643
+Kabardino-Balkarija, Zol `skij Rajon  |   .0056945   .0001439    39.59   0.000     .0054033    .0059857
+            Altaiskij Kraj: Biisk CR  |  -.0001625   .0000554    -2.94   0.006    -.0002746   -.0000504
+    Komi-ASSR: Usinsk CR (1994-2019)  |  -.0143209   .0001591   -90.01   0.000     -.014643   -.0139988
+                         Vladivostok  |  -.0116398    .000081  -143.78   0.000    -.0118037   -.0114759
+  Amurskaja Oblast: Tambovskii Rajon  |   .0480133    .000052   922.97   0.000      .047908    .0481186
+Saratov Oblast: Volskij Gorosovet ..  |  -.0076923    .000035  -220.03   0.000     -.007763   -.0076215
+                Komi-ASSR: Syktyvkar  |  -.0097765   .0000498  -196.27   0.000    -.0098773   -.0096756
+                         Cheliabinsk  |  -.0117351   .0000619  -189.53   0.000    -.0118604   -.0116097
+Cheliabinsk Oblast:  Krasnoarmeisk..  |  -.0074809    .000026  -287.85   0.000    -.0075335   -.0074283
+Gorkovskaja Oblast: Nizhnij Novgorod  |  -.0102063   .0000921  -110.87   0.000    -.0103926   -.0100199
+Penzenskaya Oblast: Zemetchinskij ..  |   .0101737   .0000473   214.94   0.000     .0100779    .0102695
+Krasnodarskij Kraj: Kushchevskij R..  |  -.0000106   .0000214    -0.50   0.623    -.0000539    .0000327
+                         Smolensk CR  |   -.010351   .0000527  -196.23   0.000    -.0104578   -.0102443
+               Tulskaja Oblast: Tula  |  -.0135663   .0000701  -193.56   0.000    -.0137082   -.0134244
+              Rostov Oblast: Batajsk  |  -.0100695   .0001299   -77.53   0.000    -.0103324   -.0098066
+                         Moscow City  |    -.01232   .0000691  -178.23   0.000    -.0124599   -.0121801
+                 St. Petersburg City  |  -.0131951   .0000902  -146.23   0.000    -.0133778   -.0130124
+                       Moscow Oblast  |  -.0106257    .000051  -208.32   0.000    -.0107289   -.0105224
+Novosibirskaya Oblast: Berdsk Cit..)  |  -.0112505   .0000598  -188.08   0.000    -.0113716   -.0111294
+Komi-ASSR: Pechora CR (2020-present)  |  -.0140496   .0006008   -23.39   0.000    -.0152658   -.0128334
+                                      |
+                                _cons |   .0143186   .0009553    14.99   0.000     .0123848    .0162525
+-------------------------------------------------------------------------------------------------------
+
+. 
+. matrix b_sw = e(b)
+
+. matrix V_sw = e(V)
+
+. 
+. * Create plot data
+. preserve
+
+. clear
+
+. set obs 12
+Number of observations (_N) was 0, now 12.
+
+. gen event_time = .
+(12 missing values generated)
+
+. replace event_time = -3 in 1
+(1 real change made)
+
+. replace event_time = -2 in 2
+(1 real change made)
+
+. replace event_time = 0 in 3
+(1 real change made)
+
+. replace event_time = 1 in 4
+(1 real change made)
+
+. replace event_time = 2 in 5
+(1 real change made)
+
+. replace event_time = 3 in 6
+(1 real change made)
+
+. replace event_time = 4 in 7
+(1 real change made)
+
+. replace event_time = 5 in 8
+(1 real change made)
+
+. replace event_time = 6 in 9
+(1 real change made)
+
+. replace event_time = 7 in 10
+(1 real change made)
+
+. replace event_time = 8 in 11
+(1 real change made)
+
+. replace event_time = 9 in 12
+(1 real change made)
+
+. 
+. gen coef = .
+(12 missing values generated)
+
+. gen se = .
+(12 missing values generated)
+
+. 
+. forval i = 1/12 {
+  2.     replace coef = b_sw[1, `i'] in `i'
+  3.     replace se = sqrt(V_sw[`i', `i']) in `i'
+  4. }
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+
+. 
+. * Add reference period
+. set obs 13
+Number of observations (_N) was 12, now 13.
+
+. replace event_time = -1 in 13
+(1 real change made)
+
+. replace coef = 0 in 13
+(1 real change made)
+
+. replace se = 0 in 13
+(1 real change made)
+
+. sort event_time
+
+. 
+. * Scale to percentage points
+. replace coef = coef * 100
+(12 real changes made)
+
+. replace se = se * 100
+(12 real changes made)
+
+. 
+. gen ci_lo = coef - 1.96*se
+
+. gen ci_hi = coef + 1.96*se
+
+. 
+. twoway (rcap ci_lo ci_hi event_time, lcolor(navy)) ///
+>        (scatter coef event_time, mcolor(navy) msymbol(circle)), ///
+>     xline(-0.5, lcolor(red) lpattern(dash)) ///
+>     yline(0, lcolor(gray) lpattern(solid)) ///
+>     xlabel(-3(1)9) ///
+>     ylabel(-1(0.5)1.5, format(%9.1f)) ///
+>     xtitle("Years Relative to 2014 Food Embargo") ///
+>     ytitle("Change in P(Switch to Agri) (pp)") ///
+>     title("Event Study: Switching Into Agriculture") ///
+>     note("Sample: Workers not in agriculture in t-1. Reference: 2013.") ///
+>     legend(off) ///
+>     scheme(s2color)
+
+. graph export "output/figures/event_study_switch_into.png", replace width(1200)
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/event_study_switch_into.png saved as PNG format
+
+. graph export "output/figures/event_study_switch_into.pdf", replace
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/figures/event_study_switch_into.pdf saved as PDF format
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 5: Employment in Agriculture (Level)
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 5: P(Employed in Agriculture)"
+PART 5: P(Employed in Agriculture)
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. 
+. eststo clear
+
+. 
+. * Cross-sectional probability of being in agriculture
+. eststo emp1: reg agri post i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =    105,142
+                                                F(13, 38)         =       3.05
+                                                Prob > F          =     0.0037
+                                                R-squared         =     0.0008
+                                                Root MSE          =      .1944
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+        agri | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |  -.0150249   .0050961    -2.95   0.005    -.0253414   -.0047084
+             |
+        year |
+       2011  |  -.0015971    .002941    -0.54   0.590    -.0075508    .0043566
+       2012  |  -.0041946   .0026898    -1.56   0.127    -.0096399    .0012507
+       2013  |  -.0075935    .003617    -2.10   0.042    -.0149156   -.0002713
+       2014  |   .0021862   .0037675     0.58   0.565    -.0054408    .0098131
+       2015  |   .0004734   .0033715     0.14   0.889    -.0063518    .0072985
+       2016  |   .0008569    .003523     0.24   0.809     -.006275    .0079888
+       2017  |   .0030739   .0038146     0.81   0.425    -.0046483    .0107961
+       2018  |   .0027869   .0034903     0.80   0.430    -.0042789    .0098527
+       2019  |   .0001513   .0027276     0.06   0.956    -.0053704    .0056729
+       2020  |   .0012892   .0023422     0.55   0.585    -.0034523    .0060307
+       2021  |  -.0005302   .0018282    -0.29   0.773    -.0042313    .0031708
+       2022  |  -.0020907   .0012068    -1.73   0.091    -.0045338    .0003523
+       2023  |          0  (omitted)
+             |
+       _cons |   .0499361   .0120412     4.15   0.000       .02556    .0743123
+------------------------------------------------------------------------------
+
+. eststo emp2: reg agri post age age_sq female i.educ_cat i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =    104,987
+                                                F(19, 38)         =       5.90
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0239
+                                                Root MSE          =     .19217
+
+                                 (Std. err. adjusted for 39 clusters in region)
+-------------------------------------------------------------------------------
+              |               Robust
+         agri | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+         post |  -.0144696   .0047414    -3.05   0.004    -.0240681   -.0048711
+          age |    .001231   .0007733     1.59   0.120    -.0003344    .0027965
+       age_sq |  -4.77e-06   8.65e-06    -0.55   0.585    -.0000223    .0000127
+       female |  -.0247093   .0069417    -3.56   0.001     -.038762   -.0106567
+              |
+     educ_cat |
+   Secondary  |  -.2584378   .1212937    -2.13   0.040     -.503984   -.0128916
+Some college  |  -.3066966   .1218357    -2.52   0.016      -.55334   -.0600531
+ University+  |  -.3316011   .1244391    -2.66   0.011    -.5835148   -.0796873
+              |
+         year |
+        2011  |  -.0020199   .0029412    -0.69   0.496     -.007974    .0039342
+        2012  |  -.0074852   .0029566    -2.53   0.016    -.0134705   -.0014999
+        2013  |  -.0076285    .003581    -2.13   0.040    -.0148778   -.0003792
+        2014  |    .001664   .0032506     0.51   0.612    -.0049166    .0082446
+        2015  |   .0006828   .0032389     0.21   0.834    -.0058741    .0072396
+        2016  |   .0011933   .0034688     0.34   0.733    -.0058289    .0082154
+        2017  |   .0036731   .0037861     0.97   0.338    -.0039915    .0113376
+        2018  |   .0033217   .0032968     1.01   0.320    -.0033523    .0099956
+        2019  |   .0006124   .0026346     0.23   0.817     -.004721    .0059459
+        2020  |   .0017083   .0021697     0.79   0.436    -.0026841    .0061006
+        2021  |  -.0003678   .0017571    -0.21   0.835    -.0039248    .0031893
+        2022  |  -.0019219   .0011732    -1.64   0.110     -.004297    .0004532
+        2023  |          0  (omitted)
+              |
+        _cons |     .33783   .1261403     2.68   0.011     .0824722    .5931878
+-------------------------------------------------------------------------------
+
+. eststo emp3: reghdfe agri post, absorb(year region) cluster(region)
+note: post is probably collinear with the fixed effects (all partialled-out values are close to zero; to
+> l = 1.0e-09)
+(MWFE estimator converged in 4 iterations)
+note: post omitted because of collinearity
+
+HDFE Linear regression                            Number of obs   =    105,142
+Absorbing 2 HDFE groups                           F(   0,     38) =          .
+Statistics robust to heteroskedasticity           Prob > F        =          .
+                                                  R-squared       =     0.1166
+                                                  Adj R-squared   =     0.1161
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         39         Root MSE        =     0.1828
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+        agri | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |          0  (omitted)
+       _cons |   .0393658   6.62e-14  5.9e+11   0.000     .0393658    .0393658
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+        year |        14           0          14     |
+      region |        39          39           0    *|
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. esttab emp1 emp2 emp3 using "output/tables/table17_emp_agri.tex", ///
+>     replace booktabs label ///
+>     title("Probability of Being Employed in Agriculture") ///
+>     mtitles("Year FE" "+ Demographics" "+ Region FE") ///
+>     keep(post) ///
+>     stats(N r2, labels("Observations" "R-squared")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(4) b(4)
+(file output/tables/table17_emp_agri.tex not found)
+(output written to output/tables/table17_emp_agri.tex)
+
+. 
+. esttab emp1 emp2 emp3 using "output/tables/table17_emp_agri.csv", ///
+>     replace csv label
+(file output/tables/table17_emp_agri.csv not found)
+(output written to output/tables/table17_emp_agri.csv)
+
+. 
+. ********************************************************************************
+. * PART 6: Combined Summary Table
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 6: Combined Switching Results"
+PART 6: Combined Switching Results
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/rlms_transitions.dta", clear
+
+. 
+. eststo clear
+
+. 
+. * (1) P(Switch into) - from non-agri
+. preserve
+
+. keep if agri_lag == 0
+(3,349 observations deleted)
+
+. eststo comb1: reg switch_into_agri post i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =     79,721
+                                                F(12, 38)         =       0.90
+                                                Prob > F          =     0.5580
+                                                R-squared         =     0.0002
+                                                Root MSE          =     .08447
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+switch_int~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |  -.0002696   .0014874    -0.18   0.857    -.0032807    .0027416
+             |
+        year |
+       2012  |   .0010518   .0015717     0.67   0.507      -.00213    .0042336
+       2013  |  -.0007943   .0014751    -0.54   0.593    -.0037806     .002192
+       2014  |  -.0016757   .0014838    -1.13   0.266    -.0046796    .0013281
+       2015  |  -.0021369   .0012482    -1.71   0.095    -.0046638      .00039
+       2016  |  -.0015257   .0017618    -0.87   0.392    -.0050924    .0020409
+       2017  |  -.0007131   .0020246    -0.35   0.727    -.0048117    .0033855
+       2018  |   .0001626   .0018241     0.09   0.929      -.00353    .0038552
+       2019  |  -.0016631   .0018966    -0.88   0.386    -.0055026    .0021765
+       2020  |  -.0023609   .0013802    -1.71   0.095    -.0051551    .0004332
+       2021  |  -.0026667   .0013936    -1.91   0.063    -.0054878    .0001544
+       2022  |  -.0013017   .0012464    -1.04   0.303    -.0038249    .0012215
+       2023  |          0  (omitted)
+             |
+       _cons |   .0084335   .0017445     4.83   0.000      .004902     .011965
+------------------------------------------------------------------------------
+
+. local b1 = _b[post]
+
+. local se1 = _se[post]
+
+. local n1 = e(N)
+
+. restore
+
+. 
+. * (2) P(Switch out) - from agri
+. preserve
+
+. keep if agri_lag == 1
+(79,721 observations deleted)
+
+. eststo comb2: reg switch_out_agri post i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =      3,349
+                                                F(12, 38)         =       2.52
+                                                Prob > F          =     0.0149
+                                                R-squared         =     0.0075
+                                                Root MSE          =     .39432
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+switch_out~i | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |   .0199899   .0286985     0.70   0.490    -.0381073    .0780871
+             |
+        year |
+       2012  |   .0577915   .0303518     1.90   0.064    -.0036525    .1192356
+       2013  |   .0378884   .0226909     1.67   0.103    -.0080469    .0838237
+       2014  |   .0776709    .038944     1.99   0.053    -.0011671     .156509
+       2015  |   -.021105   .0318613    -0.66   0.512    -.0856048    .0433948
+       2016  |  -.0091603   .0342019    -0.27   0.790    -.0783985    .0600778
+       2017  |  -.0481775   .0330629    -1.46   0.153    -.1151099    .0187549
+       2018  |   .0195944   .0382843     0.51   0.612    -.0579081    .0970969
+       2019  |   .0382171    .036619     1.04   0.303    -.0359142    .1123484
+       2020  |   .0031499   .0279025     0.11   0.911    -.0533358    .0596355
+       2021  |     .03008   .0278709     1.08   0.287    -.0263418    .0865018
+       2022  |   .0677294   .0373176     1.81   0.077    -.0078161     .143275
+       2023  |          0  (omitted)
+             |
+       _cons |   .1578947   .0146672    10.77   0.000     .1282026    .1875869
+------------------------------------------------------------------------------
+
+. local b2 = _b[post]
+
+. local se2 = _se[post]
+
+. local n2 = e(N)
+
+. restore
+
+. 
+. * (3) P(In agriculture) - all workers
+. use "output/rlms_analysis_sample.dta", clear
+
+. eststo comb3: reg agri post i.year, cluster(region)
+note: 2023.year omitted because of collinearity.
+
+Linear regression                               Number of obs     =    105,142
+                                                F(13, 38)         =       3.05
+                                                Prob > F          =     0.0037
+                                                R-squared         =     0.0008
+                                                Root MSE          =      .1944
+
+                                (Std. err. adjusted for 39 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+        agri | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        post |  -.0150249   .0050961    -2.95   0.005    -.0253414   -.0047084
+             |
+        year |
+       2011  |  -.0015971    .002941    -0.54   0.590    -.0075508    .0043566
+       2012  |  -.0041946   .0026898    -1.56   0.127    -.0096399    .0012507
+       2013  |  -.0075935    .003617    -2.10   0.042    -.0149156   -.0002713
+       2014  |   .0021862   .0037675     0.58   0.565    -.0054408    .0098131
+       2015  |   .0004734   .0033715     0.14   0.889    -.0063518    .0072985
+       2016  |   .0008569    .003523     0.24   0.809     -.006275    .0079888
+       2017  |   .0030739   .0038146     0.81   0.425    -.0046483    .0107961
+       2018  |   .0027869   .0034903     0.80   0.430    -.0042789    .0098527
+       2019  |   .0001513   .0027276     0.06   0.956    -.0053704    .0056729
+       2020  |   .0012892   .0023422     0.55   0.585    -.0034523    .0060307
+       2021  |  -.0005302   .0018282    -0.29   0.773    -.0042313    .0031708
+       2022  |  -.0020907   .0012068    -1.73   0.091    -.0045338    .0003523
+       2023  |          0  (omitted)
+             |
+       _cons |   .0499361   .0120412     4.15   0.000       .02556    .0743123
+------------------------------------------------------------------------------
+
+. 
+. esttab comb1 comb2 comb3 using "output/tables/table18_switching_combined.tex", ///
+>     replace booktabs label ///
+>     title("Industry Switching and Employment as Outcomes") ///
+>     mtitles("P(Switch In)" "P(Switch Out)" "P(In Agri)") ///
+>     keep(post) ///
+>     stats(N r2, labels("Observations" "R-squared")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(4) b(4)
+(file output/tables/table18_switching_combined.tex not found)
+(output written to output/tables/table18_switching_combined.tex)
+
+. 
+. esttab comb1 comb2 comb3 using "output/tables/table18_switching_combined.csv", ///
+>     replace csv label
+(file output/tables/table18_switching_combined.csv not found)
+(output written to output/tables/table18_switching_combined.csv)
+
+. 
+. di ""
+
+
+. di "SUMMARY OF SWITCHING RESULTS:"
+SUMMARY OF SWITCHING RESULTS:
+
+. di "=============================="
+==============================
+
+. di "P(Switch INTO agri | was non-agri): post coef = " %6.4f `b1' " (se = " %6.4f `se1' "), N = " `n1'
+P(Switch INTO agri | was non-agri): post coef = -0.0003 (se = 0.0015), N = 79721
+
+. di "P(Switch OUT of agri | was agri):   post coef = " %6.4f `b2' " (se = " %6.4f `se2' "), N = " `n2'
+P(Switch OUT of agri | was agri):   post coef = 0.0200 (se = 0.0287), N = 3349
+
+. di ""
+
+
+. 
+. ********************************************************************************
+. * CLOSE
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "Switching Analysis Complete!"
+Switching Analysis Complete!
+
+. di as text "=========================================="
+==========================================
+
+. di as text "Tables: table15-18 (switching)"
+Tables: table15-18 (switching)
+
+. di as text "Figures: switching_rates_time, event_study_switch_into"
+Figures: switching_rates_time, event_study_switch_into
+
+. di as text "=========================================="
+==========================================
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/analysis_switching_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 11:22:48
+--------------------------------------------------------------------------------------------------------
