@@ -1,0 +1,702 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_employment_collapse_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 16:34:46
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "EMPLOYMENT COLLAPSE INVESTIGATION"
+EMPLOYMENT COLLAPSE INVESTIGATION
+
+. di "======================================================================"
+======================================================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. ********************************************************************************
+. * PART 1: Document the Collapse
+. ********************************************************************************
+. 
+. di _n "=== PART 1: DOCUMENT THE COLLAPSE ==="
+
+=== PART 1: DOCUMENT THE COLLAPSE ===
+
+. 
+. * Count agricultural workers by year
+. tab year agri, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+           |  Agriculture sector
+      Year |         0          1 |     Total
+-----------+----------------------+----------
+      2010 |     8,181        430 |     8,611 
+           |     95.01       4.99 |    100.00 
+-----------+----------------------+----------
+      2011 |     8,308        422 |     8,730 
+           |     95.17       4.83 |    100.00 
+-----------+----------------------+----------
+      2012 |     8,616        413 |     9,029 
+           |     95.43       4.57 |    100.00 
+-----------+----------------------+----------
+      2013 |     8,323        368 |     8,691 
+           |     95.77       4.23 |    100.00 
+-----------+----------------------+----------
+      2014 |     7,086        273 |     7,359 
+           |     96.29       3.71 |    100.00 
+-----------+----------------------+----------
+      2015 |     6,897        253 |     7,150 
+           |     96.46       3.54 |    100.00 
+-----------+----------------------+----------
+      2016 |     7,036        261 |     7,297 
+           |     96.42       3.58 |    100.00 
+-----------+----------------------+----------
+      2017 |     6,990        276 |     7,266 
+           |     96.20       3.80 |    100.00 
+-----------+----------------------+----------
+      2018 |     6,739        264 |     7,003 
+           |     96.23       3.77 |    100.00 
+-----------+----------------------+----------
+      2019 |     6,715        244 |     6,959 
+           |     96.49       3.51 |    100.00 
+-----------+----------------------+----------
+     Total |    74,891      3,204 |    78,095 
+           |     95.90       4.10 |    100.00 
+
+. 
+. * Summarize
+. preserve
+
+. collapse (sum) n_agri = agri (count) n_total = agri, by(year)
+
+. gen pct_agri = 100 * n_agri / n_total
+
+. list year n_agri n_total pct_agri
+
+     +------------------------------------+
+     | year   n_agri   n_total   pct_agri |
+     |------------------------------------|
+  1. | 2010      430      8611   4.993613 |
+  2. | 2011      422      8730   4.833906 |
+  3. | 2012      413      9029    4.57415 |
+  4. | 2013      368      8691   4.234265 |
+  5. | 2014      273      7359   3.709743 |
+     |------------------------------------|
+  6. | 2015      253      7150   3.538461 |
+  7. | 2016      261      7297   3.576813 |
+  8. | 2017      276      7266   3.798514 |
+  9. | 2018      264      7003   3.769813 |
+ 10. | 2019      244      6959   3.506251 |
+     +------------------------------------+
+
+. di _n "Change 2013-2014:"
+
+Change 2013-2014:
+
+. local n_2013 = n_agri[4]
+
+. local n_2014 = n_agri[5]
+
+. di "  2013: " `n_2013'
+  2013: 368
+
+. di "  2014: " `n_2014'
+  2014: 273
+
+. di "  Change: " `n_2014' - `n_2013' " (" %5.1f 100*(`n_2014'-`n_2013')/`n_2013' "%)"
+  Change: -95 (-25.8%)
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 2: Panel vs Cross-Section - Same Individuals?
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: PANEL TRACKING - ARE THESE THE SAME PEOPLE?"
+PART 2: PANEL TRACKING - ARE THESE THE SAME PEOPLE?
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Create indicator for being in sample each year
+. gen in_2013 = (year == 2013)
+
+. gen in_2014 = (year == 2014)
+
+. 
+. * For each individual, check if they appear in both years
+. bys idind: egen ever_2013 = max(in_2013)
+
+. bys idind: egen ever_2014 = max(in_2014)
+
+. 
+. * Agricultural workers in 2013
+. gen agri_2013 = (year == 2013 & agri == 1)
+
+. bys idind: egen was_agri_2013 = max(agri_2013)
+
+. 
+. * Agricultural workers in 2014
+. gen agri_2014 = (year == 2014 & agri == 1)
+
+. bys idind: egen was_agri_2014 = max(agri_2014)
+
+. 
+. * Count unique individuals
+. preserve
+
+. keep idind was_agri_2013 was_agri_2014 ever_2013 ever_2014
+
+. duplicates drop
+
+Duplicates in terms of all variables
+
+(58,483 observations deleted)
+
+. 
+. di _n "=== Individual-Level Tracking ==="
+
+=== Individual-Level Tracking ===
+
+. 
+. * How many 2013 agri workers appear in 2014?
+. count if was_agri_2013 == 1
+  368
+
+. local n_agri_2013 = r(N)
+
+. di "Individuals who were agri workers in 2013: " `n_agri_2013'
+Individuals who were agri workers in 2013: 368
+
+. 
+. count if was_agri_2013 == 1 & ever_2014 == 1
+  228
+
+. local n_agri_2013_in_2014 = r(N)
+
+. di "  ...who appear in 2014 sample: " `n_agri_2013_in_2014' " (" %5.1f 100*`n_agri_2013_
+> in_2014'/`n_agri_2013' "%)"
+  ...who appear in 2014 sample: 228 ( 62.0%)
+
+. 
+. count if was_agri_2013 == 1 & was_agri_2014 == 1
+  174
+
+. local n_stayed_agri = r(N)
+
+. di "  ...who are still in agriculture: " `n_stayed_agri' " (" %5.1f 100*`n_stayed_agri'/
+> `n_agri_2013' "%)"
+  ...who are still in agriculture: 174 ( 47.3%)
+
+. 
+. count if was_agri_2013 == 1 & ever_2014 == 1 & was_agri_2014 == 0
+  54
+
+. local n_left_agri = r(N)
+
+. di "  ...who left agriculture: " `n_left_agri' " (" %5.1f 100*`n_left_agri'/`n_agri_2013
+> ' "%)"
+  ...who left agriculture: 54 ( 14.7%)
+
+. 
+. count if was_agri_2013 == 1 & ever_2014 == 0
+  140
+
+. local n_attrited = r(N)
+
+. di "  ...who left the sample entirely: " `n_attrited' " (" %5.1f 100*`n_attrited'/`n_agr
+> i_2013' "%)"
+  ...who left the sample entirely: 140 ( 38.0%)
+
+. 
+. restore
+
+. 
+. ********************************************************************************
+. * PART 3: Compare Attrition Rates - Agri vs Non-Agri
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: DIFFERENTIAL ATTRITION?"
+PART 3: DIFFERENTIAL ATTRITION?
+
+. di "======================================================================"
+======================================================================
+
+. 
+. preserve
+
+. * Keep 2013 observations only
+. keep if year == 2013
+(69,404 observations deleted)
+
+. 
+. * Merge to see if they appear in 2014
+. rename ln_wage ln_wage_2013
+
+. rename hours_month hours_2013
+
+. keep idind agri ln_wage_2013 hours_2013 age female
+
+. 
+. tempfile sample_2013
+
+. save `sample_2013'
+file /var/folders/nh/wb1gprtx2tq7s8ykylw3q82rp3jc5y/T//S_01460.000004 saved
+
+. 
+. restore
+
+. preserve
+
+. keep if year == 2014
+(70,736 observations deleted)
+
+. keep idind
+
+. gen in_2014_sample = 1
+
+. tempfile sample_2014
+
+. save `sample_2014'
+file /var/folders/nh/wb1gprtx2tq7s8ykylw3q82rp3jc5y/T//S_01460.000006 saved
+
+. 
+. use `sample_2013', clear
+
+. merge 1:1 idind using `sample_2014', keep(1 3)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         3,171
+        from master                     3,171  (_merge==1)
+        from using                          0  (_merge==2)
+
+    matched                             5,520  (_merge==3)
+    -----------------------------------------
+
+. gen attrited = (_merge == 1)
+
+. drop _merge
+
+. 
+. di _n "=== Attrition Rates by Sector (2013 → 2014) ==="
+
+=== Attrition Rates by Sector (2013 → 2014) ===
+
+. tab agri attrited, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+Agricultur |       attrited
+  e sector |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     5,292      3,031 |     8,323 
+           |     63.58      36.42 |    100.00 
+-----------+----------------------+----------
+         1 |       228        140 |       368 
+           |     61.96      38.04 |    100.00 
+-----------+----------------------+----------
+     Total |     5,520      3,171 |     8,691 
+           |     63.51      36.49 |    100.00 
+
+. 
+. * Test for differential attrition
+. di _n "=== Test: Is Attrition Different for Agri Workers? ==="
+
+=== Test: Is Attrition Different for Agri Workers? ===
+
+. reg attrited agri, robust
+
+Linear regression                               Number of obs     =      8,691
+                                                F(1, 8689)        =       0.40
+                                                Prob > F          =     0.5294
+                                                R-squared         =     0.0000
+                                                Root MSE          =     .48144
+
+------------------------------------------------------------------------------
+             |               Robust
+    attrited |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        agri |   .0162632   .0258549     0.63   0.529    -.0344185    .0669449
+       _cons |   .3641716   .0052751    69.04   0.000     .3538311    .3745121
+------------------------------------------------------------------------------
+
+. di "Coefficient on agri: " _b[agri]
+Coefficient on agri: .01626321
+
+. di "SE: " _se[agri]
+SE: .02585488
+
+. di "p-value: " 2*ttail(e(df_r), abs(_b[agri]/_se[agri]))
+p-value: .52935318
+
+. 
+. * Attrition by characteristics
+. di _n "=== Attrition by Characteristics (Agri Workers Only) ==="
+
+=== Attrition by Characteristics (Agri Workers Only) ===
+
+. reg attrited ln_wage_2013 age female if agri == 1, robust
+
+Linear regression                               Number of obs     =        368
+                                                F(3, 364)         =       3.29
+                                                Prob > F          =     0.0208
+                                                R-squared         =     0.0260
+                                                Root MSE          =     .48178
+
+------------------------------------------------------------------------------
+             |               Robust
+    attrited |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+ln_wage_2013 |  -.0906425   .0400574    -2.26   0.024    -.1694154   -.0118695
+         age |   .0023873    .002129     1.12   0.263    -.0017995     .006574
+      female |    .071625   .0546475     1.31   0.191    -.0358395    .1790894
+       _cons |   1.092195   .3893018     2.81   0.005     .3266321    1.857758
+------------------------------------------------------------------------------
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 4: Where Did They Go? Sector Transitions
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: SECTOR TRANSITIONS"
+PART 4: SECTOR TRANSITIONS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. preserve
+
+. * Keep 2013-2014 pairs
+. keep if year == 2013 | year == 2014
+(62,045 observations deleted)
+
+. 
+. * Reshape to wide
+. keep idind year agri industry ln_wage
+
+. reshape wide agri industry ln_wage, i(idind) j(year)
+(note: j = 2013 2014)
+
+Data                               long   ->   wide
+-----------------------------------------------------------------------------
+Number of obs.                    16050   ->   10530
+Number of variables                   5   ->       7
+j variable (2 values)              year   ->   (dropped)
+xij variables:
+                                   agri   ->   agri2013 agri2014
+                               industry   ->   industry2013 industry2014
+                                ln_wage   ->   ln_wage2013 ln_wage2014
+-----------------------------------------------------------------------------
+
+. 
+. * Keep only those in both years
+. keep if agri2013 != . & agri2014 != .
+(5,010 observations deleted)
+
+. 
+. di _n "=== Transition Matrix (2013 → 2014) ==="
+
+=== Transition Matrix (2013 → 2014) ===
+
+. tab agri2013 agri2014, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+           |       2014 agri
+ 2013 agri |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     5,265         27 |     5,292 
+           |     99.49       0.51 |    100.00 
+-----------+----------------------+----------
+         1 |        54        174 |       228 
+           |     23.68      76.32 |    100.00 
+-----------+----------------------+----------
+     Total |     5,319        201 |     5,520 
+           |     96.36       3.64 |    100.00 
+
+. 
+. * Where did agri workers go?
+. di _n "=== Where Did 2013 Agri Workers Go in 2014? ==="
+
+=== Where Did 2013 Agri Workers Go in 2014? ===
+
+. tab industry2014 if agri2013 == 1
+
+                          2014 industry |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+         Light Insdustry, Food Industry |          5        2.19        2.19
+                   Oil and Gas Industry |          3        1.32        3.51
+         Other Branch of Heavy Industry |          1        0.44        3.95
+                           Construction |          4        1.75        5.70
+         Transportation, Commmunication |          9        3.95        9.65
+                            Agriculture |        174       76.32       85.96
+   Government and Public Administration |          6        2.63       88.60
+                       Science, Culture |          2        0.88       89.47
+                          Public Health |          1        0.44       89.91
+Army, Ministry of Internal Affairs, Sec |          2        0.88       90.79
+               Trade, Consumer Services |          4        1.75       92.54
+                               Finances |          1        0.44       92.98
+          Housing and Communal Services |          2        0.88       93.86
+             Wood, Timber, and Forestry |         13        5.70       99.56
+   Ecology and Environmental Protection |          1        0.44      100.00
+----------------------------------------+-----------------------------------
+                                  Total |        228      100.00
+
+. 
+. * Where did 2014 agri workers come from?
+. di _n "=== Where Did 2014 Agri Workers Come From? ==="
+
+=== Where Did 2014 Agri Workers Come From? ===
+
+. tab industry2013 if agri2014 == 1
+
+                          2013 industry |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+         Light Insdustry, Food Industry |          1        0.50        0.50
+             Civil Machine Construction |          1        0.50        1.00
+         Other Branch of Heavy Industry |          1        0.50        1.49
+                           Construction |          4        1.99        3.48
+         Transportation, Commmunication |          6        2.99        6.47
+                            Agriculture |        174       86.57       93.03
+   Government and Public Administration |          2        1.00       94.03
+                              Education |          1        0.50       94.53
+                       Science, Culture |          1        0.50       95.02
+                          Public Health |          2        1.00       96.02
+Army, Ministry of Internal Affairs, Sec |          1        0.50       96.52
+               Trade, Consumer Services |          5        2.49       99.00
+          Housing and Communal Services |          2        1.00      100.00
+----------------------------------------+-----------------------------------
+                                  Total |        201      100.00
+
+. 
+. restore
+
+. 
+. ********************************************************************************
+. * PART 5: Check for Survey Design Changes
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 5: SURVEY DESIGN - NEW ENTRANTS VS PANEL"
+PART 5: SURVEY DESIGN - NEW ENTRANTS VS PANEL
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Check if there are new individuals entering in 2014
+. preserve
+
+. bys idind: egen first_year = min(year)
+
+. bys idind: egen last_year = max(year)
+
+. 
+. * New entrants in each year
+. gen new_entrant = (year == first_year)
+
+. tab year new_entrant if agri == 1, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+           |      new_entrant
+      Year |         0          1 |     Total
+-----------+----------------------+----------
+      2010 |         0        430 |       430 
+           |      0.00     100.00 |    100.00 
+-----------+----------------------+----------
+      2011 |       303        119 |       422 
+           |     71.80      28.20 |    100.00 
+-----------+----------------------+----------
+      2012 |       341         72 |       413 
+           |     82.57      17.43 |    100.00 
+-----------+----------------------+----------
+      2013 |       319         49 |       368 
+           |     86.68      13.32 |    100.00 
+-----------+----------------------+----------
+      2014 |       241         32 |       273 
+           |     88.28      11.72 |    100.00 
+-----------+----------------------+----------
+      2015 |       236         17 |       253 
+           |     93.28       6.72 |    100.00 
+-----------+----------------------+----------
+      2016 |       244         17 |       261 
+           |     93.49       6.51 |    100.00 
+-----------+----------------------+----------
+      2017 |       255         21 |       276 
+           |     92.39       7.61 |    100.00 
+-----------+----------------------+----------
+      2018 |       242         22 |       264 
+           |     91.67       8.33 |    100.00 
+-----------+----------------------+----------
+      2019 |       225         19 |       244 
+           |     92.21       7.79 |    100.00 
+-----------+----------------------+----------
+     Total |     2,406        798 |     3,204 
+           |     75.09      24.91 |    100.00 
+
+. 
+. di _n "=== Panel Tenure of Agri Workers ==="
+
+=== Panel Tenure of Agri Workers ===
+
+. gen panel_years = last_year - first_year + 1
+
+. tab panel_years if agri == 1 & year == 2013
+
+panel_years |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |         15        4.08        4.08
+          2 |         14        3.80        7.88
+          3 |         14        3.80       11.68
+          4 |         57       15.49       27.17
+          5 |         33        8.97       36.14
+          6 |         27        7.34       43.48
+          7 |         25        6.79       50.27
+          8 |         42       11.41       61.68
+          9 |         44       11.96       73.64
+         10 |         97       26.36      100.00
+------------+-----------------------------------
+      Total |        368      100.00
+
+. tab panel_years if agri == 1 & year == 2014
+
+panel_years |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |         11        4.03        4.03
+          2 |          9        3.30        7.33
+          3 |          2        0.73        8.06
+          4 |         18        6.59       14.65
+          5 |         31       11.36       26.01
+          6 |         35       12.82       38.83
+          7 |         27        9.89       48.72
+          8 |         29       10.62       59.34
+          9 |         35       12.82       72.16
+         10 |         76       27.84      100.00
+------------+-----------------------------------
+      Total |        273      100.00
+
+. 
+. restore
+
+. 
+. ********************************************************************************
+. * PART 6: Compare 2013 vs 2014 Agri Worker Characteristics
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 6: COMPOSITION CHANGES"
+PART 6: COMPOSITION CHANGES
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "=== 2013 Agricultural Workers ==="
+
+=== 2013 Agricultural Workers ===
+
+. sum age female ln_wage hours_month if agri == 1 & year == 2013
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         age |        368    42.47962    11.80179       20.5         65
+      female |        368    .3451087     .476051          0          1
+     ln_wage |        368    9.243885    .6525315   6.214608   11.51293
+ hours_month |        313    206.2588    64.95689         42        480
+
+. 
+. di _n "=== 2014 Agricultural Workers ==="
+
+=== 2014 Agricultural Workers ===
+
+. sum age female ln_wage hours_month if agri == 1 & year == 2014
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         age |        273    42.11172    12.07747       18.5       64.5
+      female |        273    .3296703    .4709567          0          1
+     ln_wage |        273    9.418563    .6848992   7.056175   12.42922
+ hours_month |        242    204.1198    63.49279         35        540
+
+. 
+. * T-test for differences
+. di _n "=== T-Tests for Composition Changes ==="
+
+=== T-Tests for Composition Changes ===
+
+. foreach var in age female ln_wage hours_month {
+  2.     di _n "Variable: `var'"
+  3.     ttest `var' if agri == 1, by(year == 2014)
+  4. }
+
+Variable: age
+== invalid name
+(error in option by())
+r(198);
+
+end of do-file
+r(198);
