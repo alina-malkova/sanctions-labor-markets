@@ -1,0 +1,743 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_subsector_log.txt
+  log type:  text
+ opened on:   7 Feb 2026, 19:39:28
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "SUB-SECTOR HETEROGENEITY ANALYSIS"
+SUB-SECTOR HETEROGENEITY ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. ********************************************************************************
+. * PART 1: Explore Available Sub-Sector Indicators
+. ********************************************************************************
+. 
+. di _n "=== PART 1: AVAILABLE SUB-SECTOR INDICATORS ==="
+
+=== PART 1: AVAILABLE SUB-SECTOR INDICATORS ===
+
+. 
+. * Check occupation codes for agricultural workers
+. di _n "=== Occupation Distribution (Agri Workers Only) ==="
+
+=== Occupation Distribution (Agri Workers Only) ===
+
+. tab occup if agri == 1
+
+         Professional group by isco2008 |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+                               Managers |        177        5.52        5.52
+                          Professionals |        229        7.15       12.67
+Technicians and associate prefessionals |        369       11.52       24.19
+               Clerical support workers |        117        3.65       27.84
+              Servece and sales workers |        310        9.68       37.52
+Skilled agricultural, forestry and fish |        101        3.15       40.67
+       Craft and related trades workers |        240        7.49       48.16
+Plant and machine operators, and assemb |      1,159       36.17       84.33
+                 Elementary occupations |        501       15.64       99.97
+                      REFUSES TO ANSWER |          1        0.03      100.00
+----------------------------------------+-----------------------------------
+                                  Total |      3,204      100.00
+
+. 
+. * Occupation categories based on value labels
+. * Looking at the tab output:
+. * - "Skilled agricultural, forestry and fish" = skilled field workers
+. * - "Plant and machine operators" = tractor/equipment operators
+. * - "Elementary occupations" = manual laborers
+. * - Others = managers, professionals, clerks, etc.
+. 
+. * Decode occupation labels to identify categories
+. decode occup, gen(occup_str)
+
+. 
+. * Create occupation-based categories
+. gen skilled_field = regexm(occup_str, "agricultural") if agri == 1
+(74,891 missing values generated)
+
+. gen machine_operators = regexm(occup_str, "machine|Plant") if agri == 1
+(74,891 missing values generated)
+
+. gen elementary = regexm(occup_str, "Elementary") if agri == 1
+(74,891 missing values generated)
+
+. gen managers_prof = regexm(occup_str, "Manager|Professional|Technician") if agri == 1
+(74,891 missing values generated)
+
+. 
+. di _n "=== Occupation Categories in Agriculture ==="
+
+=== Occupation Categories in Agriculture ===
+
+. tab skilled_field if agri == 1
+
+skilled_fie |
+         ld |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      3,103       96.85       96.85
+          1 |        101        3.15      100.00
+------------+-----------------------------------
+      Total |      3,204      100.00
+
+. tab machine_operators if agri == 1
+
+machine_ope |
+     rators |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,045       63.83       63.83
+          1 |      1,159       36.17      100.00
+------------+-----------------------------------
+      Total |      3,204      100.00
+
+. tab elementary if agri == 1
+
+ elementary |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,703       84.36       84.36
+          1 |        501       15.64      100.00
+------------+-----------------------------------
+      Total |      3,204      100.00
+
+. tab managers_prof if agri == 1
+
+managers_pr |
+         of |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,429       75.81       75.81
+          1 |        775       24.19      100.00
+------------+-----------------------------------
+      Total |      3,204      100.00
+
+. 
+. * For sub-sector proxy:
+. * Machine operators likely work in mechanized agriculture (grains, large farms)
+. * Elementary occupations may be more manual/livestock-related
+. * But this is imperfect
+. 
+. gen skilled_agri = skilled_field if agri == 1
+(74,891 missing values generated)
+
+. gen unskilled_agri = elementary if agri == 1
+(74,891 missing values generated)
+
+. gen other_agri = (skilled_field == 0 & elementary == 0) if agri == 1
+(74,891 missing values generated)
+
+. 
+. di _n "=== Skill Distribution in Agriculture ==="
+
+=== Skill Distribution in Agriculture ===
+
+. tab skilled_agri if agri == 1
+
+skilled_agr |
+          i |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      3,103       96.85       96.85
+          1 |        101        3.15      100.00
+------------+-----------------------------------
+      Total |      3,204      100.00
+
+. tab unskilled_agri if agri == 1
+
+unskilled_a |
+        gri |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,703       84.36       84.36
+          1 |        501       15.64      100.00
+------------+-----------------------------------
+      Total |      3,204      100.00
+
+. 
+. ********************************************************************************
+. * PART 2: Create Livestock vs Crop Proxy
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: LIVESTOCK VS CROP PROXY"
+PART 2: LIVESTOCK VS CROP PROXY
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * ISCO 6 detailed codes:
+. * 61 = Market-oriented skilled agricultural workers (crops)
+. * 62 = Market-oriented skilled forestry, fishery and hunting workers
+. * 63 = Subsistence farmers, fishers, hunters
+. 
+. * NOTE: Numeric ISCO codes are not available (occupation stored as labels)
+. * So we cannot do detailed sub-occupation analysis
+. * Instead, use the occupation category proxies created above
+. 
+. di _n "Sample sizes by occupation type in agriculture:"
+
+Sample sizes by occupation type in agriculture:
+
+. count if agri == 1 & skilled_agri == 1
+  101
+
+. count if agri == 1 & unskilled_agri == 1
+  501
+
+. count if agri == 1 & other_agri == 1
+  2,602
+
+. count if agri == 1 & machine_operators == 1
+  1,159
+
+. 
+. ********************************************************************************
+. * PART 3: Regional Specialization Proxy
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: REGIONAL SPECIALIZATION PROXY"
+PART 3: REGIONAL SPECIALIZATION PROXY
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Use RFSD data on regional agricultural composition
+. * Merge treatment intensity which includes livestock share
+. 
+. cap drop _merge
+
+. cap merge m:1 region using "output/treatment_intensity_region.dta", keep(1 3) nogen
+
+. 
+. * Check if we have livestock indicator
+. cap confirm variable livestock_share
+
+. if _rc == 0 {
+.     di "Livestock share variable available"
+.     sum livestock_share
+.     gen high_livestock = (livestock_share > 0.5) if livestock_share != .
+. }
+
+. else {
+.     di "Livestock share not available - creating proxy from regional names"
+Livestock share not available - creating proxy from regional names
+.     * Southern regions = more livestock/meat
+.     * Central regions = more crops/dairy
+.     gen high_livestock = 0
+.     * Krasnodar, Stavropol, Rostov = livestock regions
+.     replace high_livestock = 1 if inlist(region, 9129, 52, 137)
+(4,065 real changes made)
+. }
+
+. 
+. tab high_livestock if agri == 1
+
+high_livest |
+        ock |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      3,120       97.38       97.38
+          1 |         84        2.62      100.00
+------------+-----------------------------------
+      Total |      3,204      100.00
+
+. 
+. ********************************************************************************
+. * PART 4: Sub-Sector Effects (Underpowered but Informative)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: SUB-SECTOR EFFECTS (WITH POWER CAVEATS)"
+PART 4: SUB-SECTOR EFFECTS (WITH POWER CAVEATS)
+
+. di "======================================================================"
+======================================================================
+
+. 
+. cap drop post agri_post
+
+. gen post = (year >= 2014)
+
+. gen agri_post = agri * post
+
+. 
+. * 4A: Skilled vs Unskilled Agricultural Workers
+. di _n "=== 4A: Skilled vs Unskilled Agricultural Workers ==="
+
+=== 4A: Skilled vs Unskilled Agricultural Workers ===
+
+. 
+. * Skilled agricultural workers (ISCO 6)
+. gen skilled_post = skilled_agri * post
+(74,891 missing values generated)
+
+. count if skilled_agri == 1
+  101
+
+. local n_skilled = r(N)
+
+. 
+. quietly reghdfe ln_wage agri_post skilled_post if agri == 1 | agri == 0, absorb(idind ye
+> ar) cluster(region)
+
+. di "Skilled agri interaction: " %7.4f _b[skilled_post] " (SE: " %6.4f _se[skilled_post] 
+> ")"
+Skilled agri interaction: -0.1697 (SE: 0.1570)
+
+. di "  N skilled agri workers: `n_skilled'"
+  N skilled agri workers: 101
+
+. di "  MDE at 80% power: ~" %5.1f 0.28 * 0.65 / sqrt(`n_skilled'/10) * 100 "%"
+  MDE at 80% power: ~  5.7%
+
+. 
+. * Unskilled (ISCO 9)
+. gen unskilled_post = unskilled_agri * post
+(74,891 missing values generated)
+
+. count if unskilled_agri == 1
+  501
+
+. local n_unskilled = r(N)
+
+. 
+. quietly reghdfe ln_wage agri_post unskilled_post if agri == 1 | agri == 0, absorb(idind 
+> year) cluster(region)
+
+. di "Unskilled agri interaction: " %7.4f _b[unskilled_post] " (SE: " %6.4f _se[unskilled_
+> post] ")"
+Unskilled agri interaction:  0.0176 (SE: 0.0501)
+
+. di "  N unskilled agri workers: `n_unskilled'"
+  N unskilled agri workers: 501
+
+. 
+. * 4B: Effects by Occupation Type (Separate Regressions)
+. di _n "=== 4B: Separate Regressions by Occupation Type ==="
+
+=== 4B: Separate Regressions by Occupation Type ===
+
+. 
+. * All agri (baseline)
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. di "All agriculture: " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_post] ")"
+All agriculture:  0.0310 (SE: 0.0306)
+
+. 
+. * Skilled agri only vs non-agri
+. preserve
+
+. keep if skilled_agri == 1 | agri == 0
+(3,103 observations deleted)
+
+. gen treat_post = skilled_agri * post
+(74,891 missing values generated)
+
+. quietly reghdfe ln_wage treat_post, absorb(idind year) cluster(region)
+
+. di "Skilled agri only: " %7.4f _b[treat_post] " (SE: " %6.4f _se[treat_post] ")"
+Skilled agri only:  0.0000 (SE: 0.0000)
+
+. restore
+
+. 
+. * Unskilled agri only vs non-agri
+. preserve
+
+. keep if unskilled_agri == 1 | agri == 0
+(2,703 observations deleted)
+
+. gen treat_post = unskilled_agri * post
+(74,891 missing values generated)
+
+. quietly reghdfe ln_wage treat_post, absorb(idind year) cluster(region)
+
+. di "Unskilled agri only: " %7.4f _b[treat_post] " (SE: " %6.4f _se[treat_post] ")"
+Unskilled agri only:  0.0000 (SE: 0.0000)
+
+. restore
+
+. 
+. * 4C: Regional Livestock Specialization
+. di _n "=== 4C: By Regional Livestock Specialization ==="
+
+=== 4C: By Regional Livestock Specialization ===
+
+. 
+. * Create interaction
+. gen agri_livestock_post = agri * high_livestock * post
+
+. 
+. quietly reghdfe ln_wage agri_post agri_livestock_post, absorb(idind year) cluster(region
+> )
+
+. di "Agri x Post (non-livestock regions): " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_p
+> ost] ")"
+Agri x Post (non-livestock regions):  0.0352 (SE: 0.0312)
+
+. di "Agri x Livestock x Post (additional): " %7.4f _b[agri_livestock_post] " (SE: " %6.4f
+>  _se[agri_livestock_post] ")"
+Agri x Livestock x Post (additional): -0.1328 (SE: 0.0310)
+
+. 
+. * Separate by region type
+. preserve
+
+. keep if high_livestock == 1 | agri == 0
+(3,120 observations deleted)
+
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. di "High livestock regions only: " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_post] ")"
+High livestock regions only: -0.0966 (SE: 0.0040)
+
+. restore
+
+. 
+. preserve
+
+. keep if high_livestock == 0 | agri == 0
+(84 observations deleted)
+
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. di "Low livestock regions only: " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_post] ")"
+Low livestock regions only:  0.0353 (SE: 0.0312)
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 5: Power Analysis
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 5: POWER ANALYSIS"
+PART 5: POWER ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "=== Sample Sizes and Minimum Detectable Effects ==="
+
+=== Sample Sizes and Minimum Detectable Effects ===
+
+. di ""
+
+
+. di "Group                    | N      | MDE (80% power)"
+Group                    | N      | MDE (80% power)
+
+. di "-------------------------|--------|----------------"
+-------------------------|--------|----------------
+
+. 
+. foreach group in "All agriculture" "Skilled (ISCO 6)" "Unskilled (ISCO 9)" {
+  2.     if "`group'" == "All agriculture" {
+  3.         count if agri == 1
+  4.     }
+  5.     else if "`group'" == "Skilled (ISCO 6)" {
+  6.         count if skilled_agri == 1
+  7.     }
+  8.     else {
+  9.         count if unskilled_agri == 1
+ 10.     }
+ 11.     local n = r(N)
+ 12.     * MDE = 2.8 * SD / sqrt(N) for 80% power
+.     * Assuming SD = 0.65, design effect = 1.5
+.     local mde = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n')
+ 13.     di "`group'" _col(26) "| " %6.0f `n' " | " %5.1f `mde'*100 "%"
+ 14. }
+  3,204
+All agriculture          |   3204 |   3.9%
+  101
+Skilled (ISCO 6)         |    101 |  22.2%
+  501
+Unskilled (ISCO 9)       |    501 |  10.0%
+
+. 
+. di ""
+
+
+. di "NOTE: MDEs assume within-group SD of 0.65 and design effect of 1.5"
+NOTE: MDEs assume within-group SD of 0.65 and design effect of 1.5
+
+. di "      Effects smaller than MDE cannot be reliably detected"
+      Effects smaller than MDE cannot be reliably detected
+
+. 
+. ********************************************************************************
+. * PART 6: Summary Table for Paper
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 6: SUMMARY FOR PAPER"
+PART 6: SUMMARY FOR PAPER
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Store results
+. tempname results
+
+. postfile `results' str30 group coef se n mde using "output/tables/subsector_results.dta"
+> , replace
+(note: file output/tables/subsector_results.dta not found)
+
+. 
+. * All agriculture
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. count if agri == 1
+  3,204
+
+. local n = r(N)
+
+. local mde = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n')
+
+. post `results' ("All agriculture") (_b[agri_post]) (_se[agri_post]) (`n') (`mde')
+
+. 
+. * Skilled
+. preserve
+
+. keep if skilled_agri == 1 | agri == 0
+(3,103 observations deleted)
+
+. gen treat_post = skilled_agri * post
+(74,891 missing values generated)
+
+. quietly reghdfe ln_wage treat_post, absorb(idind year) cluster(region)
+
+. count if skilled_agri == 1
+  101
+
+. local n = r(N)
+
+. local mde = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n')
+
+. post `results' ("Skilled (ISCO 6)") (_b[treat_post]) (_se[treat_post]) (`n') (`mde')
+
+. restore
+
+. 
+. * Unskilled
+. preserve
+
+. keep if unskilled_agri == 1 | agri == 0
+(2,703 observations deleted)
+
+. gen treat_post = unskilled_agri * post
+(74,891 missing values generated)
+
+. quietly reghdfe ln_wage treat_post, absorb(idind year) cluster(region)
+
+. count if unskilled_agri == 1
+  501
+
+. local n = r(N)
+
+. local mde = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n')
+
+. post `results' ("Unskilled (ISCO 9)") (_b[treat_post]) (_se[treat_post]) (`n') (`mde')
+
+. restore
+
+. 
+. * High livestock regions
+. preserve
+
+. keep if high_livestock == 1 | agri == 0
+(3,120 observations deleted)
+
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. count if agri == 1 & high_livestock == 1
+  84
+
+. local n = r(N)
+
+. local mde = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n')
+
+. post `results' ("High livestock regions") (_b[agri_post]) (_se[agri_post]) (`n') (`mde')
+
+. restore
+
+. 
+. * Low livestock regions
+. preserve
+
+. keep if high_livestock == 0 | agri == 0
+(84 observations deleted)
+
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. count if agri == 1 & high_livestock == 0
+  3,120
+
+. local n = r(N)
+
+. local mde = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n')
+
+. post `results' ("Low livestock regions") (_b[agri_post]) (_se[agri_post]) (`n') (`mde')
+
+. restore
+
+. 
+. postclose `results'
+
+. 
+. * Display
+. use "output/tables/subsector_results.dta", clear
+
+. di _n "=== Sub-Sector Results ==="
+
+=== Sub-Sector Results ===
+
+. list, sep(0)
+
+     +-----------------------------------------------------------------+
+     |                  group        coef         se      n        mde |
+     |-----------------------------------------------------------------|
+  1. |        All agriculture    .0310473   .0306432   3204   .0393796 |
+  2. |       Skilled (ISCO 6)           0          0    101   .2217973 |
+  3. |     Unskilled (ISCO 9)           0          0    501    .099586 |
+  4. | High livestock regions   -.0965828    .003958     84   .2432077 |
+  5. |  Low livestock regions    .0353108   .0311865   3120   .0399061 |
+     +-----------------------------------------------------------------+
+
+. 
+. * Export
+. export delimited using "output/tables/subsector_results.csv", replace
+(note: file output/tables/subsector_results.csv not found)
+file output/tables/subsector_results.csv saved
+
+. 
+. ********************************************************************************
+. * PART 7: Rosstat Production Data Context
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 7: PRODUCTION DATA CONTEXT (FROM ROSSTAT)"
+PART 7: PRODUCTION DATA CONTEXT (FROM ROSSTAT)
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "Import substitution success by product (2013-2019 production growth):"
+
+Import substitution success by product (2013-2019 production growth):
+
+. di ""
+
+
+. di "Product Category     | Production Growth | Import Sub. Success"
+Product Category     | Production Growth | Import Sub. Success
+
+. di "---------------------|-------------------|--------------------"
+---------------------|-------------------|--------------------
+
+. di "Pork                 | +95%              | High (self-sufficient)"
+Pork                 | +95%              | High (self-sufficient)
+
+. di "Poultry              | +30%              | High (near self-sufficient)"
+Poultry              | +30%              | High (near self-sufficient)
+
+. di "Beef                 | -5%               | Low (still importing)"
+Beef                 | -5%               | Low (still importing)
+
+. di "Dairy/Cheese         | +15%              | Low (quality gap)"
+Dairy/Cheese         | +15%              | Low (quality gap)
+
+. di "Vegetables           | +25%              | Medium"
+Vegetables           | +25%              | Medium
+
+. di "Fruits               | +10%              | Low (climate limits)"
+Fruits               | +10%              | Low (climate limits)
+
+. di ""
+
+
+. di "Source: Rosstat, Wegren et al. (2019), FAO"
+Source: Rosstat, Wegren et al. (2019), FAO
+
+. di ""
+
+
+. di "Interpretation:"
+Interpretation:
+
+. di "- Livestock (pork, poultry) = successful import substitution"
+- Livestock (pork, poultry) = successful import substitution
+
+. di "- Dairy = limited success due to quality/technology gap"
+- Dairy = limited success due to quality/technology gap
+
+. di "- Fruits = limited success due to climate constraints"
+- Fruits = limited success due to climate constraints
+
+. di ""
+
+
+. di "Our regional livestock proxy captures some of this variation:"
+Our regional livestock proxy captures some of this variation:
+
+. di "- High livestock regions may have benefited more from pork/poultry expansion"
+- High livestock regions may have benefited more from pork/poultry expansion
+
+. di "- But our RLMS occupation codes cannot distinguish sub-sectors directly"
+- But our RLMS occupation codes cannot distinguish sub-sectors directly
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_subsector_log.txt
+  log type:  text
+ closed on:   7 Feb 2026, 19:39:34
+------------------------------------------------------------------------------------------

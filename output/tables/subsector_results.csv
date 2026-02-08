@@ -1,0 +1,6 @@
+group,coef,se,n,mde
+All agriculture,.031047292,.030643201,3204,.039379552
+Skilled (ISCO 6),0,0,101,.22179733
+Unskilled (ISCO 9),0,0,501,.099585973
+High livestock regions,-.096582845,.0039579808,84,.24320772
+Low livestock regions,.035310801,.031186469,3120,.03990614

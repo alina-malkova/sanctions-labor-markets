@@ -1671,7 +1671,7 @@ Observations & 31,121 & 41,783 & 72,904 & 72,904 \\
 We emphasize several caveats about this approach:
 \begin{itemize}
     \item This is \textit{ecological inference}: we impute regional firm characteristics to individual workers, but a worker in a ``livestock-dominant'' region may work for a small dairy farm.
-    \item The RLMS occupation codes (ISCO) do not help: zero agricultural workers in our sample have skilled agricultural (ISCO 6) or agricultural laborer (ISCO 92) codes that might distinguish sub-sectors.
+    \item The RLMS occupation codes (ISCO) provide limited help: only 3\% of agricultural workers are coded as ``Skilled agricultural'' (ISCO 6) and 16\% as ``Elementary occupations'' (ISCO 9). Most are classified as machine operators, managers, or other categories that don't distinguish crops from livestock.
     \item The lack of statistical significance may reflect either genuine null effects or insufficient power to detect differences using imputed regional measures.
 \end{itemize}
 
@@ -1679,12 +1679,82 @@ The suggestive pattern---larger effects in dairy/small-farm regions, smaller in 
 
 The firm-level evidence suggests that import substitution generated profits for large agricultural firms but led to substantial exit of smaller producers. Combined with our finding that worker earnings gains came from hours rather than wages, this paints a picture where protection benefits accrued primarily to firm owners rather than workers.
 
+\subsection{Occupation-Based Sub-Sector Analysis}
+
+Despite power limitations, we attempt sub-sector heterogeneity analysis using two approaches: (1) occupation-based classification within agriculture, and (2) regional livestock specialization. Table \ref{tab:subsector} reports results with explicit minimum detectable effects (MDEs) at 80\% power.
+
+\begin{table}[H]
+\centering
+\caption{Sub-Sector Heterogeneity Analysis (With Power Caveats)}
+\label{tab:subsector}
+\begin{threeparttable}
+\begin{tabular}{lccccc}
+\toprule
+Sub-Sample & Coefficient & SE & N & MDE \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel A: By Occupation}} \\
+All agriculture & 0.031 & (0.031) & 3,204 & 3.9\% \\
+Machine operators (ISCO Plant/Machine) & 0.028 & (0.034) & 1,159 & 6.6\% \\
+Elementary occupations (ISCO 9) & 0.048 & (0.050) & 501 & 10.0\% \\
+Skilled field workers (ISCO 6) & $-$0.170 & (0.157) & 101 & 22.2\% \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel B: By Regional Livestock Specialization}} \\
+Low livestock regions & 0.035 & (0.031) & 3,120 & 4.0\% \\
+High livestock regions$^{\dagger}$ & $-$0.097 & (0.004) & 84 & 24.3\% \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} All specifications include individual and year fixed effects (2010--2019). Occupation categories derived from ISCO-2008 labels in RLMS: ``Skilled field'' = ``Skilled agricultural, forestry and fish workers''; ``Machine operators'' = ``Plant and machine operators''; ``Elementary'' = ``Elementary occupations.'' High livestock regions are Krasnodar, Stavropol, and Rostov (major pork/poultry producers). MDE = minimum detectable effect at 80\% power, assuming within-group SD = 0.65 and design effect = 1.5.
+\item $^{\dagger}$ Severely underpowered (N=84). Negative coefficient is unexpected and likely reflects composition or small-sample bias.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\textbf{Interpretation with explicit caveats:}
+
+\begin{itemize}
+    \item \textbf{Most sub-groups are underpowered}: Only ``All agriculture'' (MDE = 3.9\%) and ``Low livestock regions'' (MDE = 4.0\%) have sufficient power to detect plausible effect sizes. Other categories have MDEs of 6--24\%, far exceeding our estimated effects.
+
+    \item \textbf{Point estimates are noisy}: The skilled field worker coefficient ($-$17\%) and high livestock region coefficient ($-$9.7\%) have the ``wrong'' sign relative to theory (livestock/pork regions had successful import substitution). These likely reflect small-sample bias rather than true negative effects.
+
+    \item \textbf{Occupation proxies are imperfect}: 96\% of agricultural workers in RLMS are classified as ``other'' (managers, professionals, service workers) rather than skilled field or elementary workers. This reflects the survey's occupation coding rather than true workforce composition.
+
+    \item \textbf{Regional proxy has ecological inference problems}: A worker in a ``high livestock'' region may work for a dairy farm, not a pork facility. We are imputing regional characteristics to individuals.
+\end{itemize}
+
+For context, import substitution success varied substantially by product (Table \ref{tab:rosstat_production}):
+
+\begin{table}[H]
+\centering
+\caption{Import Substitution Success by Product (2013--2019)}
+\label{tab:rosstat_production}
+\begin{tabular}{lcc}
+\toprule
+Product & Production Growth & Import Substitution \\
+\midrule
+Pork & +95\% & High (self-sufficient by 2018) \\
+Poultry & +30\% & High (near self-sufficient) \\
+Vegetables & +25\% & Medium \\
+Dairy/Cheese & +15\% & Low (quality gap) \\
+Fruits & +10\% & Low (climate limits) \\
+Beef & $-$5\% & Low (still importing) \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Source:} Rosstat, Wegren et al.\ (2019), FAO.
+\end{tablenotes}
+\end{table}
+
+Given the variation in import substitution success, labor market effects likely varied across sub-sectors. However, \textbf{we cannot reliably estimate these heterogeneous effects} with the available data. The occupation codes in RLMS do not distinguish livestock from crops, and regional proxies suffer from ecological inference problems. Future research with matched employer-employee data could better identify sub-sector heterogeneity.
+
 \subsection{Limitations}
 
 Our analysis has several limitations:
 
 \begin{enumerate}
-    \item \textbf{Sample size and sub-sector analysis}: With 368 agricultural workers at baseline and 3,204 agricultural worker-years in our primary sample, we have adequate power to detect effects of 4+ percentage points for the aggregate agricultural sector. However, we \textit{cannot} reliably estimate heterogeneous effects across agricultural sub-sectors (livestock, dairy, crops). The RLMS industry classification does not distinguish between these sub-sectors, and occupation-based proxies yield cell sizes of only 50--200 observations with MDEs of 15--25\%. We therefore present only aggregate results and caution against interpreting our findings as applying uniformly to all agricultural activities. Import substitution success varied substantially across products (succeeding for pork and poultry but largely failing for dairy), and labor market effects may have varied accordingly.
+    \item \textbf{Sample size and sub-sector analysis}: With 368 agricultural workers at baseline and 3,204 agricultural worker-years in our primary sample, we have adequate power to detect effects of 4+ percentage points for the aggregate agricultural sector. We present sub-sector analysis (Table \ref{tab:subsector}) but with explicit caveats: occupation-based proxies yield cell sizes of 84--501 observations with MDEs of 10--24\%, far exceeding plausible effect sizes. The RLMS industry classification does not distinguish between livestock, dairy, and crop sub-sectors. We therefore emphasize aggregate results and caution against interpreting our findings as applying uniformly to all agricultural activities. Import substitution success varied substantially across products (succeeding for pork and poultry but largely failing for dairy), and labor market effects may have varied accordingly---but we lack power to detect this variation.
 
     \item \textbf{Sub-sector $\times$ firm size interactions}: A potentially important concern is that sub-sector effects and firm size effects may be confounded---large agriholdings dominate livestock (pork, poultry) while small farms are concentrated in dairy. Ideally, we would test specifications with both sub-sector and firm size interactions simultaneously. However, \textit{neither variable is available at the worker level in the RLMS}. The survey does not include firm size measures (number of employees, enterprise type) in our analysis sample, nor does it distinguish agricultural sub-sectors beyond the broad ``agriculture'' category. We observe from RFSD firm-level data that the sector consolidated dramatically (42\% decline in firm counts, top 10\% holding 92\%+ of assets), but we cannot link individual workers to firm characteristics. This remains a critical limitation: our aggregate effects may mask substantial heterogeneity across farm types that we cannot identify.
 
