@@ -1,0 +1,427 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_tradable_sectors_log.txt
+  log type:  text
+ opened on:   8 Feb 2026, 17:32:26
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "TRADABLE SECTORS ANALYSIS: TESTING RUBLE DEPRECIATION CONFOUND"
+TRADABLE SECTORS ANALYSIS: TESTING RUBLE DEPRECIATION CONFOUND
+
+. di "======================================================================"
+======================================================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. ********************************************************************************
+. * PART 1: Create Sector Indicators
+. ********************************************************************************
+. 
+. di _n "=== CREATING SECTOR INDICATORS ==="
+
+=== CREATING SECTOR INDICATORS ===
+
+. 
+. * Drop if already exist
+. cap drop manufacturing oil_gas food_processing
+
+. 
+. gen manufacturing = inlist(industry, 2, 3, 5) if industry < 99999990
+
+. gen oil_gas = (industry == 4) if industry < 99999990
+
+. gen food_processing = (industry == 1) if industry < 99999990
+
+. 
+. * Sample sizes
+. count if agri == 1
+  3,204
+
+. local n_agri = r(N)
+
+. count if manufacturing == 1
+  6,203
+
+. local n_mfg = r(N)
+
+. count if oil_gas == 1
+  2,310
+
+. local n_oil = r(N)
+
+. count if food_processing == 1
+  4,655
+
+. local n_food = r(N)
+
+. 
+. di "Agriculture: `n_agri'"
+Agriculture: 3204
+
+. di "Manufacturing: `n_mfg'"
+Manufacturing: 6203
+
+. di "Oil & Gas: `n_oil'"
+Oil & Gas: 2310
+
+. di "Food processing: `n_food'"
+Food processing: 4655
+
+. 
+. ********************************************************************************
+. * PART 2: DiD Estimates (using areg for speed)
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: SECTOR-SPECIFIC DID ESTIMATES"
+PART 2: SECTOR-SPECIFIC DID ESTIMATES
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Create interaction terms
+. foreach v in mfg_post oil_post food_post {
+  2.     cap drop `v'
+  3. }
+
+. gen mfg_post = manufacturing * post
+
+. gen oil_post = oil_gas * post
+
+. gen food_post = food_processing * post
+
+. 
+. * Agriculture (baseline)
+. areg ln_wage agri_post i.year, absorb(idind) cluster(region)
+
+Linear regression, absorbing indicators         Number of obs     =     78,095
+Absorbed variable: idind                        No. of categories =     19,612
+                                                F(  10,     37)   =     262.94
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8188
+                                                Adj R-squared     =     0.7579
+                                                Root MSE          =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0310473   .0354108     0.88   0.386    -.0407018    .1027963
+             |
+        year |
+       2011  |   .1184806   .0090674    13.07   0.000     .1001083    .1368528
+       2012  |   .2477124   .0120295    20.59   0.000     .2233382    .2720866
+       2013  |   .3622266   .0143911    25.17   0.000     .3330675    .3913858
+       2014  |   .4416227   .0167647    26.34   0.000     .4076543    .4755912
+       2015  |   .4859106    .014847    32.73   0.000     .4558278    .5159934
+       2016  |   .5346018   .0174074    30.71   0.000      .499331    .5698726
+       2017  |   .5935046   .0172174    34.47   0.000     .5586188    .6283904
+       2018  |   .6790147   .0202526    33.53   0.000     .6379789    .7200505
+       2019  |   .7532133   .0185785    40.54   0.000     .7155697    .7908569
+             |
+       _cons |   9.380523   .0123822   757.58   0.000     9.355434    9.405612
+------------------------------------------------------------------------------
+
+. di _n "Agriculture x Post: " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_post] ")"
+
+Agriculture x Post:  0.0310 (SE: 0.0354)
+
+. local b_agri = _b[agri_post]
+
+. local se_agri = _se[agri_post]
+
+. 
+. * Manufacturing
+. areg ln_wage mfg_post i.year, absorb(idind) cluster(region)
+
+Linear regression, absorbing indicators         Number of obs     =     78,095
+Absorbed variable: idind                        No. of categories =     19,612
+                                                F(  10,     37)   =     272.59
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8188
+                                                Adj R-squared     =     0.7579
+                                                Root MSE          =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    mfg_post |   .0207671    .020931     0.99   0.328    -.0216432    .0631774
+             |
+        year |
+       2011  |   .1185419   .0090771    13.06   0.000       .10015    .1369338
+       2012  |   .2477835   .0120321    20.59   0.000     .2234041    .2721629
+       2013  |   .3623542   .0143739    25.21   0.000     .3332299    .3914786
+       2014  |   .4413667   .0162133    27.22   0.000     .4085155     .474218
+       2015  |   .4855893   .0142688    34.03   0.000     .4566779    .5145006
+       2016  |   .5342395   .0169678    31.49   0.000     .4998594    .5686195
+       2017  |   .5933026   .0168324    35.25   0.000     .5591968    .6274084
+       2018  |    .678743   .0198946    34.12   0.000     .6384327    .7190532
+       2019  |   .7527658   .0184243    40.86   0.000     .7154347    .7900969
+             |
+       _cons |   9.380398   .0124723   752.10   0.000     9.355127    9.405669
+------------------------------------------------------------------------------
+
+. di "Manufacturing x Post: " %7.4f _b[mfg_post] " (SE: " %6.4f _se[mfg_post] ")"
+Manufacturing x Post:  0.0208 (SE: 0.0209)
+
+. local b_mfg = _b[mfg_post]
+
+. local se_mfg = _se[mfg_post]
+
+. 
+. * Oil & Gas
+. areg ln_wage oil_post i.year, absorb(idind) cluster(region)
+
+Linear regression, absorbing indicators         Number of obs     =     78,095
+Absorbed variable: idind                        No. of categories =     19,612
+                                                F(  10,     37)   =     251.38
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8188
+                                                Adj R-squared     =     0.7580
+                                                Root MSE          =     0.3481
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    oil_post |   .0738571   .0294157     2.51   0.017     .0142551    .1334591
+             |
+        year |
+       2011  |   .1185263   .0090975    13.03   0.000     .1000931    .1369595
+       2012  |   .2477305    .012019    20.61   0.000     .2233776    .2720833
+       2013  |   .3623592   .0143795    25.20   0.000     .3332236    .3914947
+       2014  |   .4406057   .0164086    26.85   0.000     .4073588    .4738526
+       2015  |   .4848851   .0146273    33.15   0.000     .4552473    .5145229
+       2016  |   .5335465   .0173034    30.83   0.000     .4984865    .5686065
+       2017  |   .5924543   .0170616    34.72   0.000     .5578841    .6270245
+       2018  |   .6779123   .0202763    33.43   0.000     .6368287    .7189959
+       2019  |    .752097   .0187195    40.18   0.000     .7141676    .7900263
+             |
+       _cons |   9.380452   .0123413   760.09   0.000     9.355446    9.405458
+------------------------------------------------------------------------------
+
+. di "Oil & Gas x Post: " %7.4f _b[oil_post] " (SE: " %6.4f _se[oil_post] ")"
+Oil & Gas x Post:  0.0739 (SE: 0.0294)
+
+. local b_oil = _b[oil_post]
+
+. local se_oil = _se[oil_post]
+
+. 
+. * Food Processing (also treated by embargo)
+. areg ln_wage food_post i.year, absorb(idind) cluster(region)
+
+Linear regression, absorbing indicators         Number of obs     =     78,095
+Absorbed variable: idind                        No. of categories =     19,612
+                                                F(  10,     37)   =     254.82
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8187
+                                                Adj R-squared     =     0.7579
+                                                Root MSE          =     0.3482
+
+                                (Std. Err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   food_post |   .0104377   .0139638     0.75   0.459    -.0178556     .038731
+             |
+        year |
+       2011  |   .1185466   .0090836    13.05   0.000     .1001414    .1369518
+       2012  |   .2477943    .012036    20.59   0.000      .223407    .2721816
+       2013  |   .3623693   .0143893    25.18   0.000     .3332138    .3915249
+       2014  |   .4423458   .0164362    26.91   0.000     .4090429    .4756487
+       2015  |   .4866253   .0145841    33.37   0.000     .4570751    .5161755
+       2016  |   .5353351   .0172565    31.02   0.000     .5003701    .5703002
+       2017  |   .5943719   .0170177    34.93   0.000     .5598908     .628853
+       2018  |   .6798792   .0202395    33.59   0.000     .6388701    .7208884
+       2019  |   .7540496   .0188535    40.00   0.000     .7158488    .7922504
+             |
+       _cons |   9.380338   .0125067   750.02   0.000     9.354997    9.405679
+------------------------------------------------------------------------------
+
+. di "Food Processing x Post: " %7.4f _b[food_post] " (SE: " %6.4f _se[food_post] ")"
+Food Processing x Post:  0.0104 (SE: 0.0140)
+
+. local b_food = _b[food_post]
+
+. local se_food = _se[food_post]
+
+. 
+. ********************************************************************************
+. * PART 3: Summary Table
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: SUMMARY TABLE"
+PART 3: SUMMARY TABLE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "=== Post-2014 Wage Effects by Sector ==="
+
+=== Post-2014 Wage Effects by Sector ===
+
+. di ""
+
+
+. di "Sector                  | Coef   | SE     | N      | Interpretation"
+Sector                  | Coef   | SE     | N      | Interpretation
+
+. di "------------------------|--------|--------|--------|---------------"
+------------------------|--------|--------|--------|---------------
+
+. di "Agriculture             | " %6.3f `b_agri' " | " %6.3f `se_agri' " | " %6.0f `n_agri
+> ' " | TREATED (embargo)"
+Agriculture             |  0.031 |  0.035 |   3204 | TREATED (embargo)
+
+. di "Food Processing         | " %6.3f `b_food' " | " %6.3f `se_food' " | " %6.0f `n_food
+> ' " | TREATED (embargo)"
+Food Processing         |  0.010 |  0.014 |   4655 | TREATED (embargo)
+
+. di "Manufacturing           | " %6.3f `b_mfg' " | " %6.3f `se_mfg' " | " %6.0f `n_mfg' "
+>  | Tradable (depreciation)"
+Manufacturing           |  0.021 |  0.021 |   6203 | Tradable (depreciation)
+
+. di "Oil & Gas               | " %6.3f `b_oil' " | " %6.3f `se_oil' " | " %6.0f `n_oil' "
+>  | Tradable (depreciation)"
+Oil & Gas               |  0.074 |  0.029 |   2310 | Tradable (depreciation)
+
+. 
+. ********************************************************************************
+. * PART 4: Interpretation
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: INTERPRETATION"
+PART 4: INTERPRETATION
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "KEY FINDINGS:"
+
+KEY FINDINGS:
+
+. di ""
+
+
+. di "If ruble depreciation were driving our agriculture results,"
+If ruble depreciation were driving our agriculture results,
+
+. di "we would expect other tradable sectors to show similar gains."
+we would expect other tradable sectors to show similar gains.
+
+. di ""
+
+
+. di "Manufacturing effect: " %4.1f `b_mfg'*100 "%"
+Manufacturing effect:  2.1%
+
+. di "Agriculture effect: " %4.1f `b_agri'*100 "%"
+Agriculture effect:  3.1%
+
+. di ""
+
+
+. di "Difference (Agri - Manufacturing): " %5.3f (`b_agri' - `b_mfg')
+Difference (Agri - Manufacturing): 0.010
+
+. 
+. if `b_mfg' > 0.02 {
+.     di ""
+
+.     di "CONCERN: Manufacturing also shows substantial positive gains,"
+CONCERN: Manufacturing also shows substantial positive gains,
+.     di "suggesting depreciation may explain part of agricultural effect."
+suggesting depreciation may explain part of agricultural effect.
+. }
+
+. else if `b_mfg' < 0 {
+.     di ""
+.     di "SUPPORTIVE: Manufacturing shows negative/zero effect,"
+.     di "suggesting agricultural gains are NOT driven by depreciation alone."
+. }
+
+. else {
+.     di ""
+.     di "MIXED: Manufacturing shows modest effect,"
+.     di "cannot fully rule out depreciation as partial explanation."
+. }
+
+. 
+. * Save results
+. tempname results
+
+. postfile `results' str30 sector coef se n using "output/tables/tradable_sectors_results.
+> dta", replace
+(note: file output/tables/tradable_sectors_results.dta not found)
+
+. post `results' ("Agriculture") (`b_agri') (`se_agri') (`n_agri')
+
+. post `results' ("Food Processing") (`b_food') (`se_food') (`n_food')
+
+. post `results' ("Manufacturing") (`b_mfg') (`se_mfg') (`n_mfg')
+
+. post `results' ("Oil & Gas") (`b_oil') (`se_oil') (`n_oil')
+
+. postclose `results'
+
+. 
+. use "output/tables/tradable_sectors_results.dta", clear
+
+. list, sep(0)
+
+     +----------------------------------------------+
+     |          sector       coef         se      n |
+     |----------------------------------------------|
+  1. |     Agriculture   .0310473   .0354108   3204 |
+  2. | Food Processing   .0104377   .0139638   4655 |
+  3. |   Manufacturing   .0207671    .020931   6203 |
+  4. |       Oil & Gas   .0738571   .0294157   2310 |
+     +----------------------------------------------+
+
+. export delimited using "output/tables/tradable_sectors_results.csv", replace
+(note: file output/tables/tradable_sectors_results.csv not found)
+file output/tables/tradable_sectors_results.csv saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_tradable_sectors_log.txt
+  log type:  text
+ closed on:   8 Feb 2026, 17:32:41
+------------------------------------------------------------------------------------------

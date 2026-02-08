@@ -47,7 +47,7 @@
 \begin{abstract}
 \noindent We study how domestic labor markets respond to sudden trade barriers using Russia's 2014 food import embargo as a natural experiment. Using individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS), we employ a difference-in-differences design comparing agricultural workers to those in other sectors. \textbf{Our primary sample covers 2010--2019}, providing a clean 5-year pre/post window uncontaminated by later shocks (COVID-19, Ukraine war).
 
-We find that agricultural workers experienced monthly earnings gains of 3--5 percent relative to other sectors following the embargo. Event study analysis shows these effects emerged after 2014 and grew over time, with pre-treatment coefficients close to zero. Effects are concentrated in high-agricultural-intensity regions. However, dose-response tests find no evidence that effects are larger in regions with greater exposure to banned products---if anything, the pattern is reversed---which weakens the case that import substitution is the primary mechanism.
+We find that agricultural workers experienced monthly earnings gains of 3--5 percent relative to other sectors following the embargo. Event study analysis shows these effects emerged after 2014 and grew over time, with pre-treatment coefficients close to zero. However, we emphasize important caveats: (1) our estimated effect is close to the minimum detectable effect given our sample size, explaining borderline statistical significance; (2) dose-response tests find no evidence that effects are larger in regions with greater exposure to banned products; and (3) ruble depreciation (approximately 70\% in 2014--2015) confounds interpretation---manufacturing workers, who were \textit{not} protected by the embargo, also show earnings gains of approximately 2\%, suggesting that at most one-third of the agricultural effect can be attributed to the embargo specifically.
 
 We explore whether earnings gains reflected higher hourly wages or increased hours worked. The decomposition suggests hours played a role---agricultural workers worked 5 additional hours per month post-embargo while hourly wages showed no relative change. However, \textbf{this hours evidence is inconclusive}: agricultural workers worked substantially more hours than other workers \textit{before} the embargo (27 vs. 175 monthly), and formal tests cannot reject that the post-treatment hours gap equals the pre-treatment gap ($p = 0.36$). Placebo tests show similar ``effects'' at non-treatment dates. We therefore present monthly earnings as our primary finding and treat the hours decomposition as suggestive but not definitive.
 
@@ -77,6 +77,8 @@ Our setting offers three key advantages for identification. First, the embargo w
 We use individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS), which tracks the same individuals over time from 2010 to 2023. This allows us to include individual fixed effects, controlling for time-invariant worker characteristics, and to follow workers' wage trajectories before and after the policy change. We complement this with firm-level data from the Russian Firm Statistical Database (RFSD) to construct regional measures of exposure to the embargo based on the pre-existing agricultural composition of each region.
 
 Our main finding is that \textbf{trade protection raised agricultural earnings by 3--5 percent}. In our baseline difference-in-differences specification with individual fixed effects, we estimate that monthly earnings in agriculture increased relative to other sectors after 2014. Event study analysis shows pre-treatment coefficients close to zero and effects emerging after the policy change, supporting a causal interpretation. Effects are concentrated in high-agricultural-intensity regions, consistent with import substitution driving the results.
+
+\textbf{Important caveats.} We highlight two methodological concerns upfront. First, our estimated effect of 3--5\% is close to the minimum detectable effect (MDE) of 3.9\% given our sample of approximately 3,200 agricultural worker-years. This explains the borderline statistical significance ($p \approx 0.10$--$0.30$ depending on specification) and means our estimates should be interpreted with caution. Second, Russia experienced severe ruble depreciation in 2014--2015 (approximately 70\% against the dollar), which independently boosted competitiveness of all tradable sectors. When we examine other tradable sectors as a placebo test, we find that manufacturing workers---who were \textit{not} protected by the food embargo---also experienced earnings gains of approximately 2\% post-2014, suggesting that depreciation may account for a substantial portion of the agricultural effect. We discuss these concerns in detail in Section \ref{sec:robustness}.
 
 We explore whether these earnings gains reflected higher hourly wages or increased hours worked. The decomposition suggests that hours may have played a role: agricultural workers worked approximately 5 additional hours per month post-embargo, while hourly wages showed no relative change. However, we emphasize that this hours evidence is \textit{inconclusive}. Agricultural workers already worked substantially more hours than other workers before the embargo (27 hours more per month), and formal tests cannot reject that the post-treatment hours gap equals the pre-treatment gap ($p = 0.36$). Placebo tests at non-treatment dates show similar hours ``effects.'' We therefore present monthly earnings as our primary finding and treat the hours decomposition as suggestive but not definitive evidence about the mechanism.
 
@@ -893,13 +895,41 @@ Several considerations suggest subsidies are unlikely to explain our findings:
     \item \textbf{Magnitude}: Agricultural subsidies totaled roughly 250 billion rubles annually post-embargo, supporting an agricultural workforce of approximately 6 million. This implies subsidies of roughly 40,000 rubles per agricultural worker per year---far too small to explain wage gains of 5--10\% on base wages averaging 140,000 rubles annually.
 \end{enumerate}
 
-\paragraph{Ruble depreciation.} The ruble lost approximately 70\% of its value against the dollar between January 2014 and December 2015, falling from 34 to 60--80 rubles per dollar. This depreciation independently boosted agricultural competitiveness by making Russian exports cheaper on world markets and imports more expensive.
+\paragraph{Ruble depreciation.} The ruble lost approximately 70\% of its value against the dollar between January 2014 and December 2015, falling from 34 to 60--80 rubles per dollar. This depreciation independently boosted competitiveness of all tradable sectors by making Russian products cheaper and imports more expensive.
 
-We acknowledge this as a genuine confound that we cannot fully separate from the embargo effect. However, two points are relevant:
+\textbf{We acknowledge this as a serious confound that substantially complicates causal interpretation.} To assess whether depreciation drives our results, we estimate the same specification for other tradable sectors that should have benefited from depreciation but were \textit{not} protected by the food embargo:
+
+\begin{table}[H]
+\centering
+\caption{Tradable Sectors Comparison: Testing the Depreciation Confound}
+\label{tab:tradable_sectors}
+\begin{threeparttable}
+\begin{tabular}{lcccl}
+\toprule
+Sector & Coefficient & SE & N & Interpretation \\
+\midrule
+Agriculture & 0.031 & (0.035) & 3,204 & Embargo + depreciation \\
+Food Processing & 0.010 & (0.014) & 4,655 & Embargo + depreciation \\
+Manufacturing & 0.021 & (0.021) & 6,203 & Depreciation only \\
+Oil \& Gas & 0.074** & (0.029) & 2,310 & Depreciation only \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} All specifications include individual and year fixed effects (2010--2019). Each row shows a separate regression of sector $\times$ post on log wages. Manufacturing includes machinery and heavy industry (not protected by embargo). Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\textbf{The results are concerning.} Manufacturing workers---who were \textit{not} protected by the food embargo---show earnings gains of approximately 2.1\% post-2014. This is almost as large as agriculture's 3.1\% effect. The difference (agriculture minus manufacturing) is only 1.0 percentage points, suggesting that \textit{at most one-third of the agricultural effect} can be attributed to the embargo specifically, with the remainder potentially explained by depreciation.
+
+We emphasize three points:
 \begin{enumerate}
-    \item \textbf{Reinforcement, not alternative}: Ruble depreciation and the import ban worked in the \textit{same direction}---both increased demand for domestic agricultural products. Our estimates capture the combined effect of trade protection (embargo) and exchange rate protection (depreciation). This is arguably the policy-relevant quantity, since the depreciation was itself partly caused by Western sanctions.
+    \item \textbf{We cannot fully separate these effects}: Ruble depreciation and the import ban worked in the \textit{same direction}---both increased demand for domestic agricultural products. Our estimates should be interpreted as capturing the \textit{combined} effect of trade protection (embargo) and exchange rate protection (depreciation).
 
-    \item \textbf{Differential sectoral effects}: If depreciation alone drove our results, we would expect similar wage gains in other tradable sectors that benefited from improved export competitiveness (e.g., chemicals, metals). Our placebo tests show that manufacturing sectors did \textit{not} experience comparable wage gains, suggesting the agricultural effect is not purely a depreciation story.
+    \item \textbf{The embargo-specific effect may be small}: The 1.0 percentage point difference between agriculture and manufacturing is not statistically distinguishable from zero, meaning we cannot reject that all of agriculture's gains came from depreciation rather than the embargo.
+
+    \item \textbf{Policy relevance}: From a policy perspective, it may be relevant that the depreciation was itself partly caused by Western sanctions. The embargo and depreciation were both responses to the same geopolitical crisis, and Russia did not independently choose one without the other.
 \end{enumerate}
 
 \paragraph{Pre-existing productivity trends.} Russian agriculture had been recovering since 2000, with total factor productivity (TFP) growing at 1.7\% annually during 2005--2013. Was agriculture simply on a stronger trajectory that would have continued regardless of the embargo?
@@ -908,7 +938,7 @@ Our event study directly addresses this concern. The pre-treatment coefficients 
 
 Moreover, USDA estimates suggest that Russian agricultural TFP growth actually \textit{slowed} from +2.7\% annually in 2000--2008 to $-$1.0\% in 2010--2016. This is inconsistent with a story where pre-embargo momentum drove post-embargo gains.
 
-\paragraph{Summary.} While we cannot definitively rule out all alternative explanations, the weight of evidence supports our interpretation. Subsidies were too small to explain the magnitude of wage gains, and the World Bank finds they did not boost productivity. Ruble depreciation is a genuine confound but worked in the same direction as the embargo and does not explain why agriculture specifically (rather than other tradables) saw gains. Pre-existing trends were actually \textit{negative}, making the post-embargo gains more striking, not less.
+\paragraph{Summary.} We cannot definitively attribute agricultural wage gains to the food embargo alone. Government subsidies appear too small to explain the magnitude of effects, and pre-existing trends were \textit{negative}, ruling out simple extrapolation. However, \textbf{ruble depreciation remains a serious confound}: manufacturing workers (who were \textit{not} protected by the embargo) also experienced wage gains of approximately 2\%, suggesting that at most one-third of agriculture's 3\% effect can be attributed to the embargo specifically. Readers should interpret our estimates as capturing the \textit{combined} effect of trade protection and exchange rate depreciation, both of which occurred simultaneously in 2014.
 
 %==============================================================================
 \section{Addressing Identification Concerns} \label{sec:identification}
@@ -1842,9 +1872,11 @@ Our analysis has several limitations:
 \section{Conclusion} \label{sec:conclusion}
 %==============================================================================
 
-This paper studies the labor market effects of Russia's 2014 food import embargo using individual-level panel data. Our \textbf{primary sample covers 2010--2019}, providing a clean medium-run window uncontaminated by COVID-19 or the Ukraine war. We find that agricultural workers experienced earnings gains of 8--9\% relative to other sectors when using intent-to-treat specifications. Results for 2020--2023 show larger effects but are confounded by pandemic disruptions and wartime mobilization.
+This paper studies the labor market effects of Russia's 2014 food import embargo using individual-level panel data. Our \textbf{primary sample covers 2010--2019}, providing a clean medium-run window uncontaminated by COVID-19 or the Ukraine war. We find that agricultural workers experienced earnings gains of 3--5\% relative to other sectors in our baseline specification, with larger effects (8--9\%) using intent-to-treat assignments.
 
-Our wage decomposition reveals that earnings gains appear related to differences in hours worked, not higher hourly wages. However, this finding requires nuance: agricultural workers worked substantially more hours than non-agricultural workers \textit{before} the embargo (27 hours more per month), and formal tests show the post-treatment hours gap is not statistically different from the pre-treatment gap ($p = 0.36$). The raw hours gap actually \textit{narrowed} from 27.3 to 24.8 hours post-embargo. We therefore interpret the hours mechanism cautiously.
+\textbf{We emphasize important caveats about causal interpretation.} First, our estimated effect is close to the minimum detectable effect given our sample size (MDE = 3.9\%), explaining the borderline statistical significance. Second, dose-response tests show no evidence that effects are larger in regions with greater exposure to banned products. Third, and most concerning, the 2014--2015 ruble depreciation (approximately 70\%) represents a serious confound: manufacturing workers, who were \textit{not} protected by the food embargo, also show earnings gains of approximately 2\%. This suggests that at most one-third of the agricultural effect can be attributed to the embargo specifically, with the remainder potentially explained by depreciation.
+
+Additionally, our hours decomposition is inconclusive: agricultural workers worked substantially more hours than non-agricultural workers \textit{before} the embargo (27 hours more per month), and formal tests cannot reject that the post-treatment hours gap equals the pre-treatment gap ($p = 0.36$).
 
 This nuance has important implications for evaluating trade protection:
 \begin{enumerate}
