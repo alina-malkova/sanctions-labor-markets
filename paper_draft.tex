@@ -47,7 +47,7 @@
 \begin{abstract}
 \noindent We study how domestic labor markets respond to sudden trade barriers using Russia's 2014 food import embargo as a natural experiment. Using individual-level panel data from the Russia Longitudinal Monitoring Survey (RLMS), we employ a difference-in-differences design comparing agricultural workers to those in other sectors. \textbf{Our primary sample covers 2010--2019}, providing a clean 5-year pre/post window uncontaminated by later shocks (COVID-19, Ukraine war).
 
-We find that agricultural workers experienced monthly earnings gains of 3--5 percent relative to other sectors following the embargo. Event study analysis shows these effects emerged after 2014 and grew over time, with pre-treatment coefficients close to zero. Effects are concentrated in high-agricultural-intensity regions, supporting a causal interpretation.
+We find that agricultural workers experienced monthly earnings gains of 3--5 percent relative to other sectors following the embargo. Event study analysis shows these effects emerged after 2014 and grew over time, with pre-treatment coefficients close to zero. Effects are concentrated in high-agricultural-intensity regions. However, dose-response tests find no evidence that effects are larger in regions with greater exposure to banned products---if anything, the pattern is reversed---which weakens the case that import substitution is the primary mechanism.
 
 We explore whether earnings gains reflected higher hourly wages or increased hours worked. The decomposition suggests hours played a role---agricultural workers worked 5 additional hours per month post-embargo while hourly wages showed no relative change. However, \textbf{this hours evidence is inconclusive}: agricultural workers worked substantially more hours than other workers \textit{before} the embargo (27 vs. 175 monthly), and formal tests cannot reject that the post-treatment hours gap equals the pre-treatment gap ($p = 0.36$). Placebo tests show similar ``effects'' at non-treatment dates. We therefore present monthly earnings as our primary finding and treat the hours decomposition as suggestive but not definitive.
 
@@ -1269,17 +1269,21 @@ Test for nonlinearity & & & p=0.183 & p=0.424 \\
 \end{threeparttable}
 \end{table}
 
-Contrary to our prediction, we find no evidence that effects are larger in higher-intensity regions. The linear interaction is negative (though not significant), suggesting if anything that effects are \textit{smaller} in regions with greater exposure to banned products. The quadratic term is also negative and not significant, providing no evidence of threshold effects or nonlinearity.
+\textbf{Contrary to our prediction, we find no evidence that effects are larger in higher-intensity regions.} The linear interaction is negative ($-$0.053, SE 0.056), suggesting if anything that effects are \textit{smaller} in regions with greater exposure to banned products. The high-tercile interaction is also negative ($-$0.098). None of these coefficients are statistically significant, but the consistent negative sign is the opposite of what the import substitution mechanism would predict.
+
+\paragraph{This null result is a challenge for the causal interpretation.} If the earnings gains we document were driven by import substitution increasing labor demand in agriculture, we would expect larger effects in regions more exposed to banned products. The failure to find this pattern---and the suggestion of the opposite pattern---raises questions about whether import substitution is the primary mechanism.
 
 \paragraph{Product-specific dose-response.} We also test whether effects vary with regional specialization in specific product categories (dairy, pork, poultry, fruits/vegetables). The only significant result is for fruits and vegetables: regions with higher pre-ban fruit/vegetable firm concentration show \textit{smaller} wage effects ($-$5.5\% per SD, p=0.007). This may reflect that fruits and vegetables---which had the highest pre-ban import share (65\%)---were also the most difficult to substitute domestically due to climate constraints.
 
-These null results on dose-response have several possible interpretations:
+\paragraph{Possible explanations (untested).} We offer several possible interpretations, but acknowledge that we cannot directly test them with available data:
 \begin{enumerate}
-    \item \textbf{Spillovers}: Agricultural labor markets may be integrated enough that treatment effects spread from high-intensity to low-intensity regions.
-    \item \textbf{Measurement error}: Our region-level intensity measure may poorly proxy individual-level exposure.
+    \item \textbf{Spillovers}: Agricultural labor markets may be integrated enough that treatment effects spread from high-intensity to low-intensity regions. We lack the geographic distance data needed to test this directly.
+    \item \textbf{Measurement error}: Our region-level intensity measure may poorly proxy individual-level exposure to import substitution.
     \item \textbf{Ceiling effects}: Very high-intensity regions may have already been operating near capacity, limiting additional gains.
-    \item \textbf{True null}: Treatment intensity may genuinely not predict effect heterogeneity in this setting.
+    \item \textbf{Alternative mechanism}: The earnings gains may not be primarily driven by import substitution, but by other factors correlated with the embargo (e.g., ruble depreciation making all agriculture more competitive, or government subsidies to the sector).
 \end{enumerate}
+
+\textbf{Bottom line}: The absence of dose-response weakens the case that import substitution is the mechanism driving our results. While we find robust evidence that agricultural workers experienced earnings gains after 2014, the null dose-response result leaves open the possibility that these gains reflect sector-wide trends rather than differential exposure to import substitution.
 
 %==============================================================================
 \section{Discussion}
