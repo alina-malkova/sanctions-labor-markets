@@ -569,6 +569,52 @@ The key finding is in Column (4): the triple-difference coefficient is 0.026 and
 
 This pattern is consistent with our theoretical framework: labor market effects of import substitution are concentrated in regions where agriculture constitutes a larger share of economic activity. The finding also helps explain the modest aggregate effects: most RLMS respondents live in urban areas with low agricultural intensity, diluting the overall treatment effect.
 
+\textbf{This geographic heterogeneity is important for external validity}: Our average effects understate the impact in agricultural regions where the policy was most relevant. In regions like Amur Oblast (38\% agricultural employment), the implied effect of 4--5\% is economically meaningful and more representative of the embargo's impact on agricultural communities.
+
+\subsection{Firm Type Heterogeneity: Enterprises vs. Family Farms}
+
+A key question is whether protection benefits accrued to workers at large agriholdings or at smaller family farms. Our RFSD firm-level analysis showed substantial consolidation (42\% decline in firm counts, with the top 10\% holding 92\%+ of assets), suggesting large firms captured most of the sector's gains. If this is true, workers at large firms may have seen smaller wage gains (with rents retained as profits) while workers at small farms---with less market power---may have seen more direct wage pass-through.
+
+The RLMS includes an enterprise type variable distinguishing workers at ``enterprises or organizations'' (formal employers, 88\% of agricultural workers) from those ``not at an enterprise'' (likely family farms or informal operations, 12\%). Table \ref{tab:firmtype} tests for differential effects.
+
+\begin{table}[H]
+\centering
+\caption{Firm Type Heterogeneity: Enterprises vs. Family Farms}
+\label{tab:firmtype}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+& (1) & (2) & (3) & (4) \\
+& All Agri & Enterprises & Family Farms & Triple DiD \\
+\midrule
+Agriculture $\times$ Post & 0.031 & 0.029 & 0.030 & 0.026 \\
+& (0.031) & (0.035) & (0.047) & (0.032) \\
+Agri $\times$ Informal $\times$ Post & & & & 0.050 \\
+& & & & (0.035) \\
+\midrule
+N (agricultural workers) & 3,204 & 2,825 & 374 & 3,199 \\
+MDE (80\% power) & 3.9\% & 4.2\% & 11.5\% & --- \\
+Observations & 78,095 & 77,716 & 75,265 & 78,095 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} All specifications include individual and year fixed effects (2010--2019). ``Enterprises'' = workers reporting employment at ``an enterprise or organization.'' ``Family Farms'' = workers reporting ``not an enterprise'' (informal/family operations). Column (4) includes an interaction term for informal farm workers. MDE = minimum detectable effect at 80\% power. Standard errors clustered at region level. * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The results show remarkably similar effects across firm types: enterprises show a 2.9\% gain (SE: 3.5\%) while family farms show a 3.0\% gain (SE: 4.7\%). The triple-difference interaction (Column 4) is positive but not significant, providing no evidence that informal farm workers experienced larger gains.
+
+\textbf{Interpretation with caveats:}
+\begin{itemize}
+    \item The ``enterprise'' proxy captures formality, not necessarily size. A medium-sized formal farm and a large agriholding would both report ``enterprise.''
+    \item Only 12\% of agricultural workers are in the informal/family farm category (N=374), yielding an MDE of 11.5\%---we can only detect effects larger than this.
+    \item The uniform effect across firm types is consistent with either: (a) protection benefits being shared similarly across firm types, or (b) large firms retaining rents as profits while small farms passed them through as wages, but with higher baseline productivity at large firms offsetting this.
+\end{itemize}
+
+We cannot definitively test the hypothesis that large agriholdings captured protection rents as profits. This would require matched employer-employee data linking individual workers to firm financial outcomes.
+
 %==============================================================================
 \section{Robustness Checks} \label{sec:robustness}
 %==============================================================================
@@ -1782,7 +1828,7 @@ This nuance has important implications for evaluating trade protection:
     \item \textbf{Policy evaluation}: The welfare gains to workers from protection are smaller than raw earnings changes suggest once the disutility of additional work is accounted for.
 \end{enumerate}
 
-Several avenues for future research emerge. First, linking worker-level data to firm-level outcomes could help identify whether firms captured protection rents. Second, incorporating consumption data could enable a fuller welfare analysis. Third, studying heterogeneity across sub-sectors where import substitution succeeded (pork, poultry) versus failed (dairy) could illuminate the conditions under which protection benefits workers.
+Several avenues for future research emerge. Our analysis of firm type heterogeneity (enterprises vs. family farms) and geographic heterogeneity (by regional agricultural intensity) reveals that effects are concentrated in high-agricultural-intensity regions but do not vary significantly by firm type. However, we lack matched employer-employee data to directly test whether large agriholdings captured protection rents as profits rather than passing them to workers as wages. Incorporating consumption data could enable fuller welfare analysis, and studies with sub-sector identifiers could illuminate variation across products where import substitution succeeded (pork, poultry) versus failed (dairy).
 
 \newpage
 

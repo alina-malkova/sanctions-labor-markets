@@ -1,0 +1,391 @@
+------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Wo
+> rking santctions/output/analysis_firmsize_v2_log.txt
+  log type:  text
+ opened on:   8 Feb 2026, 06:46:56
+
+. 
+. di "======================================================================"
+======================================================================
+
+. di "FIRM SIZE HETEROGENEITY: ENTERPRISE VS NON-ENTERPRISE"
+FIRM SIZE HETEROGENEITY: ENTERPRISE VS NON-ENTERPRISE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. use "output/rlms_analysis_sample.dta", clear
+
+. keep if year >= 2010 & year <= 2019
+(27,047 observations deleted)
+
+. 
+. ********************************************************************************
+. * PART 1: Create Firm Type Categories from Enterprise Type
+. ********************************************************************************
+. 
+. di _n "=== PART 1: ENTERPRISE TYPE DISTRIBUTION ==="
+
+=== PART 1: ENTERPRISE TYPE DISTRIBUTION ===
+
+. 
+. * enterprise_type coding:
+. * 1 = "You work at an enterprise or organization" (formal employers)
+. * 2 = "Not an enterprise, nor an organization" (family farms, individual)
+. * 99999998 = Does not know
+. 
+. tab enterprise_type if agri == 1, m
+
+                        Enterprise type |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+You work at an enterprise or organizati |      2,825       88.17       88.17
+ Not an enterprise, nor an organization |        374       11.67       99.84
+                          DOES NOT KNOW |          5        0.16      100.00
+----------------------------------------+-----------------------------------
+                                  Total |      3,204      100.00
+
+. 
+. * Create binary indicator
+. * Formal enterprise = likely larger agriholdings
+. * Non-enterprise = likely small family farms
+. gen formal_enterprise = (enterprise_type == 1) if enterprise_type < 99999990
+(151 missing values generated)
+
+. gen informal_farm = (enterprise_type == 2) if enterprise_type < 99999990
+(151 missing values generated)
+
+. 
+. di _n "=== Sample Sizes ==="
+
+=== Sample Sizes ===
+
+. count if agri == 1 & formal_enterprise == 1
+  2,825
+
+. count if agri == 1 & informal_farm == 1
+  374
+
+. 
+. * Calculate percentages
+. qui count if agri == 1 & enterprise_type < 99999990
+
+. local total = r(N)
+
+. qui count if agri == 1 & formal_enterprise == 1
+
+. local formal_n = r(N)
+
+. qui count if agri == 1 & informal_farm == 1
+
+. local informal_n = r(N)
+
+. 
+. di _n "Formal enterprises: `formal_n' (" %4.1f `formal_n'/`total'*100 "%)"
+
+Formal enterprises: 2825 (88.3%)
+
+. di "Informal/family farms: `informal_n' (" %4.1f `informal_n'/`total'*100 "%)"
+Informal/family farms: 374 (11.7%)
+
+. 
+. ********************************************************************************
+. * PART 2: Heterogeneity Analysis
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 2: HETEROGENEITY BY ENTERPRISE TYPE"
+PART 2: HETEROGENEITY BY ENTERPRISE TYPE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. cap drop post agri_post
+
+. gen post = (year >= 2014)
+
+. gen agri_post = agri * post
+
+. 
+. * 2A: Interaction Model
+. di _n "=== 2A: Interaction Model ==="
+
+=== 2A: Interaction Model ===
+
+. 
+. gen agri_informal = agri * informal_farm
+(151 missing values generated)
+
+. gen agri_informal_post = agri * informal_farm * post
+(151 missing values generated)
+
+. 
+. quietly reghdfe ln_wage agri_post agri_informal_post, absorb(idind year) cluster(region)
+
+. di "Agri x Post (formal enterprises): " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_post
+> ] ")"
+Agri x Post (formal enterprises):  0.0256 (SE: 0.0322)
+
+. local b_formal = _b[agri_post]
+
+. local se_formal = _se[agri_post]
+
+. di "Agri x Informal x Post (additional): " %7.4f _b[agri_informal_post] " (SE: " %6.4f _
+> se[agri_informal_post] ")"
+Agri x Informal x Post (additional):  0.0497 (SE: 0.0350)
+
+. local b_informal_add = _b[agri_informal_post]
+
+. local se_informal_add = _se[agri_informal_post]
+
+. 
+. * Implied effect for informal
+. local b_informal = `b_formal' + `b_informal_add'
+
+. di "Implied effect for informal farms: " %7.4f `b_informal'
+Implied effect for informal farms:  0.0753
+
+. 
+. * 2B: Separate Regressions
+. di _n "=== 2B: Separate Regressions ==="
+
+=== 2B: Separate Regressions ===
+
+. 
+. * All agriculture
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. di "All agriculture: " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_post] ")"
+All agriculture:  0.0310 (SE: 0.0306)
+
+. local b_all = _b[agri_post]
+
+. local se_all = _se[agri_post]
+
+. 
+. * Formal enterprises only
+. preserve
+
+. keep if formal_enterprise == 1 | agri == 0
+(379 observations deleted)
+
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. di "Formal enterprises only: " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_post] ")"
+Formal enterprises only:  0.0290 (SE: 0.0345)
+
+. local b_formal_sep = _b[agri_post]
+
+. local se_formal_sep = _se[agri_post]
+
+. restore
+
+. 
+. * Informal/family farms only
+. preserve
+
+. keep if informal_farm == 1 | agri == 0
+(2,830 observations deleted)
+
+. quietly reghdfe ln_wage agri_post, absorb(idind year) cluster(region)
+
+. di "Informal/family farms only: " %7.4f _b[agri_post] " (SE: " %6.4f _se[agri_post] ")"
+Informal/family farms only:  0.0296 (SE: 0.0468)
+
+. local b_informal_sep = _b[agri_post]
+
+. local se_informal_sep = _se[agri_post]
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 3: Power Analysis
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 3: POWER ANALYSIS"
+PART 3: POWER ANALYSIS
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "=== Sample Sizes and MDEs ==="
+
+=== Sample Sizes and MDEs ===
+
+. di ""
+
+
+. di "Group                        | N      | MDE (80% power)"
+Group                        | N      | MDE (80% power)
+
+. di "-----------------------------|--------|----------------"
+-----------------------------|--------|----------------
+
+. 
+. count if agri == 1
+  3,204
+
+. local n_all = r(N)
+
+. local mde_all = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n_all')
+
+. di "All agriculture              | " %6.0f `n_all' " | " %5.1f `mde_all'*100 "%"
+All agriculture              |   3204 |   3.9%
+
+. 
+. count if agri == 1 & formal_enterprise == 1
+  2,825
+
+. local n_formal = r(N)
+
+. local mde_formal = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n_formal')
+
+. di "Formal enterprises           | " %6.0f `n_formal' " | " %5.1f `mde_formal'*100 "%"
+Formal enterprises           |   2825 |   4.2%
+
+. 
+. count if agri == 1 & informal_farm == 1
+  374
+
+. local n_informal = r(N)
+
+. local mde_informal = 2.8 * 0.65 * sqrt(1.5) / sqrt(`n_informal')
+
+. di "Informal/family farms        | " %6.0f `n_informal' " | " %5.1f `mde_informal'*100 "
+> %"
+Informal/family farms        |    374 |  11.5%
+
+. 
+. ********************************************************************************
+. * PART 4: Summary Table
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 4: SUMMARY TABLE"
+PART 4: SUMMARY TABLE
+
+. di "======================================================================"
+======================================================================
+
+. 
+. * Store results
+. tempname results
+
+. postfile `results' str35 group coef se n mde using "output/tables/firmsize_v2_results.dt
+> a", replace
+(note: file output/tables/firmsize_v2_results.dta not found)
+
+. 
+. post `results' ("All agriculture") (`b_all') (`se_all') (`n_all') (`mde_all')
+
+. post `results' ("Formal enterprises (88%)") (`b_formal_sep') (`se_formal_sep') (`n_forma
+> l') (`mde_formal')
+
+. post `results' ("Informal/family farms (12%)") (`b_informal_sep') (`se_informal_sep') (`
+> n_informal') (`mde_informal')
+
+. 
+. postclose `results'
+
+. 
+. * Display results
+. use "output/tables/firmsize_v2_results.dta", clear
+
+. di _n "=== Firm Type Heterogeneity Results ==="
+
+=== Firm Type Heterogeneity Results ===
+
+. list, sep(0)
+
+     +---------------------------------------------------------------------+
+     |                       group       coef         se      n        mde |
+     |---------------------------------------------------------------------|
+  1. |             All agriculture   .0310473   .0306432   3204   .0393796 |
+  2. |    Formal enterprises (88%)   .0289966   .0345225   2825    .041938 |
+  3. | Informal/family farms (12%)   .0296344   .0467602    374   .1152607 |
+     +---------------------------------------------------------------------+
+
+. 
+. * Export
+. export delimited using "output/tables/firmsize_v2_results.csv", replace
+(note: file output/tables/firmsize_v2_results.csv not found)
+file output/tables/firmsize_v2_results.csv saved
+
+. 
+. ********************************************************************************
+. * PART 5: Interpretation
+. ********************************************************************************
+. 
+. di ""
+
+
+. di "======================================================================"
+======================================================================
+
+. di "PART 5: INTERPRETATION"
+PART 5: INTERPRETATION
+
+. di "======================================================================"
+======================================================================
+
+. 
+. di _n "KEY FINDINGS:"
+
+KEY FINDINGS:
+
+. di ""
+
+
+. di "1. Enterprise type provides a proxy for firm formality:"
+1. Enterprise type provides a proxy for firm formality:
+
+. di "   - 88% of agricultural workers report working at 'enterprises'"
+   - 88% of agricultural workers report working at 'enterprises'
+
+. di "   - 12% report 'not an enterprise' (likely family farms, informal)"
+   - 12% report 'not an enterprise' (likely family farms, informal)
+
+. di ""
+
+
+. di "2. Results by enterprise type:"
+2. Results by enterprise type:
+
+. di "   - Formal enterprises: " %5.3f `b_formal_sep' " (SE: " %5.3f `se_formal_sep' ")"
+   - Formal enterprises: 0.029 (SE: 0.035)
+
+. di "   - Informal/family: " %5.3f `b_informal_sep' " (SE: " %5.3f `se_informal_sep' ")"
+   - Informal/family: 0.030 (SE: 0.047)
+
+. di ""
+
+
+. di "3. Power considerations:"
+3. Power considerations:
+
+. di "   - Formal enterprises (N=" %0.0f `n_formal' "): MDE = " %4.1f `mde_formal'*100 "%"
+   - Formal enterprises (N=invalid %format
+r(120);
+
+end of do-file
+r(120);
