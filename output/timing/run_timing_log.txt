@@ -1,0 +1,20 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/timing/run_timing_log.txt
+  log type:  text
+ opened on:  10 Feb 2026, 10:56:58
+
+. 
+. use "output/timing/rlms_timing_sample.dta", clear
+
+. 
+. * Variables
+. capture drop agri post_embargo agri_x_post
+
+. gen agri = (industry == 8)
+variable agri already defined
+r(110);
+
+end of do-file
+r(110);

@@ -1,0 +1,1049 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/timing/analysis_embargo_timing_log.txt
+  log type:  text
+ opened on:  10 Feb 2026, 10:49:34
+
+. 
+. ********************************************************************************
+. * PART 1: Load and Prepare Data with Interview Dates
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 1: Loading RLMS with Interview Dates"
+PART 1: Loading RLMS with Interview Dates
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "IND/RLMS_IND_1994_2023_eng_dta.dta", clear
+
+. 
+. * Keep analysis years
+. keep if year >= 2010 & year <= 2019  // Pre-COVID/war period
+(243,118 observations deleted)
+
+. 
+. * Keep key variables including interview date
+. keep idind id_h year region psu status ///
+>      int_y h7_1 h7_2 ///
+>      age h5 h6 educ diplom marst ///
+>      j1 j10 j10_1 j10_2 j4_1 j8 j11 j9 ///
+>      occup08 inwgt
+
+. 
+. * Rename interview date variables
+. rename int_y interview_year
+
+. rename h7_1 interview_day
+
+. rename h7_2 interview_month
+
+. 
+. * Create interview date variable
+. gen interview_date = mdy(interview_month, interview_day, interview_year) if ///
+>     interview_month > 0 & interview_day > 0 & interview_year > 0
+(1 missing value generated)
+
+. format interview_date %td
+
+. 
+. * Create year-month variable
+. gen interview_ym = ym(interview_year, interview_month) if interview_month > 0
+
+. format interview_ym %tm
+
+. 
+. di "Interview dates created"
+Interview dates created
+
+. tab interview_year interview_month if year == 2014, missing
+
+ Interview |            Interview month--cov
+      year |   January    October   November   December |     Total
+-----------+--------------------------------------------+----------
+      2014 |         0      4,450     11,159      2,561 |    18,170 
+      2015 |       202          0          0          0 |       202 
+-----------+--------------------------------------------+----------
+     Total |       202      4,450     11,159      2,561 |    18,372 
+
+. 
+. ********************************************************************************
+. * PART 2: Clean Variables
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 2: Cleaning Variables"
+PART 2: Cleaning Variables
+
+. di as text "=========================================="
+==========================================
+
+. 
+. * Rename for clarity
+. rename h5 female
+
+. replace female = (female == 2)
+(198,426 real changes made)
+
+. 
+. rename j10 wage_month
+
+. replace wage_month = . if wage_month >= 99999990
+(2,742 real changes made, 2,742 to missing)
+
+. replace wage_month = . if wage_month <= 0
+(0 real changes made)
+
+. 
+. gen ln_wage = ln(wage_month)
+(115,427 missing values generated)
+
+. 
+. rename j4_1 industry
+
+. replace industry = . if industry >= 99999990
+(1,142 real changes made, 1,142 to missing)
+
+. 
+. rename j8 hours_month
+
+. replace hours_month = . if hours_month >= 99999990
+(7,650 real changes made, 7,650 to missing)
+
+. 
+. rename j1 employed
+
+. replace age = . if age >= 99999990
+(0 real changes made)
+
+. 
+. * Education
+. replace educ = . if educ >= 99999990
+(361 real changes made, 361 to missing)
+
+. gen educ_cat = .
+(198,426 missing values generated)
+
+. replace educ_cat = 1 if educ <= 6
+(4,034 real changes made)
+
+. replace educ_cat = 2 if educ >= 7 & educ <= 12
+(28,307 real changes made)
+
+. replace educ_cat = 3 if educ >= 13 & educ <= 17
+(50,377 real changes made)
+
+. replace educ_cat = 4 if educ >= 18 & educ < .
+(80,565 real changes made)
+
+. 
+. gen age_sq = age^2
+
+. 
+. ********************************************************************************
+. * PART 3: Define Treatment Variables with Precise Timing
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 3: Creating Timing Variables"
+PART 3: Creating Timing Variables
+
+. di as text "=========================================="
+==========================================
+
+. 
+. * Agriculture sector
+. gen agri = (industry == 8)
+
+. label var agri "Agriculture sector"
+
+. 
+. * Key dates
+. * Embargo announcement: August 6, 2014
+. local embargo_date = mdy(8, 6, 2014)
+
+. di "Embargo date: " %td `embargo_date'
+Embargo date: 06aug2014
+
+. 
+. * Ruble crash: December 16, 2014 ("Black Tuesday")
+. local crash_date = mdy(12, 16, 2014)
+
+. di "Ruble crash date: " %td `crash_date'
+Ruble crash date: 16dec2014
+
+. 
+. * Create timing periods based on interview date
+. gen timing_period = .
+(198,426 missing values generated)
+
+. * Period 0: Pre-2014 (baseline)
+. replace timing_period = 0 if year < 2014
+(87,621 real changes made)
+
+. * Period 1: Early 2014 (pre-embargo)
+. replace timing_period = 1 if year == 2014 & interview_month < 8
+(202 real changes made)
+
+. * Period 2: Aug-Nov 2014 (POST-EMBARGO, PRE-CRASH) - KEY IDENTIFICATION WINDOW
+. replace timing_period = 2 if year == 2014 & interview_month >= 8 & interview_month <= 11
+(15,609 real changes made)
+
+. * Period 3: Dec 2014 (post-embargo, post-crash)
+. replace timing_period = 3 if year == 2014 & interview_month == 12
+(2,561 real changes made)
+
+. * Period 4: 2015+ (post-both)
+. replace timing_period = 4 if year >= 2015
+(92,433 real changes made)
+
+. 
+. label define timing_lbl 0 "Pre-2014" 1 "Jan-Jul 2014" 2 "Aug-Nov 2014" 3 "Dec 2014" 4 "2015+"
+
+. label values timing_period timing_lbl
+
+. 
+. tab timing_period, missing
+
+timing_perio |
+           d |      Freq.     Percent        Cum.
+-------------+-----------------------------------
+    Pre-2014 |     87,621       44.16       44.16
+Jan-Jul 2014 |        202        0.10       44.26
+Aug-Nov 2014 |     15,609        7.87       52.13
+    Dec 2014 |      2,561        1.29       53.42
+       2015+ |     92,433       46.58      100.00
+-------------+-----------------------------------
+       Total |    198,426      100.00
+
+. tab timing_period agri, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+timing_perio |  Agriculture sector
+           d |         0          1 |     Total
+-------------+----------------------+----------
+    Pre-2014 |    85,685      1,936 |    87,621 
+             |     97.79       2.21 |    100.00 
+-------------+----------------------+----------
+Jan-Jul 2014 |       202          0 |       202 
+             |    100.00       0.00 |    100.00 
+-------------+----------------------+----------
+Aug-Nov 2014 |    15,322        287 |    15,609 
+             |     98.16       1.84 |    100.00 
+-------------+----------------------+----------
+    Dec 2014 |     2,540         21 |     2,561 
+             |     99.18       0.82 |    100.00 
+-------------+----------------------+----------
+       2015+ |    90,973      1,460 |    92,433 
+             |     98.42       1.58 |    100.00 
+-------------+----------------------+----------
+       Total |   194,722      3,704 |   198,426 
+             |     98.13       1.87 |    100.00 
+
+. 
+. * Binary indicators
+. gen post_embargo = (timing_period >= 2) if timing_period < .
+
+. label var post_embargo "Post-Aug 2014 embargo"
+
+. 
+. gen post_crash = (timing_period >= 3) if timing_period < .
+
+. label var post_crash "Post-Dec 2014 ruble crash"
+
+. 
+. gen embargo_precrash = (timing_period == 2)
+
+. label var embargo_precrash "Aug-Nov 2014: Post-embargo, Pre-crash"
+
+. 
+. * Interaction terms
+. gen agri_post_embargo = agri * post_embargo
+
+. gen agri_post_crash = agri * post_crash
+
+. gen agri_embargo_precrash = agri * embargo_precrash
+
+. 
+. ********************************************************************************
+. * PART 4: Sample Restrictions
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 4: Sample Restrictions"
+PART 4: Sample Restrictions
+
+. di as text "=========================================="
+==========================================
+
+. 
+. * Working-age
+. keep if age >= 18 & age <= 65
+(69,796 observations deleted)
+
+. di "Observations (working age): " _N
+Observations (working age): 128630
+
+. 
+. * Employed with wages
+. keep if employed == 1
+(44,431 observations deleted)
+
+. di "Observations (employed): " _N
+Observations (employed): 84199
+
+. 
+. keep if wage_month != . & wage_month > 0
+(5,198 observations deleted)
+
+. di "Observations (with wages): " _N
+Observations (with wages): 79001
+
+. 
+. keep if industry != .
+(906 observations deleted)
+
+. di "Observations (with industry): " _N
+Observations (with industry): 78095
+
+. 
+. * Non-missing timing
+. keep if timing_period != .
+(0 observations deleted)
+
+. di "Observations (with timing): " _N
+Observations (with timing): 78095
+
+. 
+. save "output/timing/rlms_timing_sample.dta", replace
+(file output/timing/rlms_timing_sample.dta not found)
+file output/timing/rlms_timing_sample.dta saved
+
+. 
+. ********************************************************************************
+. * PART 5: Descriptive Statistics by Timing
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 5: Descriptive Statistics"
+PART 5: Descriptive Statistics
+
+. di as text "=========================================="
+==========================================
+
+. 
+. * Sample sizes
+. di "=== SAMPLE SIZES BY TIMING PERIOD ==="
+=== SAMPLE SIZES BY TIMING PERIOD ===
+
+. tab timing_period agri, missing
+
+timing_perio |  Agriculture sector
+           d |         0          1 |     Total
+-------------+----------------------+----------
+    Pre-2014 |    33,428      1,633 |    35,061 
+Jan-Jul 2014 |        94          0 |        94 
+Aug-Nov 2014 |     5,894        255 |     6,149 
+    Dec 2014 |     1,098         18 |     1,116 
+       2015+ |    34,377      1,298 |    35,675 
+-------------+----------------------+----------
+       Total |    74,891      3,204 |    78,095 
+
+. 
+. * Mean wages by timing period
+. di "=== MEAN WAGES BY TIMING PERIOD ==="
+=== MEAN WAGES BY TIMING PERIOD ===
+
+. table timing_period agri, stat(mean ln_wage) stat(sd ln_wage) stat(count ln_wage)
+
+-----------------------------------------------------------------
+                                |        Agriculture sector      
+                                |         0          1      Total
+--------------------------------+--------------------------------
+timing_period                   |                                
+  Pre-2014                      |                                
+    Mean                        |  9.576361    9.10827   9.554559
+    Standard deviation          |  .7012061   .6647792    .706463
+    Number of nonmissing values |    33,428      1,633     35,061
+  Jan-Jul 2014                  |                                
+    Mean                        |  9.870488              9.870488
+    Standard deviation          |  .8245277              .8245277
+    Number of nonmissing values |        94                    94
+  Aug-Nov 2014                  |                                
+    Mean                        |  9.812751   9.414547   9.796237
+    Standard deviation          |  .6605211   .7022715   .6669872
+    Number of nonmissing values |     5,894        255      6,149
+  Dec 2014                      |                                
+    Mean                        |  9.981575   9.475456   9.973412
+    Standard deviation          |  .6752761   .3646299   .6743383
+    Number of nonmissing values |     1,098         18      1,116
+  2015+                         |                                
+    Mean                        |  10.00965   9.695576   9.998219
+    Standard deviation          |  .6426357   .5938679    .643611
+    Number of nonmissing values |    34,377      1,298     35,675
+  Total                         |                                
+    Mean                        |  9.800165   9.372637   9.782625
+    Standard deviation          |  .7027717    .697062   .7076336
+    Number of nonmissing values |    74,891      3,204     78,095
+-----------------------------------------------------------------
+
+. 
+. * Focus on the critical 2014 period
+. di "=== DETAILED 2014 BREAKDOWN ==="
+=== DETAILED 2014 BREAKDOWN ===
+
+. preserve
+
+. keep if year == 2014
+(70,736 observations deleted)
+
+. tab interview_month agri, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+        Interview |  Agriculture sector
+       month--cov |         0          1 |     Total
+------------------+----------------------+----------
+          January |        94          0 |        94 
+                  |    100.00       0.00 |    100.00 
+------------------+----------------------+----------
+          October |     1,484        105 |     1,589 
+                  |     93.39       6.61 |    100.00 
+------------------+----------------------+----------
+         November |     4,410        150 |     4,560 
+                  |     96.71       3.29 |    100.00 
+------------------+----------------------+----------
+         December |     1,098         18 |     1,116 
+                  |     98.39       1.61 |    100.00 
+------------------+----------------------+----------
+            Total |     7,086        273 |     7,359 
+                  |     96.29       3.71 |    100.00 
+
+. table interview_month agri, stat(mean ln_wage) stat(mean wage_month) stat(count ln_wage)
+
+-----------------------------------------------------------------------
+                                      |        Agriculture sector      
+                                      |         0          1      Total
+--------------------------------------+--------------------------------
+Interview month--cov                  |                                
+  January                             |                                
+    Mean                              |                                
+      ln_wage                         |  9.870488              9.870488
+      After-tax wages last 30d--job 1 |  25209.57              25209.57
+    Number of nonmissing values       |                                
+      ln_wage                         |        94                    94
+  October                             |                                
+    Mean                              |                                
+      ln_wage                         |  9.730047   9.251836   9.698447
+      After-tax wages last 30d--job 1 |  20860.94   12826.72   20330.04
+    Number of nonmissing values       |                                
+      ln_wage                         |     1,484        105      1,589
+  November                            |                                
+    Mean                              |                                
+      ln_wage                         |  9.840581   9.528444   9.830314
+      After-tax wages last 30d--job 1 |  23160.17   18507.07    23007.1
+    Number of nonmissing values       |                                
+      ln_wage                         |     4,410        150      4,560
+  December                            |                                
+    Mean                              |                                
+      ln_wage                         |  9.981575   9.475456   9.973412
+      After-tax wages last 30d--job 1 |  26843.77   13905.56   26635.09
+    Number of nonmissing values       |                                
+      ln_wage                         |     1,098         18      1,116
+  Total                               |                                
+    Mean                              |                                
+      ln_wage                         |  9.839677   9.418563   9.824054
+      After-tax wages last 30d--job 1 |  23276.62   16018.92   23007.38
+    Number of nonmissing values       |                                
+      ln_wage                         |     7,086        273      7,359
+-----------------------------------------------------------------------
+
+. restore
+
+. 
+. ********************************************************************************
+. * PART 6: Main Results - Separating Embargo from Crash Effects
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 6: Separating Embargo from Crash"
+PART 6: Separating Embargo from Crash
+
+. di as text "=========================================="
+==========================================
+
+. 
+. eststo clear
+
+. 
+. * Model 1: Standard DiD (baseline for comparison)
+. gen post = (year >= 2014)
+
+. gen agri_post = agri * post
+
+. eststo m1: reghdfe ln_wage agri_post, ///
+>     absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3176
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_post |   .0310473   .0306432     1.01   0.318    -.0310417    .0931363
+       _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estadd local indfe "Yes"
+
+added macro:
+              e(indfe) : "Yes"
+
+. estadd local yearfe "Yes"
+
+added macro:
+             e(yearfe) : "Yes"
+
+. 
+. * Model 2: Post-embargo effect (Aug 2014+)
+. eststo m2: reghdfe ln_wage agri_post_embargo, ///
+>     absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3176
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0001
+Number of clusters (region)  =         38         Root MSE        =     0.3482
+
+                                     (Std. err. adjusted for 38 clusters in region)
+-----------------------------------------------------------------------------------
+                  |               Robust
+          ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+------------------+----------------------------------------------------------------
+agri_post_embargo |   .0310473   .0306432     1.01   0.318    -.0310417    .0931363
+            _cons |    9.79057   .0006368  1.5e+04   0.000      9.78928    9.791861
+-----------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estadd local indfe "Yes"
+
+added macro:
+              e(indfe) : "Yes"
+
+. estadd local yearfe "Yes"
+
+added macro:
+             e(yearfe) : "Yes"
+
+. 
+. * Model 3: Post-crash effect (Dec 2014+)
+. eststo m3: reghdfe ln_wage agri_post_crash, ///
+>     absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   1,     37) =       3.10
+Statistics robust to heteroskedasticity           Prob > F        =     0.0866
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                   (Std. err. adjusted for 38 clusters in region)
+---------------------------------------------------------------------------------
+                |               Robust
+        ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+agri_post_crash |   .0466549   .0265022     1.76   0.087    -.0070436    .1003533
+          _cons |   9.790405   .0004606  2.1e+04   0.000     9.789471    9.791338
+---------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estadd local indfe "Yes"
+
+added macro:
+              e(indfe) : "Yes"
+
+. estadd local yearfe "Yes"
+
+added macro:
+             e(yearfe) : "Yes"
+
+. 
+. * Model 4: KEY - Aug-Nov 2014 window only (pre-crash!)
+. * Compares Aug-Nov 2014 agricultural workers to pre-2014 baseline
+. * If effect is significant HERE, embargo effect precedes crash
+. preserve
+
+. keep if timing_period == 0 | timing_period == 2  // Pre-2014 vs Aug-Nov 2014
+(36,885 observations deleted)
+
+. eststo m4: reghdfe ln_wage agri_embargo_precrash, ///
+>     absorb(idind year) cluster(region)
+(dropped 5080 singleton observations)
+(MWFE estimator converged in 6 iterations)
+
+HDFE Linear regression                            Number of obs   =     36,130
+Absorbing 2 HDFE groups                           F(   1,     37) =       0.02
+Statistics robust to heteroskedasticity           Prob > F        =     0.8890
+                                                  R-squared       =     0.8341
+                                                  Adj R-squared   =     0.7623
+                                                  Within R-sq.    =     0.0000
+Number of clusters (region)  =         38         Root MSE        =     0.3414
+
+                                         (Std. err. adjusted for 38 clusters in region)
+---------------------------------------------------------------------------------------
+                      |               Robust
+              ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+----------------------+----------------------------------------------------------------
+agri_embargo_precrash |   .0064454   .0458494     0.14   0.889    -.0864543    .0993451
+                _cons |   9.594147   .0002906  3.3e+04   0.000     9.593558    9.594736
+---------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     10901       10901           0    *|
+        year |         5           0           5     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estadd local indfe "Yes"
+
+added macro:
+              e(indfe) : "Yes"
+
+. estadd local yearfe "Yes"
+
+added macro:
+             e(yearfe) : "Yes"
+
+. estadd local sample "Pre-2014 + Aug-Nov 2014"
+
+added macro:
+             e(sample) : "Pre-2014 + Aug-Nov 2014"
+
+. restore
+
+. 
+. * Model 5: Full model with separate timing indicators
+. gen agri_p1 = agri * (timing_period == 1)  // Early 2014
+
+. gen agri_p2 = agri * (timing_period == 2)  // Aug-Nov 2014 (KEY)
+
+. gen agri_p3 = agri * (timing_period == 3)  // Dec 2014
+
+. gen agri_p4 = agri * (timing_period == 4)  // 2015+
+
+. 
+. eststo m5: reghdfe ln_wage agri_p1 agri_p2 agri_p3 agri_p4, ///
+>     absorb(idind year) cluster(region)
+(dropped 5191 singleton observations)
+(MWFE estimator converged in 7 iterations)
+note: agri_p1 omitted because of collinearity
+
+HDFE Linear regression                            Number of obs   =     72,904
+Absorbing 2 HDFE groups                           F(   3,     37) =       3.42
+Statistics robust to heteroskedasticity           Prob > F        =     0.0269
+                                                  R-squared       =     0.8036
+                                                  Adj R-squared   =     0.7551
+                                                  Within R-sq.    =     0.0002
+Number of clusters (region)  =         38         Root MSE        =     0.3481
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     agri_p1 |          0  (omitted)
+     agri_p2 |  -.0231373   .0401394    -0.58   0.568    -.1044674    .0581928
+     agri_p3 |   -.063874   .0865013    -0.74   0.465    -.2391422    .1113942
+     agri_p4 |   .0449537   .0307195     1.46   0.152    -.0172898    .1071972
+       _cons |   9.790534   .0006388  1.5e+04   0.000     9.789239    9.791828
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       idind |     14421       14421           0    *|
+        year |        10           0          10     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estadd local indfe "Yes"
+
+added macro:
+              e(indfe) : "Yes"
+
+. estadd local yearfe "Yes"
+
+added macro:
+             e(yearfe) : "Yes"
+
+. 
+. * Export main table
+. esttab m1 m2 m3 m4 m5 using "output/timing/table_embargo_vs_crash.tex", ///
+>     replace booktabs label ///
+>     title("Separating Embargo Effect from Ruble Crash") ///
+>     mtitles("Standard DiD" "Post-Embargo" "Post-Crash" "Aug-Nov Only" "Full Timing") ///
+>     keep(agri_post agri_post_embargo agri_post_crash agri_embargo_precrash agri_p1 agri_p2 agri_p3 agr
+> i_p4) ///
+>     order(agri_post agri_post_embargo agri_post_crash agri_embargo_precrash agri_p1 agri_p2 agri_p3 ag
+> ri_p4) ///
+>     coeflabels(agri_post "Agri $\times$ Post-2014" ///
+>                agri_post_embargo "Agri $\times$ Post-Embargo (Aug 2014+)" ///
+>                agri_post_crash "Agri $\times$ Post-Crash (Dec 2014+)" ///
+>                agri_embargo_precrash "Agri $\times$ Aug-Nov 2014" ///
+>                agri_p1 "Agri $\times$ Jan-Jul 2014" ///
+>                agri_p2 "Agri $\times$ Aug-Nov 2014 (KEY)" ///
+>                agri_p3 "Agri $\times$ Dec 2014" ///
+>                agri_p4 "Agri $\times$ 2015+") ///
+>     stats(N r2_a indfe yearfe, ///
+>           labels("Observations" "Adj. R-squared" "Individual FE" "Year FE")) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     se(3) b(3) ///
+>     addnotes("Key test: Column 4 shows effect in Aug-Nov 2014 (after embargo, before crash)." ///
+>              "Significant effect in this window supports import substitution, not just depreciation.")
+(file output/timing/table_embargo_vs_crash.tex not found)
+(output written to output/timing/table_embargo_vs_crash.tex)
+
+. 
+. esttab m1 m2 m3 m4 m5 using "output/timing/table_embargo_vs_crash.csv", ///
+>     replace csv label
+(file output/timing/table_embargo_vs_crash.csv not found)
+(output written to output/timing/table_embargo_vs_crash.csv)
+
+. 
+. di as text ""
+
+
+. di as text "=== KEY INTERPRETATION ==="
+=== KEY INTERPRETATION ===
+
+. di as text "If agri_p2 (Aug-Nov 2014) is significant and positive:"
+If agri_p2 (Aug-Nov 2014) is significant and positive:
+
+. di as text "  -> Agricultural effects appear BEFORE the ruble crash"
+  -> Agricultural effects appear BEFORE the ruble crash
+
+. di as text "  -> Supports import substitution story over pure depreciation story"
+  -> Supports import substitution story over pure depreciation story
+
+. di as text ""
+
+
+. di as text "If agri_p2 is insignificant but agri_p3/agri_p4 are significant:"
+If agri_p2 is insignificant but agri_p3/agri_p4 are significant:
+
+. di as text "  -> Effects only appear after crash, harder to separate mechanisms"
+  -> Effects only appear after crash, harder to separate mechanisms
+
+. 
+. ********************************************************************************
+. * PART 7: Event Study with Monthly Precision
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 7: Monthly Event Study"
+PART 7: Monthly Event Study
+
+. di as text "=========================================="
+==========================================
+
+. 
+. * Create year-month relative to August 2014
+. gen rel_month = interview_ym - ym(2014, 8)  // Months relative to August 2014
+
+. label var rel_month "Months relative to August 2014 embargo"
+
+. 
+. * Keep reasonable window
+. keep if rel_month >= -24 & rel_month <= 60  // 2 years before to 5 years after
+(24,299 observations deleted)
+
+. 
+. * Create monthly dummies interacted with agriculture
+. forval m = -24/60 {
+  2.     if `m' != -1 {  // Omit July 2014 as reference
+  3.         local mname = cond(`m' < 0, "m" + string(abs(`m')), "p" + string(`m'))
+  4.         gen D_`mname' = (rel_month == `m') * agri
+  5.     }
+  6. }
+
+. 
+. * Run regression with quarterly aggregation for power
+. gen rel_quarter = floor(rel_month / 3)
+
+. forval q = -8/20 {
+  2.     if `q' != -1 {  // Omit Q-1 as reference
+  3.         local qname = cond(`q' < 0, "qm" + string(abs(`q')), "qp" + string(`q'))
+  4.         gen Q_`qname' = (rel_quarter == `q') * agri
+  5.     }
+  6. }
+
+. 
+. * Quarterly event study
+. reghdfe ln_wage Q_*, absorb(idind interview_ym) cluster(region)
+(dropped 4219 singleton observations)
+(MWFE estimator converged in 10 iterations)
+note: Q_qm6 omitted because of collinearity
+note: Q_qm5 omitted because of collinearity
+note: Q_qp2 omitted because of collinearity
+note: Q_qp3 omitted because of collinearity
+note: Q_qp6 omitted because of collinearity
+note: Q_qp7 omitted because of collinearity
+note: Q_qp10 omitted because of collinearity
+note: Q_qp11 omitted because of collinearity
+note: Q_qp14 omitted because of collinearity
+note: Q_qp15 omitted because of collinearity
+note: Q_qp18 omitted because of collinearity
+note: Q_qp19 omitted because of collinearity
+note: Q_qp20 omitted because of collinearity
+
+HDFE Linear regression                            Number of obs   =     49,577
+Absorbing 2 HDFE groups                           F(  15,     37) =       5.69
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.8162
+                                                  Adj R-squared   =     0.7599
+                                                  Within R-sq.    =     0.0012
+Number of clusters (region)  =         38         Root MSE        =     0.3307
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       Q_qm8 |  -.0870536    .035139    -2.48   0.018    -.1582519   -.0158552
+       Q_qm7 |  -.0038186   .0329289    -0.12   0.908    -.0705388    .0629016
+       Q_qm6 |          0  (omitted)
+       Q_qm5 |          0  (omitted)
+       Q_qm4 |  -.1515933   .0362571    -4.18   0.000    -.2250571   -.0781295
+       Q_qm3 |  -.0824687    .036445    -2.26   0.030    -.1563134    -.008624
+       Q_qm2 |   .0832497   .3012498     0.28   0.784    -.5271404    .6936399
+       Q_qp0 |  -.1151273   .0477767    -2.41   0.021    -.2119321   -.0183226
+       Q_qp1 |  -.0354295   .0329358    -1.08   0.289    -.1021638    .0313047
+       Q_qp2 |          0  (omitted)
+       Q_qp3 |          0  (omitted)
+       Q_qp4 |  -.0260603   .0372635    -0.70   0.489    -.1015632    .0494427
+       Q_qp5 |  -.0184617   .0507173    -0.36   0.718    -.1212248    .0843014
+       Q_qp6 |          0  (omitted)
+       Q_qp7 |          0  (omitted)
+       Q_qp8 |  -.0037321   .0343899    -0.11   0.914    -.0734126    .0659485
+       Q_qp9 |  -.0006793   .0575547    -0.01   0.991    -.1172962    .1159376
+      Q_qp10 |          0  (omitted)
+      Q_qp11 |          0  (omitted)
+      Q_qp12 |   .0272954   .0420368     0.65   0.520    -.0578793    .1124702
+      Q_qp13 |  -.0433509   .0427718    -1.01   0.317    -.1300149     .043313
+      Q_qp14 |          0  (omitted)
+      Q_qp15 |          0  (omitted)
+      Q_qp16 |   .0247509   .0411632     0.60   0.551    -.0586536    .1081554
+      Q_qp17 |   .0343541   .0303756     1.13   0.265    -.0271926    .0959008
+      Q_qp18 |          0  (omitted)
+      Q_qp19 |          0  (omitted)
+      Q_qp20 |          0  (omitted)
+       _cons |   9.859238   .0008904  1.1e+04   0.000     9.857434    9.861042
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+------------------------------------------------------+
+  Absorbed FE | Categories  - Redundant  = Num. Coefs |
+--------------+---------------------------------------|
+        idind |     11572       11572           0    *|
+ interview_ym |        35           0          35     |
+------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * Store coefficients
+. matrix b_q = e(b)
+
+. matrix V_q = e(V)
+
+. 
+. * Create plot data
+. preserve
+
+. clear
+
+. set obs 28  // -8 to +20 quarters, minus reference
+Number of observations (_N) was 0, now 28.
+
+. 
+. gen rel_quarter = _n - 9  // -8 to +19
+
+. replace rel_quarter = rel_quarter + 1 if rel_quarter >= -1  // Skip reference quarter
+(21 real changes made)
+
+. 
+. gen coef = .
+(28 missing values generated)
+
+. gen se = .
+(28 missing values generated)
+
+. 
+. local i = 1
+
+. forval q = -8/20 {
+  2.     if `q' != -1 {
+  3.         local qname = cond(`q' < 0, "qm" + string(abs(`q')), "qp" + string(`q'))
+  4.         capture replace coef = b_q[1, `i'] if rel_quarter == `q'
+  5.         capture replace se = sqrt(V_q[`i', `i']) if rel_quarter == `q'
+  6.         local i = `i' + 1
+  7.     }
+  8. }
+
+. 
+. * Add reference quarter
+. set obs 29
+Number of observations (_N) was 28, now 29.
+
+. replace rel_quarter = -1 in 29
+(1 real change made)
+
+. replace coef = 0 in 29
+(1 real change made)
+
+. replace se = 0 in 29
+(1 real change made)
+
+. sort rel_quarter
+
+. 
+. * Confidence intervals
+. gen ci_lo = coef - 1.96*se
+
+. gen ci_hi = coef + 1.96*se
+
+. 
+. * Convert to approximate dates for labels
+. gen approx_date = ym(2014, 8) + rel_quarter * 3
+
+. format approx_date %tm
+
+. 
+. * Plot with vertical lines for key events
+. twoway (rcap ci_lo ci_hi rel_quarter, lcolor(navy)) ///
+>        (scatter coef rel_quarter, mcolor(navy) msymbol(circle)) ///
+>        (line coef rel_quarter, lcolor(navy) lpattern(solid)), ///
+>     xline(0, lcolor(red) lpattern(dash) lwidth(medium)) ///
+>     xline(1.33, lcolor(orange) lpattern(shortdash) lwidth(medium)) ///
+>     yline(0, lcolor(gray) lpattern(solid)) ///
+>     xlabel(-8(2)20, labsize(small)) ///
+>     ylabel(, format(%9.2f)) ///
+>     xtitle("Quarters Relative to August 2014 Embargo") ///
+>     ytitle("Effect on Log Wages (Agriculture vs. Others)") ///
+>     title("Quarterly Event Study: Timing of Agricultural Wage Effects") ///
+>     note("Red dashed line: August 2014 embargo. Orange line: December 2014 ruble crash." ///
+>          "Reference period: Q-1 (May-July 2014). 95% CIs shown.") ///
+>     legend(off) ///
+>     scheme(s2color)
+
+. graph export "output/timing/event_study_quarterly.png", replace width(1200)
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/timing/event_study_quarterly.png saved as PNG format
+
+. graph export "output/timing/event_study_quarterly.pdf", replace
+file /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working
+    santctions/output/timing/event_study_quarterly.pdf saved as PDF format
+
+. 
+. restore
+
+. 
+. ********************************************************************************
+. * PART 8: Robustness - Different Control Groups
+. ********************************************************************************
+. 
+. di as text "=========================================="
+==========================================
+
+. di as text "PART 8: Robustness - Control Groups"
+PART 8: Robustness - Control Groups
+
+. di as text "=========================================="
+==========================================
+
+. 
+. use "output/timing/rlms_timing_sample.dta", clear
+
+. 
+. eststo clear
+
+. 
+. * Recreate key variables
+. gen agri = (industry == 8)
+variable agri already defined
+r(110);
+
+end of do-file
+r(110);

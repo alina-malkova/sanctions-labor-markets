@@ -1,0 +1,359 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/timing/run_timing2_log.txt
+  log type:  text
+ opened on:  10 Feb 2026, 10:59:47
+
+. 
+. use "output/timing/rlms_timing_sample.dta", clear
+
+. 
+. * Drop all existing variables we'll recreate
+. foreach v in agri post_embargo agri_x_post period agri_2012 agri_2014 agri_2015 agri_2016 {
+  2.     capture drop `v'
+  3. }
+
+. 
+. * Create fresh
+. gen agri = (industry == 8)
+
+. gen post_embargo = (year == 2014 & interview_month >= 8 & interview_month <= 11)
+
+. gen agri_x_post = agri * post_embargo
+
+. 
+. * Keep 2013 and Aug-Nov 2014 only
+. preserve
+
+. keep if year == 2013 | (year == 2014 & interview_month >= 8 & interview_month <= 11)
+(63,255 observations deleted)
+
+. 
+. di "=========================================="
+==========================================
+
+. di "SAMPLE: 2013 vs Aug-Nov 2014"
+SAMPLE: 2013 vs Aug-Nov 2014
+
+. di "=========================================="
+==========================================
+
+. tab year agri
+
+           |         agri
+      Year |         0          1 |     Total
+-----------+----------------------+----------
+      2013 |     8,323        368 |     8,691 
+      2014 |     5,894        255 |     6,149 
+-----------+----------------------+----------
+     Total |    14,217        623 |    14,840 
+
+. 
+. di ""
+
+
+. di "Mean wages:"
+Mean wages:
+
+. table year agri, stat(mean wage_month) stat(mean ln_wage) stat(count ln_wage)
+
+-----------------------------------------------------------------------
+                                      |               agri             
+                                      |         0          1      Total
+--------------------------------------+--------------------------------
+Year                                  |                                
+  2013                                |                                
+    Mean                              |                                
+      After-tax wages last 30d--job 1 |  21540.88   12565.82   21160.85
+      ln_wage                         |  9.750883   9.243885   9.729415
+    Number of nonmissing values       |                                
+      ln_wage                         |     8,323        368      8,691
+  2014                                |                                
+    Mean                              |                                
+      After-tax wages last 30d--job 1 |  22581.26    16168.1   22315.31
+      ln_wage                         |  9.812751   9.414547   9.796237
+    Number of nonmissing values       |                                
+      ln_wage                         |     5,894        255      6,149
+  Total                               |                                
+    Mean                              |                                
+      After-tax wages last 30d--job 1 |  21972.19   14040.27    21639.2
+      ln_wage                         |  9.776532   9.313738   9.757103
+    Number of nonmissing values       |                                
+      ln_wage                         |    14,217        623     14,840
+-----------------------------------------------------------------------
+
+. 
+. di ""
+
+
+. di "=========================================="
+==========================================
+
+. di "REGRESSION RESULTS"
+REGRESSION RESULTS
+
+. di "=========================================="
+==========================================
+
+. 
+. di ""
+
+
+. di "Model 1: Basic DiD (no controls)"
+Model 1: Basic DiD (no controls)
+
+. reg ln_wage agri_x_post agri post_embargo, cluster(region)
+
+Linear regression                               Number of obs     =     14,840
+                                                F(3, 37)          =      34.64
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0214
+                                                Root MSE          =     .66988
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ agri_x_post |    .108794     .04712     2.31   0.027     .0133198    .2042682
+        agri |  -.5069983   .0683223    -7.42   0.000    -.6454325   -.3685641
+post_embargo |   .0618679   .0107921     5.73   0.000     .0400009    .0837349
+       _cons |   9.750883    .064484   151.21   0.000     9.620226     9.88154
+------------------------------------------------------------------------------
+
+. 
+. di ""
+
+
+. di "Model 2: With controls"
+Model 2: With controls
+
+. reg ln_wage agri_x_post agri post_embargo age age_sq female i.educ_cat, cluster(region)
+
+Linear regression                               Number of obs     =     14,825
+                                                F(9, 37)          =     138.98
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.1616
+                                                Root MSE          =     .62019
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ agri_x_post |   .1187093   .0450377     2.64   0.012     .0274541    .2099644
+        agri |  -.4775603   .0619238    -7.71   0.000    -.6030299   -.3520907
+post_embargo |   .0606026   .0106912     5.67   0.000     .0389402     .082265
+         age |   .0512346   .0046565    11.00   0.000     .0417997    .0606694
+      age_sq |  -.0006945   .0000561   -12.38   0.000    -.0008082   -.0005808
+      female |  -.4046265   .0176522   -22.92   0.000    -.4403933   -.3688596
+             |
+    educ_cat |
+          2  |   .5245758   .2432597     2.16   0.038     .0316849    1.017467
+          3  |   .6089755   .2423784     2.51   0.016     .1178703    1.100081
+          4  |   .8721939   .2495656     3.49   0.001     .3665259    1.377862
+             |
+       _cons |   8.362452   .2784534    30.03   0.000     7.798252    8.926652
+------------------------------------------------------------------------------
+
+. 
+. di ""
+
+
+. di "Model 3: With region FE"
+Model 3: With region FE
+
+. reghdfe ln_wage agri_x_post agri age age_sq female i.educ_cat, absorb(region year) cluster(region)
+(MWFE estimator converged in 3 iterations)
+
+HDFE Linear regression                            Number of obs   =     14,825
+Absorbing 2 HDFE groups                           F(   8,     37) =     172.16
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.3630
+                                                  Adj R-squared   =     0.3610
+                                                  Within R-sq.    =     0.1815
+Number of clusters (region)  =         38         Root MSE        =     0.5413
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ agri_x_post |   .0933944   .0455291     2.05   0.047     .0011437     .185645
+        agri |  -.2367832   .0420996    -5.62   0.000    -.3220852   -.1514813
+         age |   .0627996   .0037679    16.67   0.000      .055165    .0704342
+      age_sq |  -.0008276   .0000462   -17.93   0.000    -.0009212   -.0007341
+      female |  -.4042574   .0204724   -19.75   0.000    -.4457384   -.3627764
+             |
+    educ_cat |
+          2  |   .3978568    .155559     2.56   0.015     .0826643    .7130493
+          3  |   .4768992     .15145     3.15   0.003     .1700324     .783766
+          4  |   .7136378   .1510265     4.73   0.000     .4076289    1.019647
+             |
+       _cons |   8.292105   .1743163    47.57   0.000     7.938906    8.645303
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+      region |        38          38           0    *|
+        year |         2           0           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. restore
+
+. 
+. di ""
+
+
+. di "=========================================="
+==========================================
+
+. di "FULL TIMING MODEL: 2012-2016"
+FULL TIMING MODEL: 2012-2016
+
+. di "=========================================="
+==========================================
+
+. 
+. * Full timing comparison
+. preserve
+
+. keep if year >= 2012 & year <= 2016
+(38,569 observations deleted)
+
+. 
+. * Create period variable
+. gen period = year
+
+. * Aug-Nov 2014 coded as 2014
+. replace period = 2014 if year == 2014 & interview_month >= 8 & interview_month <= 11
+(0 real changes made)
+
+. * Drop other 2014 obs
+. replace period = . if year == 2014 & interview_month < 8
+(94 real changes made, 94 to missing)
+
+. replace period = . if year == 2014 & interview_month == 12
+(1,116 real changes made, 1,116 to missing)
+
+. keep if period != .
+(1,210 observations deleted)
+
+. 
+. gen agri_2012 = agri * (period == 2012)
+
+. gen agri_2014 = agri * (period == 2014)
+
+. gen agri_2015 = agri * (period == 2015)
+
+. gen agri_2016 = agri * (period == 2016)
+
+. 
+. di "Sample:"
+Sample:
+
+. tab period agri
+
+           |         agri
+    period |         0          1 |     Total
+-----------+----------------------+----------
+      2012 |     8,616        413 |     9,029 
+      2013 |     8,323        368 |     8,691 
+      2014 |     5,894        255 |     6,149 
+      2015 |     6,897        253 |     7,150 
+      2016 |     7,036        261 |     7,297 
+-----------+----------------------+----------
+     Total |    36,766      1,550 |    38,316 
+
+. 
+. di ""
+
+
+. di "Event study (ref = 2013):"
+Event study (ref = 2013):
+
+. reg ln_wage agri_2012 agri_2014 agri_2015 agri_2016 agri i.period ///
+>     age age_sq female i.educ_cat, cluster(region)
+
+Linear regression                               Number of obs     =     38,243
+                                                F(15, 37)         =     163.22
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.1806
+                                                Root MSE          =      .6189
+
+                                (Std. err. adjusted for 38 clusters in region)
+------------------------------------------------------------------------------
+             |               Robust
+     ln_wage | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   agri_2012 |   .0478764   .0466771     1.03   0.312    -.0467003    .1424531
+   agri_2014 |   .1178377   .0446795     2.64   0.012     .0273085    .2083669
+   agri_2015 |   .1598777   .0526221     3.04   0.004     .0532553    .2665001
+   agri_2016 |   .1529902   .0698109     2.19   0.035     .0115398    .2944405
+        agri |  -.4776232    .061512    -7.76   0.000    -.6022583   -.3529881
+             |
+      period |
+       2013  |   .0888015   .0162364     5.47   0.000     .0559034    .1216995
+       2014  |   .1493887   .0154105     9.69   0.000     .1181642    .1806133
+       2015  |   .2124225    .018341    11.58   0.000     .1752601    .2495849
+       2016  |   .2579134   .0217586    11.85   0.000     .2138263    .3020005
+             |
+         age |    .052784   .0044968    11.74   0.000     .0436726    .0618954
+      age_sq |  -.0007076   .0000534   -13.26   0.000    -.0008158   -.0005995
+      female |  -.4085957   .0177543   -23.01   0.000    -.4445693   -.3726221
+             |
+    educ_cat |
+          2  |   .4395022    .196784     2.23   0.032       .04078    .8382245
+          3  |   .5189545   .1986239     2.61   0.013     .1165041    .9214048
+          4  |   .7925496   .2066692     3.83   0.000      .373798    1.211301
+             |
+       _cons |   8.319983   .2309784    36.02   0.000     7.851976     8.78799
+------------------------------------------------------------------------------
+
+. 
+. di ""
+
+
+. di "=========================================="
+==========================================
+
+. di "INTERPRETATION"
+INTERPRETATION
+
+. di "=========================================="
+==========================================
+
+. di "agri_2012: Pre-trend (should be ~0)"
+agri_2012: Pre-trend (should be ~0)
+
+. di "agri_2014: Aug-Nov 2014 effect (KEY - post-embargo, pre-crash)"
+agri_2014: Aug-Nov 2014 effect (KEY - post-embargo, pre-crash)
+
+. di "agri_2015: 2015 effect (post-crash)"
+agri_2015: 2015 effect (post-crash)
+
+. di "agri_2016: 2016 effect (long-run)"
+agri_2016: 2016 effect (long-run)
+
+. di ""
+
+
+. di "If agri_2014 > 0, effects appeared BEFORE ruble crash"
+If agri_2014 > 0, effects appeared BEFORE ruble crash
+
+. 
+. restore
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/timing/run_timing2_log.txt
+  log type:  text
+ closed on:  10 Feb 2026, 10:59:50
+--------------------------------------------------------------------------------------------------------

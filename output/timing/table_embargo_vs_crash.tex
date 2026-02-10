@@ -1,0 +1,43 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Separating Embargo Effect from Ruble Crash}
+\begin{tabular}{l*{5}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+                    &\multicolumn{1}{c}{Standard DiD}&\multicolumn{1}{c}{Post-Embargo}&\multicolumn{1}{c}{Post-Crash}&\multicolumn{1}{c}{Aug-Nov Only}&\multicolumn{1}{c}{Full Timing}\\
+\midrule
+Agri $\times$ Post-2014&       0.031         &                     &                     &                     &                     \\
+                    &     (0.031)         &                     &                     &                     &                     \\
+\addlinespace
+Agri $\times$ Post-Embargo (Aug 2014+)&                     &       0.031         &                     &                     &                     \\
+                    &                     &     (0.031)         &                     &                     &                     \\
+\addlinespace
+Agri $\times$ Post-Crash (Dec 2014+)&                     &                     &       0.047\sym{*}  &                     &                     \\
+                    &                     &                     &     (0.027)         &                     &                     \\
+\addlinespace
+Agri $\times$ Aug-Nov 2014&                     &                     &                     &       0.006         &                     \\
+                    &                     &                     &                     &     (0.046)         &                     \\
+\addlinespace
+Agri $\times$ Jan-Jul 2014&                     &                     &                     &                     &       0.000         \\
+                    &                     &                     &                     &                     &         (.)         \\
+\addlinespace
+Agri $\times$ Aug-Nov 2014 (KEY)&                     &                     &                     &                     &      -0.023         \\
+                    &                     &                     &                     &                     &     (0.040)         \\
+\addlinespace
+Agri $\times$ Dec 2014&                     &                     &                     &                     &      -0.064         \\
+                    &                     &                     &                     &                     &     (0.087)         \\
+\addlinespace
+Agri $\times$ 2015+ &                     &                     &                     &                     &       0.045         \\
+                    &                     &                     &                     &                     &     (0.031)         \\
+\midrule
+Observations        &   72904.000         &   72904.000         &   72904.000         &   36130.000         &   72904.000         \\
+Adj. R-squared      &       0.755         &       0.755         &       0.755         &       0.762         &       0.755         \\
+Individual FE       &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         \\
+Year FE             &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         \\
+\bottomrule
+\multicolumn{6}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{6}{l}{\footnotesize Key test: Column 4 shows effect in Aug-Nov 2014 (after embargo, before crash).}\\
+\multicolumn{6}{l}{\footnotesize Significant effect in this window supports import substitution, not just depreciation.}\\
+\multicolumn{6}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

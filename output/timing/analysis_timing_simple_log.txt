@@ -1,0 +1,22 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/amalkova/Library/CloudStorage/OneDrive-FloridaInstituteofTechnology/Working santctio
+> ns/output/timing/analysis_timing_simple_log.txt
+  log type:  text
+ opened on:  10 Feb 2026, 10:53:11
+
+. 
+. ********************************************************************************
+. * Load prepared data
+. ********************************************************************************
+. 
+. use "output/timing/rlms_timing_sample.dta", clear
+
+. 
+. * Recreate key variables
+. gen agri = (industry == 8)
+variable agri already defined
+r(110);
+
+end of do-file
+r(110);
