@@ -1,0 +1,2 @@
+method,coefficient,std_error,p_value,ci_lower,ci_upper,n_controls_selected,controls_selected,n_obs
+Post-Double-Selection LASSO,0.08916721695030305,0.04301337325458022,0.038171210325306196,0.004861005371325819,0.17347342852928027,20,"year, id_h, age, age_sq, agri, treated_sector, post, treated_post, D_m4, D_m3, D_p0, D_p1, D_p2, D_p3, D_p4, D_p5, educ_0, educ_1, educ_2, educ_3",78095
