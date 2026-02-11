@@ -227,6 +227,8 @@ The LASSO-selected specification yields $\hat{\beta} = 0.089$ (SE = 0.043, $p = 
     \item The effect survives a specification designed to minimize both omitted variable bias and overfitting
 \end{itemize}
 
+Notably, the LASSO procedure retained 20 of 25 candidate controls, suggesting that the original specification was already well-specified. The modest reduction reflects removal of five irrelevant covariates rather than discovery of major omitted variables. This is reassuring: the original research design was sound, and the LASSO refinement provides marginal improvements in precision.
+
 %==============================================================================
 \section{Evidence 4: Causal Forest Heterogeneity Analysis}
 %==============================================================================
@@ -256,11 +258,11 @@ We implement the X-learner variant:
 
 \begin{table}[htbp]
 \centering
-\caption{Causal Forest: Distribution of Individual Treatment Effects}
+\caption{Causal Forest: Conditional Wage Gap Between Agricultural and Non-Agricultural Workers}
 \label{tab:cf_dist}
 \begin{tabular}{lc}
 \toprule
-Statistic & $\hat{\tau}(x)$ \\
+Statistic & $\hat{\tau}(x)$ (Wage Gap) \\
 \midrule
 Mean & $-$0.321 \\
 Std. Dev. & 0.206 \\
@@ -268,14 +270,18 @@ Std. Dev. & 0.206 \\
 Median & $-$0.311 \\
 90th percentile & $-$0.088 \\
 \midrule
-Pre-2014 mean & $-$0.376 \\
-Post-2014 mean & $-$0.276 \\
-\textbf{Difference (DiD)} & \textbf{+0.101} \\
+Pre-2014 mean gap & $-$0.376 \\
+Post-2014 mean gap & $-$0.276 \\
+\textbf{Narrowing of gap (DiD)} & \textbf{+0.101} \\
 \bottomrule
+\multicolumn{2}{l}{\footnotesize Note: $\hat{\tau}(x)$ estimates the wage gap $E[Y(1) - Y(0) | X]$. Negative values}\\
+\multicolumn{2}{l}{\footnotesize indicate agriculture pays less. The pre-post comparison is descriptive.}
 \end{tabular}
 \end{table}
 
-The mean $\tau(x) = -0.321$ represents the average agricultural wage \emph{penalty} (agriculture pays less than other sectors). The key finding is the \textbf{difference by period}: the penalty decreased from $-0.376$ pre-embargo to $-0.276$ post-embargo, implying a DiD effect of $+0.101$ (10.1\%)---consistent with LASSO (8.9\%) and event study (11.8\%) estimates.
+The causal forest estimates the \emph{conditional wage gap} between agricultural and non-agricultural workers: $\hat{\tau}(x) = E[\ln w^{\text{agri}} - \ln w^{\text{other}} | X]$. Negative values indicate that agricultural workers earn less than observationally similar workers in other sectors. The key finding is that this gap \textbf{narrowed} after the embargo: from $-0.376$ pre-2014 to $-0.276$ post-2014. This narrowing of 10.1 percentage points represents the treatment effect---consistent with LASSO (8.9\%) and event study (11.8\%) estimates.
+
+\textit{Note on inference:} Causal forests provide valid pointwise inference for individual $\hat{\tau}(x_i)$, but the aggregate pre-post comparison reported here is descriptive rather than a formal hypothesis test. The consistency with other methods provides indirect validation.
 
 \subsection{Variable Importance}
 
@@ -355,14 +361,15 @@ Method & Estimate & SE & $p$-value \\
 \midrule
 Event Study (Oct--Nov 2014) & 0.118 & 0.045 & 0.012 \\
 Post-Double-Selection LASSO & 0.089 & 0.043 & 0.038 \\
-Causal Forest (X-Learner) & 0.101 & --- & --- \\
+Causal Forest (X-Learner)$^a$ & 0.101 & --- & --- \\
 \midrule
 \textbf{Average} & \textbf{0.103} & & \\
 \bottomrule
+\multicolumn{4}{l}{\footnotesize $^a$ Descriptive pre-post comparison; formal inference requires bootstrap.}
 \end{tabular}
 \end{table}
 
-All three methods yield estimates in the range of 9--12\%, with an average of approximately 10\%. This consistency across specifications with different assumptions strengthens confidence in the causal interpretation.
+All three methods yield estimates in the range of 9--12\%, with an average of approximately 10\%. The event study and LASSO estimates are statistically significant; the causal forest estimate is a descriptive comparison that corroborates the magnitude. This consistency across specifications with fundamentally different assumptions---parametric DiD, data-driven control selection, and nonparametric machine learning---strengthens confidence in the causal interpretation.
 
 \subsection{Limitations}
 
